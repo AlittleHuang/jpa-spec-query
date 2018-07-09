@@ -564,7 +564,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     private Path<?> getPath(String name) {
-        return getPath(conditions.root, name);
+        return Criteria.getPath(conditions.root, name);
     }
 
     static class Conditions<T> {
