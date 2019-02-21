@@ -1,37 +1,42 @@
 package com.github.jpa.spec;
 
+import lombok.Setter;
+import lombok.experimental.Delegate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.cglib.proxy.Enhancer;
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CriteriaImpl<T> implements Criteria<T> {
 
-    private static final Log logger = LogFactory.getLog(Criteria.class);
+    private static final Log logger = LogFactory.getLog(CriteriaImpl.class);
 
-    private final Conditions<T> conditions;
+    @Delegate
+    private final Conditions conditions;
     private Predicate.BooleanOperator operator = Predicate.BooleanOperator.AND;
     private Predicate predicate;
 
-    List<Criteria<T>> criterias;
-
-    public CriteriaImpl(Root<T> root, CriteriaQuery<?> query,
-                        CriteriaBuilder criteriaBuilder) {
-        this.conditions = new Conditions(root, query, criteriaBuilder, this);
-    }
+    private List<Criteria<T>> ands;
+    private List<Criteria<T>> ors;
 
     public CriteriaImpl(EntityManager em, Class<T> entityType) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<?> query = criteriaBuilder.createQuery();
         Root<T> root = query.from(entityType);
-        this.conditions = new Conditions<>(root, query, criteriaBuilder, this);
+        this.conditions = new Conditions(root, query, criteriaBuilder, em, this);
     }
 
     private CriteriaImpl(Conditions conditions) {
@@ -45,38 +50,53 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return this;
     }
 
-
-    private void add(Criteria<T> criteria) {
-        if (criterias == null) {
-            criterias = new ArrayList<>();
+    private void add2And(Criteria<T> criteria) {
+        if (ands == null) {
+            ands = new ArrayList<>();
         }
-        criterias.add(criteria);
+        ands.add(criteria);
+    }
+
+    private void add2Or(Criteria<T> criteria) {
+        if (ors == null) {
+            ors = new ArrayList<>();
+        }
+        ors.add(criteria);
     }
 
     /**
      * 返回一个新的Criteria,与原Criteria以AND条件链接
      */
     @Override
-    public Criteria and() {
+    public Criteria<T> and() {
         CriteriaImpl<T> criteria = new CriteriaImpl<>(conditions);
-        add(criteria);
+        add2And(criteria);
         return criteria;
     }
 
+    /**
+     * 返回一个新的Criteria,与原Criteria以OR条件链接
+     */
     @Override
-    public Criteria or() {
+    public Criteria<T> or() {
         CriteriaImpl<T> criteria = new CriteriaImpl<>(conditions);
         criteria.operator(Predicate.BooleanOperator.OR);
-        add(criteria);
+        add2Or(criteria);
         return criteria;
     }
 
-    private Criteria<T> or(Predicate restriction) {
-        if (predicate != null)
-            predicate = conditions.cb.or(predicate, restriction);
-        else
-            predicate = conditions.cb.or(restriction);
+    private Criteria<T> or(Predicate append) {
+        predicate = appendOr(predicate, append);
         return this;
+    }
+
+    private Predicate appendOr(Predicate predicate, Predicate append) {
+        Predicate result = predicate;
+        if (result != null)
+            result = conditions.cb.or(result, append);
+        else
+            result = conditions.cb.or(append);
+        return result;
     }
 
     private Criteria<T> orNot(Predicate restriction) {
@@ -88,11 +108,17 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     private Criteria<T> and(Predicate restriction) {
-        if (predicate != null)
-            predicate = conditions.cb.and(predicate, restriction);
-        else
-            predicate = conditions.cb.and(restriction);
+        predicate = appendAnd(predicate, restriction);
         return this;
+    }
+
+    private Predicate appendAnd(Predicate predicate, Predicate append) {
+        Predicate result = predicate;
+        if (result != null)
+            result = conditions.cb.and(result, append);
+        else
+            result = conditions.cb.and(append);
+        return result;
     }
 
     private Criteria<T> andNot(Predicate restriction) {
@@ -111,22 +137,22 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public Criteria<T> andEqualAsPath(String path, String other) {
-        return and(conditions.cb.equal(getPath(path), getPath(path)));
+        return and(conditions.cb.equal(getPath(path), getPath(other)));
     }
 
     @Override
     public Criteria<T> orEqualAsPath(String path, String other) {
-        return or(conditions.cb.equal(getPath(path), getPath(path)));
+        return or(conditions.cb.equal(getPath(path), getPath(other)));
     }
 
     @Override
     public Criteria<T> andNotEqualAsPath(String path, String other) {
-        return andNot(conditions.cb.equal(getPath(path), getPath(path)));
+        return andNot(conditions.cb.equal(getPath(path), getPath(other)));
     }
 
     @Override
-    public Criteria<T> orNotNotEqualAsPath(String path, String other) {
-        return orNot(conditions.cb.equal(getPath(path), getPath(path)));
+    public Criteria<T> orNotEqualAsPath(String path, String other) {
+        return orNot(conditions.cb.equal(getPath(path), getPath(other)));
     }
 
     @Override
@@ -141,7 +167,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
-    public Criteria<T> orNotNotEqual(String name, Object value) {
+    public Criteria<T> orNotEqual(String name, Object value) {
         return value == null ? this
                 : orNot(conditions.cb.equal(getPath(name), value));
     }
@@ -173,7 +199,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
     /**
      * 忽略空字符串
      */
-    public Criteria<T> orNotNotEqIgnoreEmpty(String name, Object value) {
+    public Criteria<T> orNotEqIgnoreEmpty(String name, Object value) {
         return isEmpty(value) ? this
                 : orNot(conditions.cb.equal(getPath(name), value));
     }
@@ -184,8 +210,14 @@ public class CriteriaImpl<T> implements Criteria<T> {
             Y value,
             Class<Y> type) {
         return isEmpty(value) ? this
-                : and(conditions.cb
-                .greaterThanOrEqualTo(getPath(name).as(type), value));
+                : and(conditions.cb.greaterThanOrEqualTo(getPath(name).as(type), value));
+    }
+
+    @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> andGe(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : and(conditions.cb.greaterThanOrEqualTo(path, value));
     }
 
     @Override
@@ -199,12 +231,26 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> orGe(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : or(conditions.cb.greaterThanOrEqualTo(path, value));
+    }
+
+    @Override
     public <Y extends Comparable<? super Y>> Criteria<T> andGt(
             String name,
             Y value,
             Class<Y> type) {
         return isEmpty(value) ? this : and(
                 conditions.cb.greaterThan(getPath(name).as(type), value));
+    }
+
+    @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> andGt(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : and(conditions.cb.greaterThan(path, value));
     }
 
     @Override
@@ -216,11 +262,26 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> orGt(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : or(conditions.cb.greaterThan(path, value));
+    }
+
+    @Override
     public <Y extends Comparable<? super Y>> Criteria<T> andLe(
             String name,
             Y value,
             Class<Y> type) {
         return isEmpty(value) ? this : and(conditions.cb.lessThanOrEqualTo(getPath(name).as(type), value));
+    }
+
+
+    @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> andLe(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : and(conditions.cb.lessThanOrEqualTo(path, value));
     }
 
     @Override
@@ -232,6 +293,13 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> orLe(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : or(conditions.cb.lessThanOrEqualTo(path, value));
+    }
+
+    @Override
     public <Y extends Comparable<? super Y>> Criteria<T> andLt(
             String name,
             Y value,
@@ -240,11 +308,25 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> andLt(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : and(conditions.cb.lessThan(path, value));
+    }
+
+    @Override
     public <Y extends Comparable<? super Y>> Criteria<T> orLt(
             String name,
             Y value,
             Class<Y> type) {
         return isEmpty(value) ? this : or(conditions.cb.lessThan(getPath(name).as(type), value));
+    }
+
+    @Override
+    public <Y extends Comparable<? super Y>> Criteria<T> orLt(String name, Y value) {
+        Path path = getPath(name);
+        //noinspection unchecked
+        return isEmpty(value) ? this : or(conditions.cb.lessThan(path, value));
     }
 
     @Override
@@ -337,6 +419,16 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
+    public Criteria<T> orIsNotNull(String name) {
+        return or(conditions.cb.isNotNull(getPath(name)));
+    }
+
+    @Override
+    public Criteria<T> orIsNull(String name) {
+        return or(conditions.cb.isNull(getPath(name)));
+    }
+
+    @Override
     public Criteria<T> andLike(String name, String value) {
         return isEmpty(value) ? this : and(conditions.cb.like(getPath(name).as(String.class), value));
     }
@@ -358,7 +450,12 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <X> Criteria<T> andIn(String name, Collection<X> value) {
-        if (value.isEmpty()) return this;
+        if (value.isEmpty()) {
+            return andNotEqualAsPath(name, name);
+        }
+        if (value.size() == 1) {
+            return andEqual(name, value.iterator().next());
+        }
         CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
         for (X x : value) {
             in.value(x);
@@ -367,17 +464,17 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <X> Criteria<T> andIn(String name, X... value) {
-        CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
-        for (X x : value) {
-            in.value(x);
-        }
-        return and(in);
+        return andIn(name, Arrays.asList(value));
     }
 
     @Override
     public <X> Criteria<T> andNotIn(String name, Collection<X> value) {
-        //if (value.isEmpty()) return this;
+        if (value.isEmpty()) return this;
+        if (value.size() == 1) {
+            return andNotEqual(name, value.iterator().next());
+        }
         CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
         for (X x : value) {
             in.value(x);
@@ -385,18 +482,20 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return and(in.not());
     }
 
+    @SafeVarargs
     @Override
-    public <X> Criteria<T> andNotIn(String name, X[] value) {
-        CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
-        for (X x : value) {
-            in.value(x);
-        }
-        return and(in.not());
+    public final <X> Criteria<T> andNotIn(String name, X... value) {
+        return andNotIn(name, Arrays.asList(value));
     }
 
     @Override
     public <X> Criteria<T> orIn(String name, Collection<X> value) {
-        if (value.isEmpty()) return this;
+        if (value.isEmpty()) {
+            return orNotEqualAsPath(name, name);
+        }
+        if (value.size() == 1) {
+            return orEqual(name, value.iterator().next());
+        }
         CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
         for (X x : value) {
             in.value(x);
@@ -404,18 +503,20 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return or(in);
     }
 
+    @SafeVarargs
     @Override
-    public <X> Criteria<T> orIn(String name, X[] value) {
-        CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
-        for (X x : value) {
-            in.value(x);
-        }
-        return or(in);
+    public final <X> Criteria<T> orIn(String name, X... value) {
+        return orIn(name, Arrays.asList(value));
     }
 
     @Override
     public <X> Criteria<T> orNotIn(String name, Collection<X> value) {
-        if (value.isEmpty()) return this;
+        if (value.isEmpty()) {
+            return this;
+        }
+        if (value.size() == 1) {
+            return orNotEqual(name, value.iterator().next());
+        }
         CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
         for (X x : value) {
             in.value(x);
@@ -423,22 +524,38 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return or(in.not());
     }
 
+    @SafeVarargs
     @Override
-    public <X> Criteria<T> orNotIn(String name, X[] value) {
-        CriteriaBuilder.In<Object> in = conditions.cb.in(getPath(name));
-        for (X x : value) {
-            in.value(x);
-        }
-        return or(in.not());
+    public final <X> Criteria<T> orNotIn(String name, X... value) {
+        return orNotIn(name, Arrays.asList(value));
     }
 
     @Override
     public Predicate toPredicate() {
-        if (criterias == null)
-            return predicate;
-        if (predicate != null)
-            return conditions.cb.and(predicate, toPredicate(criterias));
-        return toPredicate(criterias);
+        Predicate result = this.predicate;
+        if (ands != null && !ands.isEmpty()) {
+            result = appendAnd(result, toPredicate(ands));
+        }
+        if (ors != null && !ors.isEmpty()) {
+            result = appendOr(result, toPredicate(ors));
+        }
+        if (result == null) {
+            result = conditions.cb.and();
+        }
+        return result;
+    }
+
+    @Override
+    public Criteria<T> setLockMode(LockModeType lockMode) {
+        this.conditions.lockModeType = lockMode;
+        return this;
+    }
+
+    @Override
+    public Criteria<T> fetch(Getters<T, ?> getters) {
+        String attributeName = getAttributeNameByGetter(getters);
+        conditions.root.fetch(attributeName);
+        return this;
     }
 
     private boolean isEmpty(Object str) {
@@ -470,6 +587,12 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
+    public Class<T> getType() {
+        //noinspection unchecked
+        return (Class<T>) conditions.root.getJavaType();
+    }
+
+    @Override
     public Criteria<T> setPageable(Pageable pageable) {
         conditions.setPageable(pageable);
         return this;
@@ -495,12 +618,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
     @Override
     public Criteria<T> groupBy(String... attributes) {
         conditions.groupBy(attributes);
-        return this;
-    }
-
-    @Override
-    public Criteria<T> criteria() {
-        conditions.criteria();
         return this;
     }
 
@@ -534,31 +651,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
-    public Page<T> getPage(Pageable pageable) {
-        return conditions.getPage(pageable);
-    }
-
-    @Override
-    public Pageable getPageable() {
-        return conditions.getPageable();
-    }
-
-    @Override
-    public long count() {
-        return conditions.count();
-    }
-
-    @Override
-    public List<?> getObjList() {
-        return conditions.getObjList();
-    }
-
-    @Override
-    public List<T> getList() {
-        return conditions.getList();
-    }
-
-    @Override
     public Predicate.BooleanOperator getOperator() {
         return operator;
     }
@@ -567,11 +659,32 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return Criteria.getPath(conditions.root, name);
     }
 
-    static class Conditions<T> {
+    @Override
+    public String getAttributeNameByGetter(Getters<T, ?> getters) {
+        List<Getters> list = getters.list();
+        //noinspection unchecked
+        String result = getPropertyNameFromGetter(getType(), list.get(0));
+        int size = list.size();
+        if (size <= 1) {
+            return result;
+        }
+        StringBuilder sb = new StringBuilder(result);
+        String last = result;
+        Path path = conditions.root;
+        for (int i = 1; i < size; i++) {
+            path = path.get(last);
+            //noinspection unchecked
+            last = getPropertyNameFromGetter(path.getJavaType(), list.get(i));
+            sb.append('.').append(last);
+        }
+        return sb.toString();
+    }
+
+    private class Conditions {
 
         private final List<Selection<?>> selections = new ArrayList<>();
 
-        private final List<Expression<?>> grouping = new ArrayList<>();
+        private final List<Expression<?>> groupings = new ArrayList<>();
 
         private final List<Order> orders = new ArrayList<>();
 
@@ -593,48 +706,52 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
         private CriteriaQuery<?> query;
 
+        @Setter
+        private LockModeType lockModeType;
+        private boolean emptyPage;
 
-        private CriteriaQuery<?> getCriteriaQuery() {
-            return query;
+        private JpaEntityInformation entityInformation;
+
+        private Conditions(Root<T> root,
+                           CriteriaQuery<?> query,
+                           CriteriaBuilder criteriaBuilder,
+                           EntityManager entityManager,
+                           Criteria<T> criteriaRoot) {
+            this.cb = criteriaBuilder;
+            this.root = root;
+            this.query = query;
+            this.criteriaRoot = criteriaRoot;
+            this.entityManager = entityManager;
+
         }
 
-
-        private CriteriaBuilder getCb() {
-            return cb;
-        }
-
-
-        private Root<T> getRoot() {
-            return root;
-        }
-
-
-        private Page<T> getPage(Pageable pageable) {
+        public Page<T> getPage(Pageable pageable) {
             if (emptyPage) {
                 return Page.empty();
             }
             Assert.notNull(pageable, "pageable must not be null");
             long count = count();
             CriteriaQuery<T> entityQuery = initQuery();
-            List<Order> pOrders = new ArrayList<>();
-            Sort sort = pageable.getSort();
+            List<Order> orderList = new ArrayList<>();
+            Sort sort = pageable.isPaged() ? pageable.getSort() : Sort.unsorted();
+
             if (sort != null) {
                 for (Sort.Order order : sort) {
                     String property = order.getProperty();
                     switch (order.getDirection()) {
                         case ASC:
-                            pOrders.add(cb.asc(getPath(property)));
+                            orderList.add(cb.asc(getPath(property)));
                             break;
                         case DESC:
-                            pOrders.add(cb.desc(getPath(property)));
+                            orderList.add(cb.desc(getPath(property)));
                             break;
                     }
                 }
             }
             List<Order> orders = entityQuery.getOrderList();
-            pOrders.addAll(orders);
-            entityQuery.orderBy(pOrders);
-            TypedQuery<T> tQuery = getRootQuery();
+            orderList.addAll(orders);
+            entityQuery.orderBy(orderList);
+            TypedQuery<T> tQuery = entityManager.createQuery(entityQuery.select(root));
             tQuery.setFirstResult((int) pageable.getOffset());
             int pageSize = pageable.getPageSize();
             if (maxIndex != null) {
@@ -650,8 +767,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
             return page;
         }
 
-
-        private long count() {
+        public long count() {
             CriteriaQuery<?> query = initQuery();
             @SuppressWarnings("unchecked")
             CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) query;
@@ -659,30 +775,37 @@ public class CriteriaImpl<T> implements Criteria<T> {
             return entityManager.createQuery(countQuery).getSingleResult();
         }
 
-
-        private List<?> getObjList() {
-            return entityManager.createQuery(initQuery()).getResultList();
+        public boolean exists() {
+            CriteriaQuery<?> query = initQuery();
+            //noinspection unchecked
+            query.select(root.get(getEntityInformation().getIdAttribute()));
+            return !entityManager.createQuery(query)
+                    .setLockMode(lockModeType == null ? LockModeType.NONE : lockModeType)
+                    .setMaxResults(1)
+                    .getResultList()
+                    .isEmpty();
         }
 
+        public List<?> getObjList() {
+            return entityManager.createQuery(initQuery().multiselect(selections)).getResultList();
+        }
 
-        private List<T> getList() {
+        public List<T> getList() {
             return getRootQuery().getResultList();
         }
 
-
-        private Pageable getPageable() {
+        public Pageable getPageable() {
             return pageable;
         }
 
-
-        private Conditions(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder, Criteria<T> criteriaRoot) {
-            this.cb = criteriaBuilder;
-            this.root = root;
-            this.query = query;
-            this.criteriaRoot = criteriaRoot;
+        /**
+         * 设置分页条件
+         *
+         * @param pageable 分页条件
+         */
+        private void setPageable(Pageable pageable) {
+            this.pageable = pageable;
         }
-
-        private boolean emptyPage;
 
         /**
          * 设置分页条件
@@ -690,7 +813,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
          * @param offset     开始位置
          * @param maxResults 每页数量
          */
-
         private void limit(int offset, int maxResults) {
             this.offset = offset;
             this.maxResults = maxResults;
@@ -706,7 +828,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
             this.maxResults = maxResults;
         }
 
-
         private void limitMaxIndex(int maxIndex) {
             this.maxIndex = maxIndex;
         }
@@ -717,52 +838,15 @@ public class CriteriaImpl<T> implements Criteria<T> {
          * @param page 页码
          * @param size 每页最大记录
          */
-
         private void setPageable(int page, int size) {
             pageable = PageRequest.of(page - 1, size);
         }
-
-        /**
-         * 设置分页条件
-         *
-         * @param pageable 分页条件
-         */
-
-        private void setPageable(Pageable pageable) {
-            this.pageable = pageable;
-        }
-
-
-        private CriteriaBuilder cb() {
-            return cb;
-        }
-
-        private Root<T> root() {
-            return root;
-        }
-
-
-        private Criteria<T> criteria() {
-            return criteriaRoot.and();
-        }
-
-
-        private Criteria<T> or() {
-            return criteria().operator(Predicate.BooleanOperator.OR);
-        }
-
-
-        private Criteria<T> and() {
-            return criteria();
-        }
-
 
         private void addOrderByDesc(String... attributeNames) {
             for (String attributeName : attributeNames) {
                 orders.add(cb.desc(getPath(attributeName)));
             }
         }
-
 
         private void addOrderByAsc(String... attributeNames) {
             for (String attributeName : attributeNames) {
@@ -789,7 +873,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
             return criteria.toPredicate();
         }
 
-
         private void setPageResultEmpty() {
             emptyPage = true;
         }
@@ -807,10 +890,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
             cb.min(path.as(type));
         }
 
-        /**
-         *
-         */
-
         private void addSelectMax(String property) {
             Path<?> path = getPath(property);
             @SuppressWarnings("unchecked")
@@ -818,9 +897,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
             selections.add(cb.max(path.as(type)));
         }
 
-        /**
-         * selel
-         */
 
         private void addSelectSum(String property) {
             Path<?> path = getPath(property);
@@ -829,36 +905,27 @@ public class CriteriaImpl<T> implements Criteria<T> {
             selections.add(cb.sum(path.as(type)));
         }
 
-        /**
-         *
-         */
-
         private void groupBy(String... attributes) {
             for (String attr : attributes) {
-                grouping.add(getPath(attr));
+                groupings.add(getPath(attr));
             }
 
         }
-        /*  end */
 
         /* 以下private方法 */
 
-        @SuppressWarnings("unchecked")
         private void initQuery(CriteriaQuery<?> query, Predicate predicate) {
             if (query == null)
                 return;
             if (!orders.isEmpty())
                 query.orderBy(orders);
-            if (!grouping.isEmpty())
-                query.groupBy(grouping);
-            if (selections.isEmpty()) {
-                ((CriteriaQuery<T>) query).select(root);
-            } else
-                query.multiselect(selections);
+            if (!groupings.isEmpty())
+                query.groupBy(groupings);
             if (predicate != null)
                 query.where(predicate);
         }
 
+        @SuppressWarnings("unchecked")
         private CriteriaQuery<T> initQuery() {
             initQuery(query, criteriaRoot.toPredicate());
             return (CriteriaQuery<T>) query;
@@ -872,11 +939,96 @@ public class CriteriaImpl<T> implements Criteria<T> {
                     typedQuery.setFirstResult(offset);
                 }
             }
+            if (lockModeType != null) {
+                typedQuery.setLockMode(lockModeType);
+            }
             return typedQuery;
+        }
+
+        private JpaEntityInformation getEntityInformation() {
+            if (entityInformation == null) {
+                entityInformation = JpaEntityInformationSupport.getEntityInformation(root.getJavaType(), entityManager);
+            }
+            return entityInformation;
         }
 
         private Path<?> getPath(String name) {
             return Criteria.getPath(root, name);
         }
+    }
+
+
+    private final static Map<String, String> map = new HashMap<>();
+
+    private static <T> String getPropertyNameFromGetter(Class<T> type, Getters<T, ?> getters) {
+
+        String key = type.getName() + "|" + getters.getClass().getName();
+
+        String name = map.get(key);
+        if (name != null) {
+            return name;
+        } else {
+            synchronized (map) {
+
+                name = map.get(key);
+                if (name != null) {
+                    return name;
+                }
+
+                name = Proxy.getPropertyName(type, getters);
+                map.put(key, name);
+
+                return name;
+
+            }
+        }
+
+    }
+
+    private static class Proxy implements MethodInterceptor {
+
+        private static Map<Class<?>, Object> instanceMap = new ConcurrentHashMap<>();
+        private static Proxy proxy = new Proxy();
+
+        private static <T, U> String getGetterName(Class<T> type, Getters<T, U> getters) {
+            T target = proxy.getProxyInstance(type);
+            try {
+                getters.apply(target);
+            } catch (Exception e) {
+                return e.getMessage();
+            }
+            throw new RuntimeException();
+        }
+
+        private static <T> String getPropertyName(Class<T> type, Getters<T, ?> getters) {
+            String getterName = getGetterName(type, getters);
+            boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
+            Assert.state(check, "the function is not getters");
+            StringBuilder builder = new StringBuilder(getterName.substring(3));
+            if (builder.length() == 1) {
+                return builder.toString().toLowerCase();
+            }
+            if (builder.charAt(1) >= 'A' && builder.charAt(1) <= 'Z') {
+                return builder.toString();
+            }
+            builder.setCharAt(0, Character.toLowerCase(builder.charAt(0)));
+            return builder.toString();
+        }
+
+        private <T> T getProxyInstance(Class<T> type) {
+            //noinspection unchecked
+            return (T) instanceMap.computeIfAbsent(type, it -> {
+                Enhancer enhancer = new Enhancer();
+                enhancer.setSuperclass(type);
+                enhancer.setCallback(this);
+                return enhancer.create();
+            });
+        }
+
+        @Override
+        public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
+            throw new Exception(method.getName());
+        }
+
     }
 }
