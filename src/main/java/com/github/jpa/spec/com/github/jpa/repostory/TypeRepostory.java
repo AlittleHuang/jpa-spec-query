@@ -5,7 +5,7 @@ import com.github.jpa.spec.CriteriaImpl;
 
 import javax.persistence.EntityManager;
 
-public abstract class TypeRepostory<T> {
+public class TypeRepostory<T> {
 
     protected final Class<T> entityType;
     protected final EntityManager entityManager;
@@ -17,6 +17,15 @@ public abstract class TypeRepostory<T> {
 
     public Criteria getCriteria(){
         return new CriteriaImpl<>(entityManager, entityType);
+    }
+
+    public T persist(T entity) {
+        entityManager.persist(entity);
+        return entity;
+    }
+
+    public T merge(T entity) {
+        return entityManager.merge(entity);
     }
 
 

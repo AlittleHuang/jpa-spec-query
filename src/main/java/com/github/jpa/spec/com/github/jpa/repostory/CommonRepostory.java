@@ -7,14 +7,23 @@ import javax.persistence.EntityManager;
 
 public class CommonRepostory {
 
-    protected final EntityManager em;
+    protected final EntityManager entityManager;
 
-    public CommonRepostory(EntityManager em) {
-        this.em = em;
+    public CommonRepostory(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public <T> Criteria<T> getCriteria(Class<T> entityType){
-        return new CriteriaImpl<>(em, entityType);
+        return new CriteriaImpl<>(this.entityManager, entityType);
+    }
+
+    public <T> T persist(T entity) {
+        entityManager.persist(entity);
+        return entity;
+    }
+
+    public <T> T merge(T entity) {
+        return entityManager.merge(entity);
     }
 
 }
