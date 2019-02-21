@@ -154,6 +154,12 @@ public class DemoApplicationTests {
                 .andEqual(User::getName, "Luna")
                 .andEqual(User::getAge, 18)
                 .getOne();
+                
+
+        // select user by company name
+        List<User> list = repostory.getCriteria()
+                .andEqual(Getters.path(User::getCompany).to(Company::getName), "Microsoft")
+                .getList();
 
     }
 
