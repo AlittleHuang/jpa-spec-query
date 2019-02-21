@@ -32,6 +32,12 @@ public class CriteriaImpl<T> implements Criteria<T> {
     private List<Criteria<T>> ands;
     private List<Criteria<T>> ors;
 
+    CriteriaImpl(Root<T> root,
+                        CriteriaQuery<?> query,
+                        CriteriaBuilder criteriaBuilder) {
+        this.conditions = new Conditions(root, query, criteriaBuilder, null, this);
+    }
+
     public CriteriaImpl(EntityManager em, Class<T> entityType) {
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<?> query = criteriaBuilder.createQuery();
