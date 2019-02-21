@@ -964,11 +964,11 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
 
-    private final static Map<String, String> map = new HashMap<>();
+    private final static Map<Class, String> map = new HashMap<>();
 
     private static <T> String getPropertyNameFromGetter(Class<T> type, Getters<T, ?> getters) {
 
-        String key = type.getName() + "|" + getters.getClass().getName();
+        Class key = getters.getClass();
 
         String name = map.get(key);
         if (name != null) {
