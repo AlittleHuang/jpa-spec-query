@@ -56,10 +56,80 @@ CREATE TABLE `user`  (
 INSERT INTO `user` VALUES (1, 18, 1, 'Luna');
 
 SET FOREIGN_KEY_CHECKS = 1;
-
 ```
 
 ## example
+[https://github.com/AlittleHuang/demo-jpa-spec-query](https://github.com/AlittleHuang/demo-jpa-spec-query);
+### dependencies
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.github</groupId>
+        <artifactId>jpa-spec-query</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+</dependencies>
+```
+
+### Company.class
+```java
+@Data
+@Entity
+@Table(name = "company")
+public class Company {
+
+    @Id
+    private Integer id;
+    private String name;
+    private String addr;
+
+}
+```
+
+### User.class
+
+```java
+@Data
+@Entity
+@Table(name = "user")
+public class User {
+
+    @Id
+    private Integer id;
+    private String name;
+    private Integer age;
+
+    @Column(name = "company_id")
+    private Integer companyId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", updatable = false, insertable = false)
+    private Company company;
+
+
+}
+```
+
+### demo
 
 ```java
 
@@ -80,14 +150,15 @@ public class DemoApplicationTests {
                 .andEqual(User::getId, 1)
                 .getOne();
 
-        // System.out.println(selectById.getCompany());//no Session
 
-        //fetch(select user inner join company)
+        // fetch:
+        // select user inner join company
         User fetch = repostory.getCriteria()
                 .andEqual(User::getId, 1)
                 .fetch(User::getCompany)
                 .getOne();
 
+        // System.out.println(selectById.getCompany());//no Session
         System.out.println(fetch.getCompany());//OK
 
         // select by name and age
