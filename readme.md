@@ -1,4 +1,10 @@
-## database
+# Quick start
+
+## example
+
+[https://github.com/AlittleHuang/demo-jpa-spec-query](https://github.com/AlittleHuang/demo-jpa-spec-query);
+
+### database
 
 ```sql
 
@@ -43,8 +49,6 @@ INSERT INTO `user` VALUES (1, 18, 1, 'Luna');
 SET FOREIGN_KEY_CHECKS = 1;
 ```
 
-## example
-[https://github.com/AlittleHuang/demo-jpa-spec-query](https://github.com/AlittleHuang/demo-jpa-spec-query);
 ### dependencies
 
 ```xml
