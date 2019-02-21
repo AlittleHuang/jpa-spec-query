@@ -15,7 +15,7 @@ public class TypeRepostory<T> {
         this.entityManager = entityManager;
     }
 
-    public Criteria getCriteria(){
+    public Criteria<T> getCriteria(){
         return new CriteriaImpl<>(entityManager, entityType);
     }
 
