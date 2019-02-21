@@ -12,7 +12,7 @@ public interface Getters<T, R> {
         return getters;
     }
 
-    default <V> Getters<T, V> to(Getters<? super R, ? extends V> after) {
+    default <V, U extends Getters<? super R, ? extends V>> Getters<T, V> to(U after) {
         Getters<T, R> previous = this;//上一个
         return new Getters<T, V>() {
             List<Getters> list = new ArrayList<>();
@@ -33,7 +33,7 @@ public interface Getters<T, R> {
             }
 
             @Override
-            public <X> Getters<T, X> to(Getters<? super V, ? extends X> after) {
+            public <X, Y extends Getters<? super V, ? extends X>> Getters<T, X> to(Y after) {
                 list.add(after);
                 //noinspection unchecked
                 return (Getters<T, X>) this;
