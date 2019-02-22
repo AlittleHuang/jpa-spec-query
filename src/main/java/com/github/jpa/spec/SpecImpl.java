@@ -11,9 +11,9 @@ import java.util.function.Consumer;
 
 public class SpecImpl<T> implements Specification<T> {
 
-    private final Consumer<Criteria<T>> criteriaConsumer;
+    private final Consumer<CriteriaFilter<T>> criteriaConsumer;
 
-    public SpecImpl(Consumer<Criteria<T>> criteriaConsumer) {
+    public SpecImpl(Consumer<CriteriaFilter<T>> criteriaConsumer) {
         this.criteriaConsumer = criteriaConsumer;
     }
 
@@ -21,16 +21,15 @@ public class SpecImpl<T> implements Specification<T> {
     public Predicate toPredicate(Root<T> root,
                                  CriteriaQuery<?> query,
                                  CriteriaBuilder criteriaBuilder) {
-        Criteria<T> criteria =
+        CriteriaFilter<T> criteria =
                 new CriteriaImpl<>(root, query, criteriaBuilder);
         criteriaConsumer.accept(criteria);
         return criteria.toPredicate();
     }
 
-    public static <T> Specification<T> build(Consumer<Criteria<T>> consumer) {
+    public static <T> Specification<T> build(Consumer<CriteriaFilter<T>> consumer) {
         return ((root, query, criteriaBuilder) -> {
-            Criteria<T> criteria =
-                    new CriteriaImpl<>(root, query, criteriaBuilder);
+            CriteriaFilter<T> criteria = new CriteriaImpl<>(root, query, criteriaBuilder);
             consumer.accept(criteria);
             return criteria.toPredicate();
         });
