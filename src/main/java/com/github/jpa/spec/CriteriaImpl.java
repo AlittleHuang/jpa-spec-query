@@ -50,7 +50,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
-    public Criteria<T> operator(Predicate.BooleanOperator operator) {
+    public Criteria<T> setOperator(Predicate.BooleanOperator operator) {
         if (operator != null)
             this.operator = operator;
         return this;
@@ -86,7 +86,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
     @Override
     public Criteria<T> or() {
         CriteriaImpl<T> criteria = new CriteriaImpl<>(conditions);
-        criteria.operator(Predicate.BooleanOperator.OR);
+        criteria.setOperator(Predicate.BooleanOperator.OR);
         add2Or(criteria);
         return criteria;
     }
@@ -592,10 +592,14 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return this;
     }
 
-    @Override
-    public Class<T> getType() {
+    private Class<T> getType() {
         //noinspection unchecked
         return (Class<T>) conditions.root.getJavaType();
+    }
+
+    @Override
+    public Page<T> getPage() {
+        return getPage(getPageable());
     }
 
     @Override
@@ -614,11 +618,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
     public Criteria<T> addOrderByAsc(String... attributeNames) {
         conditions.addOrderByAsc(attributeNames);
         return this;
-    }
-
-    @Override
-    public void setPageResultEmpty() {
-        conditions.setPageResultEmpty();
     }
 
     @Override
@@ -651,8 +650,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return this;
     }
 
-    @Override
-    public Predicate toPredicate(List<Criteria<T>> criteriaList) {
+    private Predicate toPredicate(List<Criteria<T>> criteriaList) {
         return conditions.toPredicate(criteriaList);
     }
 
@@ -662,7 +660,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     private Path<?> getPath(String name) {
-        return Criteria.getPath(conditions.root, name);
+        return conditions.getPath(conditions.root, name);
     }
 
     @Override
@@ -714,7 +712,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
         @Setter
         private LockModeType lockModeType;
-        private boolean emptyPage;
+//        private boolean emptyPage;
 
         private JpaEntityInformation entityInformation;
 
@@ -732,9 +730,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
         }
 
         public Page<T> getPage(Pageable pageable) {
-            if (emptyPage) {
-                return Page.empty();
-            }
             Assert.notNull(pageable, "pageable must not be null");
             long count = count();
             CriteriaQuery<T> entityQuery = initQuery();
@@ -792,8 +787,10 @@ public class CriteriaImpl<T> implements Criteria<T> {
                     .isEmpty();
         }
 
-        public List<?> getObjList() {
-            return entityManager.createQuery(initQuery().multiselect(selections)).getResultList();
+
+        public <X> List<X> getObjList() {
+            //noinspection unchecked
+            return (List<X>) entityManager.createQuery(initQuery().multiselect(selections)).getResultList();
         }
 
         public List<T> getList() {
@@ -879,10 +876,6 @@ public class CriteriaImpl<T> implements Criteria<T> {
             return criteria.toPredicate();
         }
 
-        private void setPageResultEmpty() {
-            emptyPage = true;
-        }
-
         private void addSelect(String property) {
             Path<?> path = getPath(property);
             Class<?> type = path.getJavaType();
@@ -959,7 +952,16 @@ public class CriteriaImpl<T> implements Criteria<T> {
         }
 
         private Path<?> getPath(String name) {
-            return Criteria.getPath(root, name);
+            return getPath(root, name);
+        }
+
+        private Path<?> getPath(Root<T> root, String name) {
+            String[] paths = name.split("\\.");
+            Path<?> path = root;
+            for (String p : paths) {
+                path = path.get(p);
+            }
+            return path;
         }
     }
 
