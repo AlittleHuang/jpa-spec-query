@@ -125,10 +125,8 @@ public class User {
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class DemoApplicationTests {
-
     @Autowired
     private EntityManager entityManager;
-
 
     @Test
     public void demo() {
@@ -137,14 +135,14 @@ public class DemoApplicationTests {
         //select by id
         User selectById = repostory.getCriteria()
                 .andEqual(User::getId, 1)
-                .getOne();
+                .getSingleResult();
 
         // fetch:
         // select user inner join company
         User fetch = repostory.getCriteria()
                 .andEqual(User::getId, 1)
-                .fetch(User::getCompany)
-                .getOne();
+                .addFetchs(User::getCompany)
+                .getSingleResult();
 
         // System.out.println(selectById.getCompany());//no Session
         System.out.println(fetch.getCompany());//OK
@@ -153,13 +151,13 @@ public class DemoApplicationTests {
         User luna = repostory.getCriteria()
                 .andEqual(User::getName, "Luna")
                 .andEqual(User::getAge, 18)
-                .getOne();
-                
+                .getSingleResult();
+
 
         // select user by company name
         List<User> list = repostory.getCriteria()
-                .andEqual(Getters.path(User::getCompany).to(Company::getName), "Microsoft")
-                .getList();
+                .andEqual(Path.of(User::getCompany).to(Company::getName), "Microsoft")
+                .getResultList();
 
     }
 
