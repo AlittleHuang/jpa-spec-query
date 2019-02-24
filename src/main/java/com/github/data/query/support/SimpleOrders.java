@@ -1,7 +1,7 @@
-package com.github.jpa.spec.query.impl;
+package com.github.data.query.support;
 
-import com.github.jpa.spec.query.api.Path;
-import com.github.jpa.spec.query.api.Orders;
+import com.github.data.query.specification.Path;
+import com.github.data.query.specification.Orders;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Sort;

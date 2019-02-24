@@ -1,4 +1,4 @@
-package com.github.jpa.spec.query.api;
+package com.github.data.query.specification;
 
 public enum ConditionalOperator {
 

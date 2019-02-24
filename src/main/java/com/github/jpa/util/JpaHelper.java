@@ -1,6 +1,6 @@
-package com.github.jpa.spec.util;
+package com.github.jpa.util;
 
-import com.github.jpa.spec.query.api.Path;
+import com.github.data.query.specification.Path;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;

@@ -1,8 +1,8 @@
-package com.github.jpa.spec.repostory;
+package com.github.jpa.repostory;
 
-import com.github.jpa.spec.query.api.Query;
-import com.github.jpa.spec.query.impl.JpaStored;
-import com.github.jpa.spec.query.impl.QueryImpl;
+import com.github.data.query.specification.Query;
+import com.github.data.query.support.QueryImpl;
+import com.github.jpa.support.JpaStored;
 
 import javax.persistence.EntityManager;
 

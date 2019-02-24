@@ -1,4 +1,4 @@
-package com.github.jpa.spec.query.api;
+package com.github.data.query.specification;
 
 import java.util.ArrayList;
 import java.util.Collections;

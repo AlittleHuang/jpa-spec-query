@@ -1,8 +1,8 @@
-package com.github.jpa.spec.query.impl;
+package com.github.data.query.support;
 
-import com.github.jpa.spec.query.api.Path;
-import com.github.jpa.spec.query.api.FieldPath;
-import com.github.jpa.spec.util.JpaHelper;
+import com.github.data.query.specification.Path;
+import com.github.data.query.specification.FieldPath;
+import com.github.jpa.util.JpaHelper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

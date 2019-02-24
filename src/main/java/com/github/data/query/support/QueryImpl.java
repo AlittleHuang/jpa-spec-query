@@ -1,9 +1,9 @@
-package com.github.jpa.spec.query.impl;
+package com.github.data.query.support;
 
-import com.github.jpa.spec.query.api.Path;
-import com.github.jpa.spec.query.api.ConditionalOperator;
-import com.github.jpa.spec.query.api.Query;
-import com.github.jpa.spec.query.api.Stored;
+import com.github.data.query.specification.Path;
+import com.github.data.query.specification.ConditionalOperator;
+import com.github.data.query.specification.Query;
+import com.github.data.query.specification.Stored;
 import lombok.experimental.Delegate;
 import org.springframework.data.domain.Sort;
 
@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static com.github.jpa.spec.query.api.ConditionalOperator.*;
+import static com.github.data.query.specification.ConditionalOperator.*;
 import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 import static javax.persistence.criteria.Predicate.BooleanOperator.OR;
 

@@ -1,6 +1,6 @@
-package com.github.jpa.spec.query.impl;
+package com.github.data.query.support;
 
-import com.github.jpa.spec.query.api.Criteria;
+import com.github.data.query.specification.Criteria;
 import lombok.Getter;
 import lombok.Setter;
 

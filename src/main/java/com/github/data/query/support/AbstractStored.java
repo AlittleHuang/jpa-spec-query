@@ -1,7 +1,7 @@
-package com.github.jpa.spec.query.impl;
+package com.github.data.query.support;
 
-import com.github.jpa.spec.query.api.Criteria;
-import com.github.jpa.spec.query.api.Stored;
+import com.github.data.query.specification.Criteria;
+import com.github.data.query.specification.Stored;
 
 public abstract class AbstractStored<T> implements Stored<T> {
     protected Criteria<T> criteria;

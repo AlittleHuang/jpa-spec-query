@@ -1,7 +1,7 @@
-package com.github.jpa.spec.repostory;
+package com.github.jpa.support;
 
-import com.github.jpa.spec.query.api.FieldPath;
-import com.github.jpa.spec.query.api.WhereClause;
+import com.github.data.query.specification.FieldPath;
+import com.github.data.query.specification.WhereClause;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;

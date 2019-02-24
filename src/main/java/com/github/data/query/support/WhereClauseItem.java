@@ -1,7 +1,7 @@
-package com.github.jpa.spec.query.impl;
+package com.github.data.query.support;
 
-import com.github.jpa.spec.query.api.ConditionalOperator;
-import com.github.jpa.spec.query.api.WhereClause;
+import com.github.data.query.specification.ConditionalOperator;
+import com.github.data.query.specification.WhereClause;
 import lombok.Getter;
 
 import javax.persistence.criteria.Predicate;

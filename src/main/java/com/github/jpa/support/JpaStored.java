@@ -1,9 +1,10 @@
-package com.github.jpa.spec.query.impl;
+package com.github.jpa.support;
 
-import com.github.jpa.spec.query.api.FieldPath;
-import com.github.jpa.spec.query.api.Orders;
-import com.github.jpa.spec.query.api.WhereClause;
-import com.github.jpa.spec.repostory.SpecificationImpl;
+import com.github.data.query.specification.FieldPath;
+import com.github.data.query.specification.Orders;
+import com.github.data.query.specification.WhereClause;
+import com.github.data.query.support.AbstractStored;
+import com.github.jpa.support.SpecificationImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
