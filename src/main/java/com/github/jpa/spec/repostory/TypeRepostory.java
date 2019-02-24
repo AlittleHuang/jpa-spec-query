@@ -1,7 +1,5 @@
 package com.github.jpa.spec.repostory;
 
-import com.github.jpa.spec.Criteria;
-import com.github.jpa.spec.CriteriaImpl;
 import com.github.jpa.spec.query.api.Query;
 import com.github.jpa.spec.query.impl.JpaStored;
 import com.github.jpa.spec.query.impl.QueryImpl;
@@ -18,7 +16,7 @@ public class TypeRepostory<T> {
         this.entityManager = entityManager;
     }
 
-    public Query<T> getCriteria(){
+    public Query<T> query() {
         return new QueryImpl<>(new JpaStored<>(entityManager,entityType));
     }
 

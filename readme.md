@@ -121,7 +121,6 @@ public class User {
 ### demo
 
 ```java
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class DemoApplicationTests {
@@ -133,13 +132,13 @@ public class DemoApplicationTests {
         TypeRepostory<User> repostory = new TypeRepostory<>(User.class, entityManager);
 
         //select by id
-        User selectById = repostory.getCriteria()
+        User selectById = repostory.query()
                 .andEqual(User::getId, 1)
                 .getSingleResult();
 
         // fetch:
         // select user inner join company
-        User fetch = repostory.getCriteria()
+        User fetch = repostory.query()
                 .andEqual(User::getId, 1)
                 .addFetchs(User::getCompany)
                 .getSingleResult();
@@ -148,14 +147,14 @@ public class DemoApplicationTests {
         System.out.println(fetch.getCompany());//OK
 
         // select by name and age
-        User luna = repostory.getCriteria()
+        User luna = repostory.query()
                 .andEqual(User::getName, "Luna")
                 .andEqual(User::getAge, 18)
                 .getSingleResult();
 
 
         // select user by company name
-        List<User> list = repostory.getCriteria()
+        List<User> list = repostory.query()
                 .andEqual(Path.of(User::getCompany).to(Company::getName), "Microsoft")
                 .getResultList();
 
