@@ -1,4 +1,4 @@
-package com.github.jpa.spec.com.github.jpa.repostory;
+package com.github.jpa.spec.repostory;
 
 import com.github.jpa.spec.Criteria;
 import com.github.jpa.spec.CriteriaImpl;
