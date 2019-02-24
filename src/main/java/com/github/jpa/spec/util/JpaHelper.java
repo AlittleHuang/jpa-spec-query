@@ -1,6 +1,6 @@
 package com.github.jpa.spec.util;
 
-import com.github.jpa.spec.Getters;
+import com.github.jpa.spec.query.api.Path;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
@@ -15,7 +15,7 @@ public class JpaHelper {
 
     private final static Map<Class, String> map = new HashMap<>();
 
-    public static <T> String getPropertyNameFromGetter(Class<T> type, Getters<T, ?> getters) {
+    public static <T> String getPropertyNameFromGetter(Class<T> type, Path<T, ?> getters) {
 
         Class key = getters.getClass();
 
@@ -45,7 +45,7 @@ public class JpaHelper {
         private static Map<Class<?>, Object> instanceMap = new ConcurrentHashMap<>();
         private static Proxy proxy = new Proxy();
 
-        private static <T, U> String getGetterName(Class<T> type, Getters<T, U> getters) {
+        private static <T, U> String getGetterName(Class<T> type, Path<T, U> getters) {
             T target = proxy.getProxyInstance(type);
             try {
                 getters.apply(target);
@@ -55,7 +55,7 @@ public class JpaHelper {
             throw new RuntimeException();
         }
 
-        private static <T> String getPropertyName(Class<T> type, Getters<T, ?> getters) {
+        private static <T> String getPropertyName(Class<T> type, Path<T, ?> getters) {
             String getterName = getGetterName(type, getters);
             boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
             Assert.state(check, "the function is not getters");

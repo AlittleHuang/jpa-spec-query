@@ -2,6 +2,9 @@ package com.github.jpa.spec.repostory;
 
 import com.github.jpa.spec.Criteria;
 import com.github.jpa.spec.CriteriaImpl;
+import com.github.jpa.spec.query.api.Query;
+import com.github.jpa.spec.query.impl.JpaStored;
+import com.github.jpa.spec.query.impl.QueryImpl;
 
 import javax.persistence.EntityManager;
 
@@ -15,8 +18,8 @@ public class TypeRepostory<T> {
         this.entityManager = entityManager;
     }
 
-    public Criteria<T> getCriteria(){
-        return new CriteriaImpl<>(entityManager, entityType);
+    public Query<T> getCriteria(){
+        return new QueryImpl<>(new JpaStored<>(entityManager,entityType));
     }
 
     public T persist(T entity) {

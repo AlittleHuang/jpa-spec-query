@@ -1,6 +1,6 @@
 package com.github.jpa.spec.query.impl;
 
-import com.github.jpa.spec.Getters;
+import com.github.jpa.spec.query.api.Path;
 import com.github.jpa.spec.query.api.Orders;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +17,7 @@ public class SimpleOrders<T> extends SimpleFieldPath<T> implements Orders<T> {
         this.direction = direction;
     }
 
-    public SimpleOrders(Sort.Direction direction, Getters<T, ?> getter) {
+    public SimpleOrders(Sort.Direction direction, Path<T, ?> getter) {
         super(getter);
         this.direction = direction;
     }

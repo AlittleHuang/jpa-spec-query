@@ -22,9 +22,14 @@ public class JpaStored<T> extends AbstractStored<T> {
     private EntityManager entityManager;
     private Class<T> type;
 
+    public JpaStored(EntityManager entityManager, Class<T> type) {
+        this.entityManager = entityManager;
+        this.type = type;
+    }
+
     @Override
     public List<T> getResultList() {
-        StoredData data = new StoredData().initAll();
+        StoredData<T> data = new StoredData<>(type).initAll();
         TypedQuery<T> typedQuery = entityManager.createQuery(data.query.select(data.root));
         setLimilt(typedQuery, criteria.getOffset(), criteria.getMaxResults());
         setLock(typedQuery);
@@ -38,43 +43,34 @@ public class JpaStored<T> extends AbstractStored<T> {
         if (list == null || list.isEmpty()) {
             return (List<X>) getResultList();
         }
-        StoredData data = new StoredData().initAll();
-        CriteriaQuery<T> query = data.query;
-        List<Selection<?>> selections = list.stream()
+        StoredData<?> data = new StoredData<>(Object.class).initWhere().initGroupBy().initOrderBy();
+        CriteriaQuery<?> query = data.query;
+        List selections = list.stream()
                 .map(it -> {
                     Path path = it.getPaths(data.root);
                     Class<?> type = path.getJavaType();
                     return path.as(type);
                 }).collect(Collectors.toList());
-        return (List<X>) entityManager.createQuery(query.multiselect(selections)).getResultList();
+        TypedQuery typedQuery = entityManager
+                .createQuery(query.multiselect(selections));
+        setLimilt(typedQuery, criteria.getOffset(), criteria.getMaxResults());
+        setLock(typedQuery);
+        return (List<X>) typedQuery.getResultList();
     }
 
     @Override
-    public Page<T> getPage() {
-
-        StoredData data = new StoredData()
-                .initWhere()
-                .initGroupBy();
-
-        //noinspection unchecked
-        CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) data.query;
-        countQuery.select(data.cb.count(data.root));
-        Long count = entityManager.createQuery(countQuery).getSingleResult();
-
-        data.initFetch().initOrderBy();
-
+    public Page<T> getPage(int page, int size) {
+        long count = count();
+        if (count == 0) {
+            return Page.empty();
+        }
+        StoredData<T> data = new StoredData<>(type).initAll();
         TypedQuery<T> typedQuery = entityManager.createQuery(data.query.select(data.root));
 
-        // init pageable
-        Integer offset = criteria.getOffset();
-        Integer maxResults = criteria.getMaxResults();
-        offset = offset == null ? 0 : offset;
-        maxResults = maxResults == null ? DEFAULT_PAGE_SIZE : maxResults;
-        PageRequest pageable = PageRequest.of(offset / maxResults, maxResults);
-        setLimilt(typedQuery, offset, maxResults);
+        PageRequest pageable = PageRequest.of(page, size);
+        setLimilt(typedQuery, (int) pageable.getOffset(), size);
 
         setLock(typedQuery);
-
         List<T> resultList = typedQuery.getResultList();
 
         return new PageImpl<>(resultList, pageable, count);
@@ -82,11 +78,9 @@ public class JpaStored<T> extends AbstractStored<T> {
 
     @Override
     public long count() {
-        StoredData data = new StoredData().initWhere().initGroupBy();
-        //noinspection unchecked
-        CriteriaQuery<Long> countQuery = (CriteriaQuery<Long>) data.query;
+        StoredData<Long> data = new StoredData<>(Long.class).initWhere().initGroupBy();
+        CriteriaQuery<Long> countQuery = data.query;
         countQuery.select(data.cb.count(data.root));
-
         return entityManager.createQuery(countQuery).getSingleResult();
     }
 
@@ -95,38 +89,43 @@ public class JpaStored<T> extends AbstractStored<T> {
         return false;
     }
 
-    private TypedQuery<T> setLock(TypedQuery<T> typedQuery) {
+    private void setLock(TypedQuery<T> typedQuery) {
         LockModeType lockModeType = criteria.getLockModeType();
         if (lockModeType != null) {
             typedQuery.setLockMode(lockModeType);
         }
-        return typedQuery;
     }
 
-    private TypedQuery<T> setLimilt(TypedQuery<T> typedQuery, Integer offset, Integer maxResults) {
+    private void setLimilt(TypedQuery<T> typedQuery, Integer offset, Integer maxResults) {
         if (maxResults != null && maxResults > 0) {
             typedQuery.setMaxResults(maxResults);
             if (offset != null && offset > 0) {
                 typedQuery.setFirstResult(offset);
             }
         }
-        return typedQuery;
     }
 
-    private class StoredData {//中间值
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<T> query = cb.createQuery(type);
-        Root<T> root = query.from(type);
-        Predicate predicate = toPredicate();
+    private class StoredData<R> {//中间值
+        final CriteriaBuilder cb;
+        final CriteriaQuery<R> query;
+        final Root<T> root;
+        final Predicate predicate;
 
-        private StoredData initWhere() {
+        StoredData(Class<R> r) {
+            cb = entityManager.getCriteriaBuilder();
+            this.query = cb.createQuery(r);
+            root = query.from(type);
+            predicate = toPredicate();
+        }
+
+        private StoredData<R> initWhere() {
             if (predicate != null) {
                 query.where(predicate);
             }
             return this;
         }
 
-        private StoredData initGroupBy() {
+        private StoredData<R> initGroupBy() {
             if (!criteria.getGroupings().isEmpty()) {
                 List<Expression<?>> paths = criteria.getGroupings().stream()
                         .map(it -> (it.getPaths(root)))
@@ -136,7 +135,7 @@ public class JpaStored<T> extends AbstractStored<T> {
             return this;
         }
 
-        private StoredData initOrderBy() {
+        private StoredData<R> initOrderBy() {
             ArrayList<Order> orders = new ArrayList<>();
             if (!criteria.getOrders().isEmpty()) {
                 for (Orders<T> order : criteria.getOrders()) {
@@ -156,7 +155,7 @@ public class JpaStored<T> extends AbstractStored<T> {
             return this;
         }
 
-        private StoredData initFetch() {
+        private StoredData<R> initFetch() {
             List<? extends FieldPath<T>> fetchs = criteria.getFetchs();
             for (FieldPath<T> fidld : fetchs) {
                 Fetch fetch = null;
@@ -171,13 +170,13 @@ public class JpaStored<T> extends AbstractStored<T> {
             return this;
         }
 
-        private StoredData initAll(){
+        private StoredData<R> initAll() {
             return initWhere().initGroupBy().initFetch().initOrderBy();
         }
 
         Predicate toPredicate() {
             WhereClause where = criteria.getWhereClause();
-            return new SpecificationImpl(where).toPredicate(root, query, cb);
+            return new SpecificationImpl<T>(where).toPredicate(root, query, cb);
         }
     }
 }

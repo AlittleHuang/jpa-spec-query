@@ -3,7 +3,6 @@ package com.github.jpa.spec.query.impl;
 import com.github.jpa.spec.query.api.ConditionalOperator;
 import com.github.jpa.spec.query.api.WhereClause;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -12,10 +11,11 @@ import java.util.List;
 import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
 @Getter
-@RequiredArgsConstructor
-public class WhereClauseItem<T> implements WhereClause<T> {
+public class WhereClauseItem implements WhereClause {
 
     final SimpleFieldPath path;
+
+    boolean compound;
 
     Object value;
 
@@ -25,6 +25,16 @@ public class WhereClauseItem<T> implements WhereClause<T> {
 
     boolean negate = false;//取反
 
-    List<WhereClauseItem<T>> compoundItems = new ArrayList<>();
+    final List<WhereClauseItem> compoundItems;
 
+    public WhereClauseItem(SimpleFieldPath path) {
+        this.path = path;
+        if (path == null) {
+            compound = true;
+            compoundItems = new ArrayList<>();
+        } else {
+            compound = false;
+            compoundItems = null;
+        }
+    }
 }

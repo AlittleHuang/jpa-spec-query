@@ -1,12 +1,11 @@
 package com.github.jpa.spec;
 
-import org.springframework.data.domain.Page;
+import com.github.jpa.spec.query.api.Path;
 import org.springframework.data.domain.Pageable;
 
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.Predicate;
 import java.util.Collection;
-import java.util.List;
 
 import static org.springframework.util.Assert.state;
 
@@ -143,33 +142,33 @@ public interface CriteriaFilter<T> {//筛选条件
 
     CriteriaFilter<T> setLockMode(LockModeType lockModeType);
 
-    CriteriaFilter<T> fetch(Getters<T, ?> getters);
+    CriteriaFilter<T> fetch(Path<T, ?> getters);
 
-    String getAttributeNameByGetter(Getters<T, ?> getters);
+    String getAttributeNameByGetter(Path<T, ?> getters);
 
-    default CriteriaFilter<T> addOrderByDesc(Getters<T, ?>... getters) {
-        for (Getters<T, ?> getter : getters) {
+    default CriteriaFilter<T> addOrderByDesc(Path<T, ?>... getters) {
+        for (Path<T, ?> getter : getters) {
             addOrderByDesc(getAttributeNameByGetter(getter));
         }
         return this;
     }
 
-    default CriteriaFilter<T> addOrderByAsc(Getters<T, ?>... getters) {
-        for (Getters<T, ?> getter : getters) {
+    default CriteriaFilter<T> addOrderByAsc(Path<T, ?>... getters) {
+        for (Path<T, ?> getter : getters) {
             addOrderByAsc(getAttributeNameByGetter(getter));
         }
         return this;
     }
 
-    default CriteriaFilter<T> groupBy(Getters<T, ?>... getters) {
-        for (Getters<T, ?> getter : getters) {
+    default CriteriaFilter<T> groupBy(Path<T, ?>... getters) {
+        for (Path<T, ?> getter : getters) {
             groupBy(getAttributeNameByGetter(getter));
         }
         return this;
     }
 
-    default CriteriaFilter<T> addSelect(Getters<T, ?>... getters) {
-        for (Getters<T, ?> getter : getters) {
+    default CriteriaFilter<T> addSelect(Path<T, ?>... getters) {
+        for (Path<T, ?> getter : getters) {
             addSelect(getAttributeNameByGetter(getter));
         }
         return this;
@@ -182,22 +181,22 @@ public interface CriteriaFilter<T> {//筛选条件
         return this;
     }
 
-    default CriteriaFilter<T> addSelectMin(Getters<T, ?>... getters) {
-        for (Getters<T, ?> getter : getters) {
+    default CriteriaFilter<T> addSelectMin(Path<T, ?>... getters) {
+        for (Path<T, ?> getter : getters) {
             addSelectMin(getAttributeNameByGetter(getter));
         }
         return this;
     }
 
-    default CriteriaFilter<T> addSelectMax(Getters<T, ?>... getters) {
-        for (Getters<T, ?> getter : getters) {
+    default CriteriaFilter<T> addSelectMax(Path<T, ?>... getters) {
+        for (Path<T, ?> getter : getters) {
             addSelectMax(getAttributeNameByGetter(getter));
         }
         return this;
     }
 
-    default CriteriaFilter<T> addSelectSum(Getters<T, ?>... getters) {
-        for (Getters<T, ?> getter : getters) {
+    default CriteriaFilter<T> addSelectSum(Path<T, ?>... getters) {
+        for (Path<T, ?> getter : getters) {
             addSelectSum(getAttributeNameByGetter(getter));
         }
         return this;
@@ -210,35 +209,35 @@ public interface CriteriaFilter<T> {//筛选条件
         return this;
     }
 
-    default <U, G extends Getters<T, ? super U>> CriteriaFilter<T> andEqualAsPath(G path, G other) {
+    default <U, G extends Path<T, ? super U>> CriteriaFilter<T> andEqualAsPath(G path, G other) {
         return andEqualAsPath(getAttributeNameByGetter(path), getAttributeNameByGetter(other));
     }
 
-    default <U, G extends Getters<T, ? super U>> CriteriaFilter<T> orEqualAsPath(G path, G other) {
+    default <U, G extends Path<T, ? super U>> CriteriaFilter<T> orEqualAsPath(G path, G other) {
         return orEqualAsPath(getAttributeNameByGetter(path), getAttributeNameByGetter(other));
     }
 
-    default <U, G extends Getters<T, ? super U>> CriteriaFilter<T> andNotEqualAsPath(G path, G other) {
+    default <U, G extends Path<T, ? super U>> CriteriaFilter<T> andNotEqualAsPath(G path, G other) {
         return andNotEqualAsPath(getAttributeNameByGetter(path), getAttributeNameByGetter(other));
     }
 
-    default <U, G extends Getters<T, ? super U>> CriteriaFilter<T> orNotEqualAsPath(G path, G other) {
+    default <U, G extends Path<T, ? super U>> CriteriaFilter<T> orNotEqualAsPath(G path, G other) {
         return orNotEqualAsPath(getAttributeNameByGetter(path), getAttributeNameByGetter(other));
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> andEqual(F getter, U value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> andEqual(F getter, U value) {
         return andEqual(getAttributeNameByGetter(getter), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> orEqual(F getter, U value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> orEqual(F getter, U value) {
         return orEqual(getAttributeNameByGetter(getter), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> andNotEqual(F getter, U value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> andNotEqual(F getter, U value) {
         return andNotEqual(getAttributeNameByGetter(getter), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> orNotEqual(F getter, U value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> orNotEqual(F getter, U value) {
         return orNotEqual(getAttributeNameByGetter(getter), value);
     }
 
@@ -246,7 +245,7 @@ public interface CriteriaFilter<T> {//筛选条件
         return andGe(name, value, value == null ? null : (Class<Y>) value.getClass());
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> andGe(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> andGe(F getter, U value) {
         return andGe(getAttributeNameByGetter(getter), value);
     }
 
@@ -254,7 +253,7 @@ public interface CriteriaFilter<T> {//筛选条件
         return orGe(name, value, value == null ? null : (Class<Y>) value.getClass());
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> orGe(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> orGe(F getter, U value) {
         return orGe(getAttributeNameByGetter(getter), value);
     }
 
@@ -262,7 +261,7 @@ public interface CriteriaFilter<T> {//筛选条件
         return andLe(name, value, value == null ? null : (Class<Y>) value.getClass());
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> andLe(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> andLe(F getter, U value) {
         return andLe(getAttributeNameByGetter(getter), value);
     }
 
@@ -270,7 +269,7 @@ public interface CriteriaFilter<T> {//筛选条件
         return orLe(name, value, value == null ? null : (Class<Y>) value.getClass());
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> orLe(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> orLe(F getter, U value) {
         return orLe(getAttributeNameByGetter(getter), value);
     }
 
@@ -278,7 +277,7 @@ public interface CriteriaFilter<T> {//筛选条件
         return andGt(name, value, value != null ? (Class<Y>) value.getClass() : null);
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> andGt(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> andGt(F getter, U value) {
         return andGt(getAttributeNameByGetter(getter), value);
     }
 
@@ -286,7 +285,7 @@ public interface CriteriaFilter<T> {//筛选条件
         return orGt(name, value, value == null ? null : (Class<Y>) value.getClass());
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> orGt(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> orGt(F getter, U value) {
         return orGt(getAttributeNameByGetter(getter), value);
     }
 
@@ -294,7 +293,7 @@ public interface CriteriaFilter<T> {//筛选条件
         return andLt(name, value, value == null ? null : (Class<Y>) value.getClass());
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> andLt(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> andLt(F getter, U value) {
         return andLt(getAttributeNameByGetter(getter), value);
     }
 
@@ -302,23 +301,23 @@ public interface CriteriaFilter<T> {//筛选条件
         return orLt(name, value, value == null ? null : (Class<Y>) value.getClass());
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> orLt(F getter, U value) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> orLt(F getter, U value) {
         return orLt(getAttributeNameByGetter(getter), value);
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> andBetween(F getter, U value, U otherValue) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> andBetween(F getter, U value, U otherValue) {
         return andBetween(getAttributeNameByGetter(getter), value, otherValue);
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> orBetween(F getter, U value, U otherValue) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> orBetween(F getter, U value, U otherValue) {
         return orBetween(getAttributeNameByGetter(getter), value, otherValue);
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> andNotBetween(F getter, U value, U otherValue) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> andNotBetween(F getter, U value, U otherValue) {
         return andNotBetween(getAttributeNameByGetter(getter), value, otherValue);
     }
 
-    default <U extends Comparable<? super U>, F extends Getters<T, ? super U>> CriteriaFilter<T> orNotBetween(F getter, U value, U otherValue) {
+    default <U extends Comparable<? super U>, F extends Path<T, ? super U>> CriteriaFilter<T> orNotBetween(F getter, U value, U otherValue) {
         return orNotBetween(getAttributeNameByGetter(getter), value, otherValue);
     }
 
@@ -342,51 +341,51 @@ public interface CriteriaFilter<T> {//筛选条件
         }
     }
 
-    default CriteriaFilter<T> andLike(Getters<T, String> getters, String value) {
+    default CriteriaFilter<T> andLike(Path<T, String> getters, String value) {
         return andLike(getAttributeNameByGetter(getters), value);
     }
 
-    default CriteriaFilter<T> andNotLike(Getters<T, String> getters, String value) {
+    default CriteriaFilter<T> andNotLike(Path<T, String> getters, String value) {
         return andNotLike(getAttributeNameByGetter(getters), value);
     }
 
-    default CriteriaFilter<T> orLike(Getters<T, String> getters, String value) {
+    default CriteriaFilter<T> orLike(Path<T, String> getters, String value) {
         return orLike(getAttributeNameByGetter(getters), value);
     }
 
-    default CriteriaFilter<T> orNotLike(Getters<T, String> getters, String value) {
+    default CriteriaFilter<T> orNotLike(Path<T, String> getters, String value) {
         return orNotLike(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> andIn(Getters<T, U> getters, Collection<U> value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> andIn(Path<T, U> getters, Collection<U> value) {
         return andIn(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> andIn(Getters<T, U> getters, U... value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> andIn(Path<T, U> getters, U... value) {
         return andIn(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> andNotIn(Getters<T, U> getters, Collection<U> value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> andNotIn(Path<T, U> getters, Collection<U> value) {
         return andNotIn(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> andNotIn(Getters<T, U> getters, U... value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> andNotIn(Path<T, U> getters, U... value) {
         return andNotIn(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> orIn(Getters<T, U> getters, Collection<U> value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> orIn(Path<T, U> getters, Collection<U> value) {
         return orIn(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> orIn(Getters<T, U> getters, U... value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> orIn(Path<T, U> getters, U... value) {
         return orIn(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> orNotIn(Getters<T, U> getters, Collection<U> value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> orNotIn(Path<T, U> getters, Collection<U> value) {
         return orNotIn(getAttributeNameByGetter(getters), value);
     }
 
-    default <U, F extends Getters<T, ? super U>> CriteriaFilter<T> orNotIn(Getters<T, U> getters, U... value) {
+    default <U, F extends Path<T, ? super U>> CriteriaFilter<T> orNotIn(Path<T, U> getters, U... value) {
         return orNotIn(getAttributeNameByGetter(getters), value);
     }
 

@@ -24,7 +24,7 @@ public interface Stored<T> {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    Page<T> getPage();
+    Page<T> getPage(int page, int size);
 
     long count();
 

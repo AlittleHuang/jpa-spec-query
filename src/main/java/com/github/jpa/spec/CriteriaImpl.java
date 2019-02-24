@@ -1,12 +1,10 @@
 package com.github.jpa.spec;
 
+import com.github.jpa.spec.util.JpaHelper;
 import lombok.Setter;
 import lombok.experimental.Delegate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
@@ -16,9 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
-import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class CriteriaImpl<T> implements Criteria<T> {
 
@@ -219,7 +215,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> andGe(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : and(conditions.cb.greaterThanOrEqualTo(path, value));
     }
@@ -236,7 +232,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> orGe(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : or(conditions.cb.greaterThanOrEqualTo(path, value));
     }
@@ -252,7 +248,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> andGt(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : and(conditions.cb.greaterThan(path, value));
     }
@@ -267,7 +263,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> orGt(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : or(conditions.cb.greaterThan(path, value));
     }
@@ -283,7 +279,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> andLe(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : and(conditions.cb.lessThanOrEqualTo(path, value));
     }
@@ -298,7 +294,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> orLe(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : or(conditions.cb.lessThanOrEqualTo(path, value));
     }
@@ -313,7 +309,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> andLt(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : and(conditions.cb.lessThan(path, value));
     }
@@ -328,7 +324,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     @Override
     public <Y extends Comparable<? super Y>> Criteria<T> orLt(String name, Y value) {
-        Path path = getPath(name);
+        javax.persistence.criteria.Path path = getPath(name);
         //noinspection unchecked
         return isEmpty(value) ? this : or(conditions.cb.lessThan(path, value));
     }
@@ -379,7 +375,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
             String name,
             Y value0,
             Y value1) {
-        return and(conditions.cb.between((Path<? extends Y>) getPath(name), value0, value1));
+        return and(conditions.cb.between((javax.persistence.criteria.Path) getPath(name), value0, value1));
     }
 
     @SuppressWarnings("unchecked")
@@ -389,7 +385,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
             Y value0,
             Y value1) {
         if (value0 == null || value1 == null) return null;
-        return or(conditions.cb.between((Path<? extends Y>) getPath(name), value0, value1));
+        return or(conditions.cb.between((javax.persistence.criteria.Path) getPath(name), value0, value1));
     }
 
     @SuppressWarnings("unchecked")
@@ -556,7 +552,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
     }
 
     @Override
-    public Criteria<T> fetch(Getters<T, ?> getters) {
+    public Criteria<T> fetch(com.github.jpa.spec.query.api.Path<T, ?> getters) {
         String attributeName = getAttributeNameByGetter(getters);
         conditions.root.fetch(attributeName);
         return this;
@@ -657,13 +653,13 @@ public class CriteriaImpl<T> implements Criteria<T> {
         return operator;
     }
 
-    private Path<?> getPath(String name) {
+    private javax.persistence.criteria.Path getPath(String name) {
         return conditions.getPath(conditions.root, name);
     }
 
     @Override
-    public String getAttributeNameByGetter(Getters<T, ?> getters) {
-        List<Getters> list = getters.list();
+    public String getAttributeNameByGetter(com.github.jpa.spec.query.api.Path<T, ?> getters) {
+        List<com.github.jpa.spec.query.api.Path> list = getters.list();
         //noinspection unchecked
         String result = getPropertyNameFromGetter(getType(), list.get(0));
         int size = list.size();
@@ -672,7 +668,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
         }
         StringBuilder sb = new StringBuilder(result);
         String last = result;
-        Path path = conditions.root;
+        javax.persistence.criteria.Path path = conditions.root;
         for (int i = 1; i < size; i++) {
             path = path.get(last);
             //noinspection unchecked
@@ -875,20 +871,20 @@ public class CriteriaImpl<T> implements Criteria<T> {
         }
 
         private void addSelect(String property) {
-            Path<?> path = getPath(property);
+            javax.persistence.criteria.Path path = getPath(property);
             Class<?> type = path.getJavaType();
             selections.add(path.as(type));
         }
 
         private void addSelectMin(String property) {
-            Path<?> path = getPath(property);
+            javax.persistence.criteria.Path path = getPath(property);
             @SuppressWarnings("unchecked")
             Class<? extends Number> type = (Class<? extends Number>) path.getJavaType();
             cb.min(path.as(type));
         }
 
         private void addSelectMax(String property) {
-            Path<?> path = getPath(property);
+            javax.persistence.criteria.Path path = getPath(property);
             @SuppressWarnings("unchecked")
             Class<? extends Number> type = (Class<? extends Number>) path.getJavaType();
             selections.add(cb.max(path.as(type)));
@@ -896,7 +892,7 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
 
         private void addSelectSum(String property) {
-            Path<?> path = getPath(property);
+            javax.persistence.criteria.Path path = getPath(property);
             @SuppressWarnings("unchecked")
             Class<? extends Number> type = (Class<? extends Number>) path.getJavaType();
             selections.add(cb.sum(path.as(type)));
@@ -949,13 +945,13 @@ public class CriteriaImpl<T> implements Criteria<T> {
             return entityInformation;
         }
 
-        private Path<?> getPath(String name) {
+        private javax.persistence.criteria.Path getPath(String name) {
             return getPath(root, name);
         }
 
-        private Path<?> getPath(Root<T> root, String name) {
+        private javax.persistence.criteria.Path getPath(Root<T> root, String name) {
             String[] paths = name.split("\\.");
-            Path<?> path = root;
+            javax.persistence.criteria.Path path = root;
             for (String p : paths) {
                 path = path.get(p);
             }
@@ -966,75 +962,8 @@ public class CriteriaImpl<T> implements Criteria<T> {
 
     private final static Map<Class, String> map = new HashMap<>();
 
-    private static <T> String getPropertyNameFromGetter(Class<T> type, Getters<T, ?> getters) {
-
-        Class key = getters.getClass();
-
-        String name = map.get(key);
-        if (name != null) {
-            return name;
-        } else {
-            synchronized (map) {
-
-                name = map.get(key);
-                if (name != null) {
-                    return name;
-                }
-
-                name = Proxy.getPropertyName(type, getters);
-                map.put(key, name);
-
-                return name;
-
-            }
-        }
-
+    private static <T> String getPropertyNameFromGetter(Class<T> type, com.github.jpa.spec.query.api.Path<T, ?> getters) {
+        return JpaHelper.getPropertyNameFromGetter(type,getters);
     }
 
-    private static class Proxy implements MethodInterceptor {
-
-        private static Map<Class<?>, Object> instanceMap = new ConcurrentHashMap<>();
-        private static Proxy proxy = new Proxy();
-
-        private static <T, U> String getGetterName(Class<T> type, Getters<T, U> getters) {
-            T target = proxy.getProxyInstance(type);
-            try {
-                getters.apply(target);
-            } catch (Exception e) {
-                return e.getMessage();
-            }
-            throw new RuntimeException();
-        }
-
-        private static <T> String getPropertyName(Class<T> type, Getters<T, ?> getters) {
-            String getterName = getGetterName(type, getters);
-            boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
-            Assert.state(check, "the function is not getters");
-            StringBuilder builder = new StringBuilder(getterName.substring(3));
-            if (builder.length() == 1) {
-                return builder.toString().toLowerCase();
-            }
-            if (builder.charAt(1) >= 'A' && builder.charAt(1) <= 'Z') {
-                return builder.toString();
-            }
-            builder.setCharAt(0, Character.toLowerCase(builder.charAt(0)));
-            return builder.toString();
-        }
-
-        private <T> T getProxyInstance(Class<T> type) {
-            //noinspection unchecked
-            return (T) instanceMap.computeIfAbsent(type, it -> {
-                Enhancer enhancer = new Enhancer();
-                enhancer.setSuperclass(type);
-                enhancer.setCallback(this);
-                return enhancer.create();
-            });
-        }
-
-        @Override
-        public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy) throws Throwable {
-            throw new Exception(method.getName());
-        }
-
-    }
 }

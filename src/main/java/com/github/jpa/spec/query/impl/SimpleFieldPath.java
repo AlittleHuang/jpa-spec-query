@@ -1,12 +1,11 @@
 package com.github.jpa.spec.query.impl;
 
-import com.github.jpa.spec.Getters;
+import com.github.jpa.spec.query.api.Path;
 import com.github.jpa.spec.query.api.FieldPath;
 import com.github.jpa.spec.util.JpaHelper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
 @Getter
@@ -14,13 +13,13 @@ import javax.persistence.criteria.Root;
 public class SimpleFieldPath<T> implements FieldPath<T> {
 
     private String[] paths;
-    private Getters<T, ?> getters;
+    private Path<T, ?> getters;
 
     public SimpleFieldPath(String path) {
         this.paths = path.split("\\.");
     }
 
-    public SimpleFieldPath(Getters<T, ?> getter) {
+    public SimpleFieldPath(Path<T, ?> getter) {
         this.getters = getter;
     }
 
@@ -34,8 +33,8 @@ public class SimpleFieldPath<T> implements FieldPath<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public <X> Path<X> getPaths(Root<T> root) {
-        Path result = root;
+    public <X> javax.persistence.criteria.Path getPaths(Root<T> root) {
+        javax.persistence.criteria.Path result = root;
         if (paths != null) {
             for (String path : paths) {
                 result = result.get(path);
@@ -43,7 +42,7 @@ public class SimpleFieldPath<T> implements FieldPath<T> {
         } else {
             paths = new String[getters.list().size()];
             int i = 0;
-            for (Getters getters : getters.list()) {
+            for (Path getters : getters.list()) {
                 String attributeName = JpaHelper.getPropertyNameFromGetter(result.getJavaType(), getters);
                 paths[i++] = attributeName;
                 result = result.get(attributeName);
