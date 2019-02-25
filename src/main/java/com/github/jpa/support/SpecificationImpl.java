@@ -35,10 +35,10 @@ public class SpecificationImpl<T> implements Specification<T> {
 
 
         private Predicate toPredicate() {
-            if (item.isCompound()) {
-                recursiveBuild();
-            } else {
+            if (!item.isCompound()) {
                 build();
+            } else {
+                recursiveBuild();
             }
             return predicate == null
                     ? null
