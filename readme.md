@@ -134,7 +134,10 @@ public class User {
 
 ### demo
 
+#### Use EntityManager
+
 ```java
+// com.github.test.Test
 public class Test {
 
     public static void main(String[] args) {
@@ -172,4 +175,15 @@ public class Test {
                 .getResultList();
     }
 }
+```
+
+#### Use JpaSpecificationExecutor
+
+
+```java
+// com.github.test.UserRepostory
+
+SpecBuilder<User> spec = new SpecBuilder<User>().andEqual(User::getId, 1);
+List<User> all = userRepostory.findAll(spec);
+
 ```
