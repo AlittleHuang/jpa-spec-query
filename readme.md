@@ -1,9 +1,5 @@
 # Quick start
 
-## example
-
-[https://github.com/AlittleHuang/demo-jpa-spec-query](https://github.com/AlittleHuang/demo-jpa-spec-query);
-
 ### database
 
 ```sql
@@ -49,34 +45,52 @@ INSERT INTO `user` VALUES (1, 18, 1, 'Luna');
 SET FOREIGN_KEY_CHECKS = 1;
 ```
 
-### dependencies
+### applicationContext.xml
 
 ```xml
-<dependencies>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>com.github</groupId>
-        <artifactId>jpa-spec-query</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-    <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <optional>true</optional>
-    </dependency>
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-test</artifactId>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <context:component-scan base-package="com.github"/>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql:///test"/>
+        <property name="user" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+
+
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+        </property>
+        <property name="packagesToScan" value="com.github"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.dialect.storage_engine">innodb</prop>
+                <prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.format_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.enable_lazy_load_no_trans">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+
+    <jpa:repositories base-package="com.github" repository-impl-postfix="Impl"
+                      entity-manager-factory-ref="entityManagerFactory" transaction-manager-ref="transactionManager"/>
+    <tx:annotation-driven/>
+</beans>
 ```
 
 ### Company.class
@@ -121,14 +135,13 @@ public class User {
 ### demo
 
 ```java
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class DemoApplicationTests {
-    @Autowired
-    private EntityManager entityManager;
+public class Test {
 
-    @Test
-    public void demo() {
+    public static void main(String[] args) {
+
+        ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
+        EntityManager entityManager = appCtx.getBean(EntityManager.class);
+
         TypeRepostory<User> repostory = new TypeRepostory<>(User.class, entityManager);
 
         //select by id
@@ -157,8 +170,6 @@ public class DemoApplicationTests {
         List<User> list = repostory.query()
                 .andEqual(Path.of(User::getCompany).to(Company::getName), "Microsoft")
                 .getResultList();
-
     }
-
 }
 ```
