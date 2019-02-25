@@ -3,7 +3,7 @@ package com.github.data.query.specification;
 import javax.persistence.LockModeType;
 import java.util.List;
 
-public interface Criteria<T> {//查询标准
+public interface Criteria<T> {
 
     WhereClause getWhereClause();
 
