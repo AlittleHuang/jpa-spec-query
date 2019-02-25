@@ -152,22 +152,18 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
 
     <U, F extends Path<T, ? super U>> THIS andIn(Path<T, U> getters, Collection<U> value);
 
-    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS andIn(Path<T, U> getters, U... value);
 
     <U, F extends Path<T, ? super U>> THIS andNotIn(Path<T, U> getters, Collection<U> value);
 
-    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS andNotIn(Path<T, U> getters, U... value);
 
     <U, F extends Path<T, ? super U>> THIS orIn(Path<T, U> getters, Collection<U> value);
 
-    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS orIn(Path<T, U> getters, U... value);
 
     <U, F extends Path<T, ? super U>> THIS orNotIn(Path<T, U> getters, Collection<U> value);
 
-    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS orNotIn(Path<T, U> getters, U... value);
 
 }

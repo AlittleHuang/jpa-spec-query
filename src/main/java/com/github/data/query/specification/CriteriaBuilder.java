@@ -2,25 +2,22 @@ package com.github.data.query.specification;
 
 import javax.persistence.LockModeType;
 
-public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> {
+public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> extends WhereClauseBuilder<T, THIS> {
+
     THIS addSelect(String... paths);
 
-    @SuppressWarnings("unchecked")
     THIS addSelect(Path<T, ?> paths);
 
     THIS addGroupings(String... paths);
 
-    @SuppressWarnings("unchecked")
     THIS addGroupings(Path<T, ?> paths);
 
     THIS addOrdersAsc(String... paths);
 
-    @SuppressWarnings("unchecked")
     THIS addOrdersAsc(Path<T, ?> paths);
 
     THIS addOrdersDesc(String... paths);
 
-    @SuppressWarnings("unchecked")
     THIS addOrdersDesc(Path<T, ?> paths);
 
     THIS addFetchs(String... paths);
@@ -28,4 +25,5 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> {
     THIS addFetchs(Path<T, ?> paths);
 
     THIS setLockModeType(LockModeType lockModeType);
+
 }

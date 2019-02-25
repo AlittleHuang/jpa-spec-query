@@ -33,67 +33,19 @@ public class SpecificationImpl<T> implements Specification<T> {
             this.item = item;
         }
 
-        @SuppressWarnings("unchecked")
+
         private Predicate toPredicate() {
-            if (item.getPath() != null) {
-                Path path = item.getPath().getPaths(root);
-                Object value = item.getValue();
-                if (value instanceof FieldPath) {
-                    value = ((FieldPath) value).getPaths(root);
-                }
-                switch (item.getConditionalOperator()) {
-                    //   EQUAL,
-                    case EQUAL:
-                        predicate = cb.equal(path, value);
-                        break;
-                    //   GT,
-                    case GT:
-                        predicate = cb.greaterThan(path, (Comparable) value);
-                        break;
-                    //   LT,
-                    case LT:
-                        predicate = cb.lessThan(path, (Comparable) value);
-                        break;
-                    //   GE,
-                    case GE:
-                        predicate = cb.greaterThanOrEqualTo(path, (Comparable) value);
-                        break;
-                    //   LE,
-                    case LE:
-                        predicate = cb.lessThanOrEqualTo(path, (Comparable) value);
-                        break;
-                    //   BETWEEN,
-                    case BETWEEN:
-                        List<Comparable> valuesBtween = (List<Comparable>) value;
-                        predicate = cb.between(path, valuesBtween.get(0), valuesBtween.get(1));
-                        break;
-                    //   IN,
-                    case IN:
-                        List<?> valuesIn = (List<Comparable>) value;
-
-                        if (valuesIn.isEmpty()) {
-                            predicate = cb.equal(path, path).not();
-                            break;
-                        }
-                        CriteriaBuilder.In<Object> in = cb.in(path);
-                        for (Object x : valuesIn) {
-                            in.value(x);
-                        }
-                        predicate = in;
-                        break;
-                    //   LIKE,
-                    case LIKE:
-                        //noinspection ConstantConditions
-                        predicate = cb.like(path, (String) value);
-                        break;
-                    //   IS_NULL,
-                    case IS_NULL:
-                        predicate = cb.isNull(path);
-                        break;
-                    default:
-                }
-
+            if (item.isCompound()) {
+                recursiveBuild();
+            } else {
+                build();
             }
+            return predicate == null
+                    ? null
+                    : (item.isNegate() ? predicate.not() : predicate);
+        }
+
+        private void recursiveBuild() {
             List<? extends WhereClause> subItems = item.getCompoundItems();
             if (subItems != null) {
                 for (WhereClause item : subItems) {
@@ -112,9 +64,57 @@ public class SpecificationImpl<T> implements Specification<T> {
                     }
                 }
             }
-            return predicate == null
-                    ? null
-                    : (item.isNegate() ? predicate.not() : predicate);
+        }
+
+        @SuppressWarnings("unchecked")
+        private void build() {
+            Path path = item.getPath().getPaths(root);
+            Object value = item.getValue();
+            if (value instanceof FieldPath) {
+                value = ((FieldPath) value).getPaths(root);
+            }
+            switch (item.getConditionalOperator()) {
+                case EQUAL:
+                    predicate = cb.equal(path, value);
+                    break;
+                case GT:
+                    predicate = cb.greaterThan(path, (Comparable) value);
+                    break;
+                case LT:
+                    predicate = cb.lessThan(path, (Comparable) value);
+                    break;
+                case GE:
+                    predicate = cb.greaterThanOrEqualTo(path, (Comparable) value);
+                    break;
+                case LE:
+                    predicate = cb.lessThanOrEqualTo(path, (Comparable) value);
+                    break;
+                case BETWEEN:
+                    List<Comparable> valuesBtween = (List<Comparable>) value;
+                    predicate = cb.between(path, valuesBtween.get(0), valuesBtween.get(1));
+                    break;
+                case IN:
+                    List<?> valuesIn = (List<Comparable>) value;
+
+                    if (valuesIn.isEmpty()) {
+                        predicate = cb.equal(path, path).not();
+                        break;
+                    }
+                    CriteriaBuilder.In<Object> in = cb.in(path);
+                    for (Object x : valuesIn) {
+                        in.value(x);
+                    }
+                    predicate = in;
+                    break;
+                case LIKE:
+                    //noinspection ConstantConditions
+                    predicate = cb.like(path, (String) value);
+                    break;
+                case IS_NULL:
+                    predicate = cb.isNull(path);
+                    break;
+                default:
+            }
         }
     }
 

@@ -11,14 +11,14 @@ import java.util.List;
 @Getter
 public class SimpleCriteria<T> implements Criteria<T> {
 
-    private final WhereClauseItem whereClause;
-    private final List<SimpleFieldPath<T>> selections = new ArrayList<>();
-    private final List<SimpleFieldPath<T>> groupings = new ArrayList<>();
-    private final List<SimpleOrders<T>> orders = new ArrayList<>();
-    private final List<SimpleFieldPath<T>> fetchs = new ArrayList<>();
+    protected final WhereClauseItem whereClause;
+    protected final List<SimpleFieldPath<T>> selections = new ArrayList<>();
+    protected final List<SimpleFieldPath<T>> groupings = new ArrayList<>();
+    protected final List<SimpleOrders<T>> orders = new ArrayList<>();
+    protected final List<SimpleFieldPath<T>> fetchs = new ArrayList<>();
 
     @Setter
-    private LockModeType lockModeType;
+    private LockModeType lockMode;
 
     @Setter
     private Integer offset;
@@ -29,4 +29,8 @@ public class SimpleCriteria<T> implements Criteria<T> {
         this.whereClause = whereClause;
     }
 
+    @Override
+    public LockModeType getLockModeType() {
+        return null;
+    }
 }
