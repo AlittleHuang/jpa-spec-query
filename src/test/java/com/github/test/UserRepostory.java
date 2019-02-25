@@ -14,7 +14,9 @@ public interface UserRepostory extends JpaRepository<User, Integer>, JpaSpecific
 
     UserRepostory userRepostory = Test.appCtx.getBean(UserRepostory.class);
     static void main(String[] args) {
-        SpecBuilder<User> spec = new SpecBuilder<User>().andEqual(User::getId, 1);
+        SpecBuilder<User> spec = new SpecBuilder<User>()
+                .andEqual(User::getName, "Luna")
+                .andEqual(User::getAge, 18);
         List<User> all = userRepostory.findAll(spec);
     }
 
