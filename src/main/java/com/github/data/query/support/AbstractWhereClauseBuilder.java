@@ -104,26 +104,6 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public THIS andEqualAsPath(String path, String other) {
-        return add(path, new SimpleFieldPath<>(other), AND, EQUAL);
-    }
-
-    @Override
-    public THIS orEqualAsPath(String path, String other) {
-        return add(path, new SimpleFieldPath<>(other), OR, EQUAL);
-    }
-
-    @Override
-    public THIS andNotEqualAsPath(String path, String other) {
-        return add(path, new SimpleFieldPath<>(other), AND, NOT, EQUAL);
-    }
-
-    @Override
-    public THIS orNotEqualAsPath(String path, String other) {
-        return add(path, new SimpleFieldPath<>(other), OR, NOT, EQUAL);
-    }
-
-    @Override
     public THIS andEqual(String name, Object value) {
         return add(name, value, AND, EQUAL);
     }
@@ -268,22 +248,22 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U, G extends Path<T, ? super U>> THIS andEqualAsPath(G path, G other) {
+    public <U, G extends Path<T, ? super U>> THIS andEqual(G path, G other) {
         return add(path, new SimpleFieldPath<>(other), AND, EQUAL);
     }
 
     @Override
-    public <U, G extends Path<T, ? super U>> THIS orEqualAsPath(G path, G other) {
+    public <U, G extends Path<T, ? super U>> THIS orEqual(G path, G other) {
         return add(path, new SimpleFieldPath<>(other), OR, EQUAL);
     }
 
     @Override
-    public <U, G extends Path<T, ? super U>> THIS andNotEqualAsPath(G path, G other) {
+    public <U, G extends Path<T, ? super U>> THIS andNotEqual(G path, G other) {
         return add(path, new SimpleFieldPath<>(other), AND, NOT, EQUAL);
     }
 
     @Override
-    public <U, G extends Path<T, ? super U>> THIS orNotEqualAsPath(G path, G other) {
+    public <U, G extends Path<T, ? super U>> THIS orNotEqual(G path, G other) {
         return add(path, new SimpleFieldPath<>(other), OR, NOT, EQUAL);
     }
 

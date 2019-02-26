@@ -14,14 +14,6 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
      */
     THIS and();
 
-    THIS andEqualAsPath(String path, String other);
-
-    THIS orEqualAsPath(String path, String other);
-
-    THIS andNotEqualAsPath(String path, String other);
-
-    THIS orNotEqualAsPath(String path, String other);
-
     THIS andEqual(String name, Object value);
 
     THIS orEqual(String name, Object value);
@@ -82,13 +74,13 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
     @SuppressWarnings("unchecked")
     <X> THIS orNotIn(String name, X... value);
 
-    <U, G extends Path<T, ? super U>> THIS andEqualAsPath(G path, G other);
+    <U, G extends Path<T, ? super U>> THIS andEqual(G path, G other);
 
-    <U, G extends Path<T, ? super U>> THIS orEqualAsPath(G path, G other);
+    <U, G extends Path<T, ? super U>> THIS orEqual(G path, G other);
 
-    <U, G extends Path<T, ? super U>> THIS andNotEqualAsPath(G path, G other);
+    <U, G extends Path<T, ? super U>> THIS andNotEqual(G path, G other);
 
-    <U, G extends Path<T, ? super U>> THIS orNotEqualAsPath(G path, G other);
+    <U, G extends Path<T, ? super U>> THIS orNotEqual(G path, G other);
 
     <U, F extends Path<T, ? super U>> THIS andEqual(F getter, U value);
 
@@ -152,18 +144,22 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
 
     <U, F extends Path<T, ? super U>> THIS andIn(Path<T, U> getters, Collection<U> value);
 
+    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS andIn(Path<T, U> getters, U... value);
 
     <U, F extends Path<T, ? super U>> THIS andNotIn(Path<T, U> getters, Collection<U> value);
 
+    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS andNotIn(Path<T, U> getters, U... value);
 
     <U, F extends Path<T, ? super U>> THIS orIn(Path<T, U> getters, Collection<U> value);
 
+    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS orIn(Path<T, U> getters, U... value);
 
     <U, F extends Path<T, ? super U>> THIS orNotIn(Path<T, U> getters, Collection<U> value);
 
+    @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS orNotIn(Path<T, U> getters, U... value);
 
 }
