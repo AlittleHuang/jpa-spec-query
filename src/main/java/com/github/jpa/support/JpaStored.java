@@ -4,10 +4,11 @@ import com.github.data.query.specification.FieldPath;
 import com.github.data.query.specification.Orders;
 import com.github.data.query.specification.WhereClause;
 import com.github.data.query.support.AbstractStored;
-import com.github.jpa.support.SpecificationImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -15,6 +16,8 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class JpaStored<T> extends AbstractStored<T> {
@@ -87,7 +90,23 @@ public class JpaStored<T> extends AbstractStored<T> {
 
     @Override
     public boolean exists() {
-        return false;
+        StoredData<Object> data = new StoredData<>(Object.class).initWhere().initGroupBy();
+        JpaEntityInformation<T, ?> information = gettJpaEntityInformation(data);
+        data.query.select(data.root.get(information.getIdAttribute()));
+        return !entityManager.createQuery(data.query)
+                .setMaxResults(1)
+                .getResultList()
+                .isEmpty();
+    }
+
+    private static final Map<Class, JpaEntityInformation> INFORMATION_MAP = new ConcurrentHashMap<>();
+
+    private JpaEntityInformation<T, ?> gettJpaEntityInformation(StoredData<Object> data) {
+        //noinspection unchecked
+        return INFORMATION_MAP.computeIfAbsent(
+                data.root.getJavaType(),
+                type -> JpaEntityInformationSupport.getEntityInformation(type, entityManager)
+        );
     }
 
     private void setLock(TypedQuery<T> typedQuery) {
