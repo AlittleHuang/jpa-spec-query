@@ -10,7 +10,7 @@ public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>
 
     @Override
     protected SpecBuilder<T> createSub(SimpleFieldPath<T> paths) {
-        return new SpecBuilder<>(paths, root);
+        return new SpecBuilder<>(paths, getWhereClause());
     }
 
     public SpecBuilder() {
@@ -22,6 +22,6 @@ public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>
 
     @Delegate
     private Specification<T> getSpecification() {
-        return new SpecificationImpl<>(root);
+        return new SpecificationImpl<>(getWhereClause());
     }
 }

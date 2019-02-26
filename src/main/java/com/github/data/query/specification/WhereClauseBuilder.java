@@ -162,4 +162,5 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
     @SuppressWarnings("unchecked")
     <U, F extends Path<T, ? super U>> THIS orNotIn(Path<T, U> getters, U... value);
 
+    WhereClause getWhereClause();
 }

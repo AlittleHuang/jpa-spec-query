@@ -26,4 +26,6 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
 
     THIS setLockModeType(LockModeType lockModeType);
 
+    Criteria getCriteria();
+
 }

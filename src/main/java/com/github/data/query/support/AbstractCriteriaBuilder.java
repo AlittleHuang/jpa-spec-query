@@ -10,11 +10,11 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         extends AbstractWhereClauseBuilder<T, THIS>
         implements CriteriaBuilder<T, THIS> {
 
-    protected final SimpleCriteria<T> criteria;
+    private final SimpleCriteria<T> criteria;
 
     protected AbstractCriteriaBuilder() {
         super();
-        this.criteria = new SimpleCriteria<>(root);
+        this.criteria = new SimpleCriteria<>(getWhereClause());
     }
 
     public AbstractCriteriaBuilder(SimpleFieldPath path, WhereClauseItem root, SimpleCriteria<T> criteria) {
@@ -97,5 +97,8 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         return self();
     }
 
-
+    @Override
+    public SimpleCriteria<T> getCriteria() {
+        return criteria;
+    }
 }

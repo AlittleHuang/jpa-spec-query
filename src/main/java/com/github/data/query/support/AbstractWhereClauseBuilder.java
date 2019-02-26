@@ -17,7 +17,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         implements WhereClauseBuilder<T, THIS> {
 
     private static final boolean NOT = true;
-    protected final WhereClauseItem root;
+    private final WhereClauseItem root;
 
     public AbstractWhereClauseBuilder(SimpleFieldPath path, WhereClauseItem root) {
         super(path);
@@ -467,5 +467,10 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     @Override
     public final <U, F extends Path<T, ? super U>> THIS orNotIn(Path<T, U> getters, U... value) {
         return orNotIn(getters, Arrays.asList(value));
+    }
+
+    @Override
+    public WhereClauseItem getWhereClause() {
+        return root;
     }
 }

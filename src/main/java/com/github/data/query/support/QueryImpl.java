@@ -11,12 +11,12 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, com.github.data.que
 
     @Override
     protected QueryImpl<T> createSub(SimpleFieldPath<T> paths) {
-        return new QueryImpl<T>(paths, root, criteria, (AbstractStored<T>) stored);
+        return new QueryImpl<T>(paths, getWhereClause(), getCriteria(), (AbstractStored<T>) stored);
     }
 
     public QueryImpl(AbstractStored<T> stored) {
         super();
-        stored.criteria = criteria;
+        stored.criteria = getCriteria();
         this.stored = stored;
     }
 
