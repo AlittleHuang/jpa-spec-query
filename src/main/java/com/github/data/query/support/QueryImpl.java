@@ -1,13 +1,14 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.Stored;
+import com.github.data.query.specification.Query;
+import com.github.data.query.specification.QueryStored;
 import lombok.experimental.Delegate;
 
-public class QueryImpl<T> extends AbstractCriteriaBuilder<T, com.github.data.query.specification.Query<T>> implements
-        com.github.data.query.specification.Query<T> {
+public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implements
+        Query<T> {
 
     @Delegate
-    protected Stored<T> stored;
+    protected QueryStored<T> stored;
 
     @Override
     protected QueryImpl<T> createSub(SimpleFieldPath<T> paths) {
