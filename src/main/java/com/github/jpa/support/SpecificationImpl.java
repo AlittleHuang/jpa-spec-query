@@ -33,7 +33,6 @@ public class SpecificationImpl<T> implements Specification<T> {
             this.item = item;
         }
 
-
         private Predicate toPredicate() {
             if (!item.isCompound()) {
                 build();
@@ -97,7 +96,7 @@ public class SpecificationImpl<T> implements Specification<T> {
                     List<?> valuesIn = (List<Comparable>) value;
 
                     if (valuesIn.isEmpty()) {
-                        predicate = cb.equal(path, path).not();
+                        predicate = cb.equal(path, path).not();//will get empty result
                         break;
                     }
                     CriteriaBuilder.In<Object> in = cb.in(path);
