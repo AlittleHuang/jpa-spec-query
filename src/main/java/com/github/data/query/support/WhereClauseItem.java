@@ -1,5 +1,6 @@
 package com.github.data.query.support;
 
+import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.ConditionalOperator;
 import com.github.data.query.specification.WhereClause;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 @Getter
 public class WhereClauseItem implements WhereClause {
 
-    final SimpleFieldPath path;
+    final Attribute path;
 
     boolean compound;
 
@@ -27,7 +28,7 @@ public class WhereClauseItem implements WhereClause {
 
     final List<WhereClauseItem> compoundItems;
 
-    public WhereClauseItem(SimpleFieldPath path) {
+    public WhereClauseItem(Attribute path) {
         this.path = path;
         if (path == null) {
             compound = true;

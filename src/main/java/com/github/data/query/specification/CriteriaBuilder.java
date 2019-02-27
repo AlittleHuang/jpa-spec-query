@@ -6,23 +6,23 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
 
     THIS addSelect(String... paths);
 
-    THIS addSelect(Path<T, ?> paths);
+    THIS addSelect(Getter<T, ?> paths);
 
     THIS addGroupings(String... paths);
 
-    THIS addGroupings(Path<T, ?> paths);
+    THIS addGroupings(Getter<T, ?> paths);
 
     THIS addOrdersAsc(String... paths);
 
-    THIS addOrdersAsc(Path<T, ?> paths);
+    THIS addOrdersAsc(Getter<T, ?> paths);
 
     THIS addOrdersDesc(String... paths);
 
-    THIS addOrdersDesc(Path<T, ?> paths);
+    THIS addOrdersDesc(Getter<T, ?> paths);
 
-    THIS addFetchs(String... paths);
+    THIS fetch(String... paths);
 
-    THIS addFetchs(Path<T, ?> paths);
+    THIS fetch(Getter<T, ?> paths);
 
     THIS setLockModeType(LockModeType lockModeType);
 

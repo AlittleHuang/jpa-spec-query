@@ -1,7 +1,8 @@
 package com.github.data.query.support;
 
+import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.CriteriaBuilder;
-import com.github.data.query.specification.Path;
+import com.github.data.query.specification.Getter;
 import org.springframework.data.domain.Sort;
 
 import javax.persistence.LockModeType;
@@ -17,7 +18,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         this.criteria = new SimpleCriteria<>(getWhereClause());
     }
 
-    public AbstractCriteriaBuilder(SimpleFieldPath path, WhereClauseItem root, SimpleCriteria<T> criteria) {
+    public AbstractCriteriaBuilder(Attribute path, WhereClauseItem root, SimpleCriteria<T> criteria) {
         super(path, root);
         this.criteria = criteria;
     }
@@ -25,28 +26,28 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS addSelect(String... paths) {
         for (String path : paths) {
-            criteria.selections.add(new SimpleFieldPath<>(path));
+            criteria.selections.add(new SimpleAttribute<>(path));
         }
         return self();
     }
 
     @Override
-    public THIS addSelect(Path<T, ?> paths) {
-        criteria.selections.add(new SimpleFieldPath<>(paths));
+    public THIS addSelect(Getter<T, ?> paths) {
+        criteria.selections.add(paths);
         return self();
     }
 
     @Override
     public THIS addGroupings(String... paths) {
         for (String path : paths) {
-            criteria.groupings.add(new SimpleFieldPath<>(path));
+            criteria.groupings.add(new SimpleAttribute<>(path));
         }
         return self();
     }
 
     @Override
-    public THIS addGroupings(Path<T, ?> paths) {
-        criteria.selections.add(new SimpleFieldPath<>(paths));
+    public THIS addGroupings(Getter<T, ?> paths) {
+        criteria.selections.add(paths);
         return self();
     }
 
@@ -59,7 +60,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS addOrdersAsc(Path<T, ?> paths) {
+    public THIS addOrdersAsc(Getter<T, ?> paths) {
         criteria.orders.add(new SimpleOrders<>(Sort.Direction.ASC, paths));
         return self();
     }
@@ -73,22 +74,22 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS addOrdersDesc(Path<T, ?> paths) {
+    public THIS addOrdersDesc(Getter<T, ?> paths) {
         criteria.orders.add(new SimpleOrders<>(Sort.Direction.DESC, paths));
         return self();
     }
 
     @Override
-    public THIS addFetchs(String... paths) {
+    public THIS fetch(String... paths) {
         for (String path : paths) {
-            criteria.fetchs.add(new SimpleFieldPath<>(path));
+            criteria.fetchs.add(new SimpleAttribute<>(path));
         }
         return self();
     }
 
     @Override
-    public THIS addFetchs(Path<T, ?> paths) {
-        criteria.fetchs.add(new SimpleFieldPath<>(paths));
+    public THIS fetch(Getter<T, ?> paths) {
+        criteria.fetchs.add(paths);
         return self();
     }
 

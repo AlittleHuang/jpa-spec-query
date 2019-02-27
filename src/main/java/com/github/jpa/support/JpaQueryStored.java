@@ -1,14 +1,13 @@
 package com.github.jpa.support;
 
-import com.github.data.query.specification.FieldPath;
+import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.Orders;
 import com.github.data.query.specification.WhereClause;
-import com.github.data.query.support.AbstractStored;
+import com.github.jpa.util.JpaHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
-import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -16,19 +15,12 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class JpaStored<T> extends AbstractStored<T> {
-    public static final int DEFAULT_PAGE_SIZE = 10;
+public class JpaQueryStored<T> extends AbstractJpaStored<T> {
 
-    private EntityManager entityManager;
-    private Class<T> type;
-
-    public JpaStored(EntityManager entityManager, Class<T> type) {
-        this.entityManager = entityManager;
-        this.type = type;
+    public JpaQueryStored(EntityManager entityManager, Class<T> type) {
+        super(entityManager, type);
     }
 
     @Override
@@ -43,7 +35,7 @@ public class JpaStored<T> extends AbstractStored<T> {
     @SuppressWarnings("unchecked")
     @Override
     public <X> List<X> getObjectList() {
-        List<? extends FieldPath<T>> list = criteria.getSelections();
+        List<? extends Attribute<T>> list = criteria.getSelections();
         if (list == null || list.isEmpty()) {
             return (List<X>) getResultList();
         }
@@ -51,7 +43,7 @@ public class JpaStored<T> extends AbstractStored<T> {
         CriteriaQuery<?> query = data.query;
         List selections = list.stream()
                 .map(it -> {
-                    Path path = it.getPaths(data.root);
+                    Path path = JpaHelper.toPath(data.root, it.getNames(type));
                     Class<?> type = path.getJavaType();
                     return path.as(type);
                 }).collect(Collectors.toList());
@@ -91,22 +83,12 @@ public class JpaStored<T> extends AbstractStored<T> {
     @Override
     public boolean exists() {
         StoredData<Object> data = new StoredData<>(Object.class).initWhere().initGroupBy();
-        JpaEntityInformation<T, ?> information = gettJpaEntityInformation(data);
+        JpaEntityInformation<T, ?> information = gettJpaEntityInformation();
         data.query.select(data.root.get(information.getIdAttribute()));
         return !entityManager.createQuery(data.query)
                 .setMaxResults(1)
                 .getResultList()
                 .isEmpty();
-    }
-
-    private static final Map<Class, JpaEntityInformation> INFORMATION_MAP = new ConcurrentHashMap<>();
-
-    private JpaEntityInformation<T, ?> gettJpaEntityInformation(StoredData<Object> data) {
-        //noinspection unchecked
-        return INFORMATION_MAP.computeIfAbsent(
-                data.root.getJavaType(),
-                type -> JpaEntityInformationSupport.getEntityInformation(type, entityManager)
-        );
     }
 
     private void setLock(TypedQuery<T> typedQuery) {
@@ -148,7 +130,7 @@ public class JpaStored<T> extends AbstractStored<T> {
         private StoredData<R> initGroupBy() {
             if (!criteria.getGroupings().isEmpty()) {
                 List<Expression<?>> paths = criteria.getGroupings().stream()
-                        .map(it -> (it.getPaths(root)))
+                        .map(it -> JpaHelper.toPath(root, it.getNames(type)))
                         .collect(Collectors.toList());
                 query.groupBy(paths);
             }
@@ -159,12 +141,13 @@ public class JpaStored<T> extends AbstractStored<T> {
             ArrayList<Order> orders = new ArrayList<>();
             if (!criteria.getOrders().isEmpty()) {
                 for (Orders<T> order : criteria.getOrders()) {
+                    Path<?> path = JpaHelper.toPath(root, order.getNames(type));
                     switch (order.getDirection()) {
                         case DESC:
-                            orders.add(cb.desc(order.getPaths(root)));
+                            orders.add(cb.desc(path));
                             break;
                         case ASC:
-                            orders.add(cb.asc(order.getPaths(root)));
+                            orders.add(cb.asc(path));
                             break;
                         default:
                             throw new RuntimeException();
@@ -176,10 +159,10 @@ public class JpaStored<T> extends AbstractStored<T> {
         }
 
         private StoredData<R> initFetch() {
-            List<? extends FieldPath<T>> fetchs = criteria.getFetchs();
-            for (FieldPath<T> fidld : fetchs) {
+            List<? extends Attribute<T>> fetchs = criteria.getFetchs();
+            for (Attribute<T> fidld : fetchs) {
                 Fetch fetch = null;
-                for (String stringPath : fidld.getStringPaths(root)) {
+                for (String stringPath : fidld.getNames(type)) {
                     if (fetch == null) {
                         fetch = root.fetch(stringPath);
                     } else {
@@ -199,4 +182,5 @@ public class JpaStored<T> extends AbstractStored<T> {
             return new SpecificationImpl<T>(where).toPredicate(root, query, cb);
         }
     }
+
 }

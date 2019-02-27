@@ -2,7 +2,7 @@ package com.github.jpa.repostory;
 
 import com.github.data.query.specification.Query;
 import com.github.data.query.support.QueryImpl;
-import com.github.jpa.support.JpaStored;
+import com.github.jpa.support.JpaQueryStored;
 
 import javax.persistence.EntityManager;
 
@@ -15,7 +15,7 @@ public class CommonRepostory {
     }
 
     public <T> Query<T> query(Class<T> entityType) {
-        return new QueryImpl<>(new JpaStored<>(entityManager, entityType));
+        return new QueryImpl<>(new JpaQueryStored<>(entityManager, entityType));
     }
 
     public <T> T persist(T entity) {

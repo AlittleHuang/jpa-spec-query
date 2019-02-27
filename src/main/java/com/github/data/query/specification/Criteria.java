@@ -7,13 +7,13 @@ public interface Criteria<T> {
 
     WhereClause getWhereClause();
 
-    List<? extends FieldPath<T>> getSelections();
+    List<? extends Attribute<T>> getSelections();
 
-    List<? extends FieldPath<T>> getGroupings();
+    List<? extends Attribute<T>> getGroupings();
 
     List<? extends Orders<T>> getOrders();
 
-    List<? extends FieldPath<T>> getFetchs();
+    List<? extends Attribute<T>> getFetchs();
 
     Integer getOffset();
 

@@ -1,5 +1,6 @@
 package com.github.data.query.support;
 
+import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.Criteria;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,10 +13,10 @@ import java.util.List;
 public class SimpleCriteria<T> implements Criteria<T> {
 
     protected final WhereClauseItem whereClause;
-    protected final List<SimpleFieldPath<T>> selections = new ArrayList<>();
-    protected final List<SimpleFieldPath<T>> groupings = new ArrayList<>();
+    protected final List<Attribute<T>> selections = new ArrayList<>();
+    protected final List<Attribute<T>> groupings = new ArrayList<>();
     protected final List<SimpleOrders<T>> orders = new ArrayList<>();
-    protected final List<SimpleFieldPath<T>> fetchs = new ArrayList<>();
+    protected final List<Attribute<T>> fetchs = new ArrayList<>();
 
     @Setter
     private LockModeType lockMode;

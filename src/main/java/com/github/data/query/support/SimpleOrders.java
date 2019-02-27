@@ -1,24 +1,27 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.Path;
+import com.github.data.query.specification.Attribute;
+import com.github.data.query.specification.Getter;
 import com.github.data.query.specification.Orders;
-import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Delegate;
 import org.springframework.data.domain.Sort;
 
-public class SimpleOrders<T> extends SimpleFieldPath<T> implements Orders<T> {
+public class SimpleOrders<T> implements Orders<T>, Attribute<T> {
 
-    @Getter
+    @lombok.Getter
     @Setter
-    Sort.Direction direction;
+    private Sort.Direction direction;
+    @Delegate
+    private Attribute<T> attribute;
 
     public SimpleOrders(Sort.Direction direction, String path) {
-        super(path);
+        attribute = new SimpleAttribute<>(path);
         this.direction = direction;
     }
 
-    public SimpleOrders(Sort.Direction direction, Path<T, ?> getter) {
-        super(getter);
+    public SimpleOrders(Sort.Direction direction, Getter<T, ?> getter) {
+        this.attribute = getter;
         this.direction = direction;
     }
 }

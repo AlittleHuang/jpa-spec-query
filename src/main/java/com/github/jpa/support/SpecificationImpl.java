@@ -1,10 +1,12 @@
 package com.github.jpa.support;
 
-import com.github.data.query.specification.FieldPath;
+import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.WhereClause;
+import com.github.jpa.util.JpaHelper;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;
+import java.util.Iterator;
 import java.util.List;
 
 public class SpecificationImpl<T> implements Specification<T> {
@@ -67,11 +69,18 @@ public class SpecificationImpl<T> implements Specification<T> {
 
         @SuppressWarnings("unchecked")
         private void build() {
-            Path path = item.getPath().getPaths(root);
+            Attribute attribute = item.getPath();
+            Path path = toPath(attribute);
             Object value = item.getValue();
-            if (value instanceof FieldPath) {
-                value = ((FieldPath) value).getPaths(root);
+            if (value instanceof Attribute) {
+                toPredicateItem(path, toPath((Attribute) value));
+            } else {
+                toPredicateItem(path, value);
             }
+        }
+
+        @SuppressWarnings("unchecked")
+        private void toPredicateItem(Path path, Object value) {
             switch (item.getConditionalOperator()) {
                 case EQUAL:
                     predicate = cb.equal(path, value);
@@ -89,31 +98,66 @@ public class SpecificationImpl<T> implements Specification<T> {
                     predicate = cb.lessThanOrEqualTo(path, (Comparable) value);
                     break;
                 case BETWEEN:
-                    List<Comparable> valuesBtween = (List<Comparable>) value;
-                    predicate = cb.between(path, valuesBtween.get(0), valuesBtween.get(1));
+                    Iterator<?> bt = ((Iterable<?>) value).iterator();
+                    Object x = bt.next();
+                    Object y = bt.next();
+                    if (x instanceof Expression && y instanceof Expression) {
+                        predicate = cb.between(path, (Expression) x, (Expression) y);
+                    } else {
+                        predicate = cb.between(path, (Comparable) x, (Comparable) y);
+                    }
                     break;
                 case IN:
-                    List<?> valuesIn = (List<Comparable>) value;
+                    Iterable<?> valuesIn = (Iterable<Comparable>) value;
+                    Iterator<?> iterator = valuesIn.iterator();
 
-                    if (valuesIn.isEmpty()) {
+                    if (!iterator.hasNext()) {
                         predicate = cb.equal(path, path).not();//will get empty result
                         break;
                     }
                     CriteriaBuilder.In<Object> in = cb.in(path);
-                    for (Object x : valuesIn) {
-                        in.value(x);
+                    for (Object valueIn : valuesIn) {
+                        in.value(valueIn);
                     }
                     predicate = in;
                     break;
                 case LIKE:
-                    //noinspection ConstantConditions
                     predicate = cb.like(path, (String) value);
                     break;
                 case IS_NULL:
                     predicate = cb.isNull(path);
                     break;
                 default:
+                    throw new RuntimeException();
             }
+        }
+
+        @SuppressWarnings("unchecked")
+        private void toPredicateItem(Path path, Expression value) {
+            switch (item.getConditionalOperator()) {
+                case EQUAL:
+                    predicate = cb.equal(path, value);
+                    break;
+                case GT:
+                    predicate = cb.greaterThan(path, value);
+                    break;
+                case LT:
+                    predicate = cb.lessThan(path, value);
+                    break;
+                case GE:
+                    predicate = cb.greaterThanOrEqualTo(path, value);
+                    break;
+                case LE:
+                    predicate = cb.lessThanOrEqualTo(path, value);
+                    break;
+                default:
+                    throw new RuntimeException();
+            }
+        }
+
+        Path toPath(Attribute<T> attribute) {
+            //noinspection unchecked
+            return JpaHelper.toPath(root, attribute.getNames((Class<T>) root.getJavaType()));
         }
     }
 

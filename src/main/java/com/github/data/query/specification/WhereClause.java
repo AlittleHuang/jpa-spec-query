@@ -8,7 +8,7 @@ public interface WhereClause {
 
     List<? extends WhereClause> getCompoundItems();
 
-    FieldPath getPath();
+    Attribute getPath();
 
     Object getValue();
 
