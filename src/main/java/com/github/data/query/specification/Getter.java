@@ -53,46 +53,49 @@ public interface Getter<T, R> extends Attribute<T> {
         return Collections.singletonList(this);
     }
 
-    default String[] getNames(Class<T> type) {
+    default String[] getNames(Class<? extends T> type) {
         return Util.getAttrNames(type, this);
     }
 
     default String[] getNames() {
-        //noinspection unchecked
-        return Util.getAttrNames((Class<T>) Object.class, this);
+        return getNames(null);
     }
 
     class Util {
 
         private final static Map<Class, Method> map = new HashMap<>();
 
-        public static <T> String[] getAttrNames(Class<T> type, Getter<T, ?> getters) {
+        public static <T> String[] getAttrNames(Class<? extends T> type, Getter<T, ?> getters) {
+            Class cls = type == null ? Object.class : type;
             List<Getter<?, ?>> list = getters.list();
             String[] strings = new String[list.size()];
             int i = 0;
-            Class cls = type;
             for (Getter getter : list) {
                 //noinspection unchecked
-                Method method = getMethod(cls, getter);
+                Method method = getMethod(cls, getter, type == null);
                 cls = method.getReturnType();
                 strings[i++] = toAttrName(method.getName());
             }
             return strings;
         }
 
-        public static <T> Method getMethod(Class<T> type, Getter<T, ?> getters) {
+        public static <T> Method getMethod(Class<T> type, Getter<T, ?> getters, boolean cast) {
             Class key = getters.getClass();
-            Method name = map.get(key);
-            if (name == null) {
+            Method method = null;
+            if (!map.containsKey(key)) {
                 synchronized (map) {
-                    name = map.get(key);
-                    if (name == null) {
-                        name = Proxy.getMethod(type, getters);
-                        map.put(key, name);
+                    method = map.get(key);
+                    if (method == null) {
+                        method = Proxy.getMethod(type, getters, cast);
+                        map.put(key, method);
                     }
                 }
             }
-            return name;
+            if (method == null) {
+                method = map.get(key);
+                Assert.notNull(method, "The function is not getter of " + type.getName());
+            }
+            return method;
         }
 
         private static String toAttrName(String getterName) {
@@ -114,7 +117,7 @@ public interface Getter<T, R> extends Attribute<T> {
             private static Map<Class<?>, Object> instanceMap = new ConcurrentHashMap<>();
             private static Proxy proxy = new Proxy();
 
-            private static <T> Method getMethod(Class<T> type, Getter<T, ?> getters) {
+            private static <T> Method getMethod(Class<T> type, Getter<T, ?> getters, boolean cast) {
                 T target = proxy.getProxyInstance(type);
                 try {
                     getters.apply(target);
@@ -122,20 +125,19 @@ public interface Getter<T, R> extends Attribute<T> {
                     if (e.getClass() == MethodInfo.class)
                         //noinspection ConstantConditions
                         return ((Proxy.MethodInfo) e).getMethod();
-                    if (e.getClass() == ClassCastException.class) {
+                    if (cast && e.getClass() == ClassCastException.class) {
                         String message = e.getMessage();
                         int i = message.lastIndexOf(' ');
                         try {
                             //noinspection unchecked
                             type = (Class<T>) Class.forName(message.substring(i + 1));
-                            return getMethod(type, getters);
+                            return getMethod(type, getters, false);
                         } catch (ClassNotFoundException e1) {
                             throw new RuntimeException(e1);
                         }
                     }
-                    throw new RuntimeException(e);
                 }
-                throw new RuntimeException();
+                return null;
             }
 
             private <T> T getProxyInstance(Class<T> type) {

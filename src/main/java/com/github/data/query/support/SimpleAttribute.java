@@ -15,7 +15,7 @@ public class SimpleAttribute<T> implements Attribute<T> {
     }
 
     @Override
-    public String[] getNames(Class<T> root) {
+    public String[] getNames(Class<? extends T> root) {
         return names;
     }
 }
