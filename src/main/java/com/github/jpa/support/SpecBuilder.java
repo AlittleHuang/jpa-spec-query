@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>> implements Specification<T> {
 
     @Override
-    protected SpecBuilder<T> createSub(Attribute<T> paths) {
+    protected SpecBuilder<T> createSubItem(Attribute<T> paths) {
         return new SpecBuilder<>(paths, getWhereClause());
     }
 

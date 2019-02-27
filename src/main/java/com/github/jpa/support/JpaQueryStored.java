@@ -43,7 +43,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         CriteriaQuery<?> query = data.query;
         List selections = list.stream()
                 .map(it -> {
-                    Path path = JpaHelper.toPath(data.root, it.getNames(type));
+                    Path path = JpaHelper.getPath(data.root, it.getNames(type));
                     Class<?> type = path.getJavaType();
                     return path.as(type);
                 }).collect(Collectors.toList());
@@ -130,7 +130,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         private StoredData<R> initGroupBy() {
             if (!criteria.getGroupings().isEmpty()) {
                 List<Expression<?>> paths = criteria.getGroupings().stream()
-                        .map(it -> JpaHelper.toPath(root, it.getNames(type)))
+                        .map(it -> JpaHelper.getPath(root, it.getNames(type)))
                         .collect(Collectors.toList());
                 query.groupBy(paths);
             }
@@ -141,7 +141,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
             ArrayList<Order> orders = new ArrayList<>();
             if (!criteria.getOrders().isEmpty()) {
                 for (Orders<T> order : criteria.getOrders()) {
-                    Path<?> path = JpaHelper.toPath(root, order.getNames(type));
+                    Path<?> path = JpaHelper.getPath(root, order.getNames(type));
                     switch (order.getDirection()) {
                         case DESC:
                             orders.add(cb.desc(path));

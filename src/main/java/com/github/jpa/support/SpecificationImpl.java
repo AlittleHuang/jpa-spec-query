@@ -157,7 +157,7 @@ public class SpecificationImpl<T> implements Specification<T> {
 
         Path toPath(Attribute<T> attribute) {
             //noinspection unchecked
-            return JpaHelper.toPath(root, attribute.getNames((Class<T>) root.getJavaType()));
+            return JpaHelper.getPath(root, attribute.getNames((Class<T>) root.getJavaType()));
         }
     }
 

@@ -12,7 +12,7 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
     protected QueryStored<T> stored;
 
     @Override
-    protected QueryImpl<T> createSub(Attribute<T> paths) {
+    protected QueryImpl<T> createSubItem(Attribute<T> paths) {
         return new QueryImpl<>(paths, getWhereClause(), getCriteria(), (AbstractQueryStored<T>) stored);
     }
 

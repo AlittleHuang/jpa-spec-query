@@ -25,7 +25,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         this.root = root;
     }
 
-    protected abstract THIS createSub(Attribute<T> paths);
+    protected abstract THIS createSubItem(Attribute<T> paths);
 
     protected THIS self(){
         //noinspection unchecked
@@ -34,7 +34,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
 
     private AbstractWhereClauseBuilder<T, THIS> sub(Attribute<T> paths){
         //noinspection unchecked
-        return (AbstractWhereClauseBuilder) createSub(paths);
+        return (AbstractWhereClauseBuilder) createSubItem(paths);
     }
 
     public AbstractWhereClauseBuilder() {
