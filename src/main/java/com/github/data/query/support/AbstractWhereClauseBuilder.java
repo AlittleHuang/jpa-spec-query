@@ -289,82 +289,82 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
 
     @Override
     public <Y extends Comparable<? super Y>> THIS andGe(String name, Y value) {
-        return add(name, value, AND, GE);
+        return add(name, value, AND, GREATER_THAN_OR_EQUAL_TO);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andGe(F getter, U value) {
-        return add(getter, value, AND, GE);
+        return add(getter, value, AND, GREATER_THAN_OR_EQUAL_TO);
     }
 
     @Override
     public <Y extends Comparable<? super Y>> THIS orGe(String name, Y value) {
-        return add(name, value, OR, GE);
+        return add(name, value, OR, GREATER_THAN_OR_EQUAL_TO);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orGe(F getter, U value) {
-        return add(getter, value, OR, GE);
+        return add(getter, value, OR, GREATER_THAN_OR_EQUAL_TO);
     }
 
     @Override
     public <Y extends Comparable<? super Y>> THIS andLe(String name, Y value) {
-        return add(name, value, AND, LT);
+        return add(name, value, AND, LESS_THAN);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andLe(F getter, U value) {
-        return add(getter, value, AND, LE);
+        return add(getter, value, AND, LESS_THAN_OR_EQUAL_TO);
     }
 
     @Override
     public <Y extends Comparable<? super Y>> THIS orLe(String name, Y value) {
-        return add(name, value, OR, LT);
+        return add(name, value, OR, LESS_THAN);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orLe(F getter, U value) {
-        return add(getter, value, OR, LE);
+        return add(getter, value, OR, LESS_THAN_OR_EQUAL_TO);
     }
 
     @Override
     public <Y extends Comparable<? super Y>> THIS andGt(String name, Y value) {
-        return add(name, value, AND, GT);
+        return add(name, value, AND, GREATER_THAN);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andGt(F getter, U value) {
-        return add(getter, value, AND, GT);
+        return add(getter, value, AND, GREATER_THAN);
     }
 
     @Override
     public <Y extends Comparable<? super Y>> THIS orGt(String name, Y value) {
-        return add(name, value, OR, GT);
+        return add(name, value, OR, GREATER_THAN);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orGt(F getter, U value) {
-        return add(getter, value, OR, GT);
+        return add(getter, value, OR, GREATER_THAN);
     }
 
     @Override
     public <Y extends Comparable<? super Y>> THIS andLt(String name, Y value) {
-        return add(name, value, AND, LT);
+        return add(name, value, AND, LESS_THAN);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andLt(F getter, U value) {
-        return add(getter, value, AND, LT);
+        return add(getter, value, AND, LESS_THAN);
     }
 
     @Override
     public <Y extends Comparable<? super Y>> THIS orLt(String name, Y value) {
-        return add(name, value, OR, LT);
+        return add(name, value, OR, LESS_THAN);
     }
 
     @Override
     public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orLt(F getter, U value) {
-        return add(getter, value, OR, LT);
+        return add(getter, value, OR, LESS_THAN);
     }
 
     @Override

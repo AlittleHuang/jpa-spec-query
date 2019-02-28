@@ -85,16 +85,16 @@ public class SpecificationImpl<T> implements Specification<T> {
                 case EQUAL:
                     predicate = cb.equal(path, value);
                     break;
-                case GT:
+                case GREATER_THAN:
                     predicate = cb.greaterThan(path, (Comparable) value);
                     break;
-                case LT:
+                case LESS_THAN:
                     predicate = cb.lessThan(path, (Comparable) value);
                     break;
-                case GE:
+                case GREATER_THAN_OR_EQUAL_TO:
                     predicate = cb.greaterThanOrEqualTo(path, (Comparable) value);
                     break;
-                case LE:
+                case LESS_THAN_OR_EQUAL_TO:
                     predicate = cb.lessThanOrEqualTo(path, (Comparable) value);
                     break;
                 case BETWEEN:
@@ -138,16 +138,16 @@ public class SpecificationImpl<T> implements Specification<T> {
                 case EQUAL:
                     predicate = cb.equal(path, value);
                     break;
-                case GT:
+                case GREATER_THAN:
                     predicate = cb.greaterThan(path, value);
                     break;
-                case LT:
+                case LESS_THAN:
                     predicate = cb.lessThan(path, value);
                     break;
-                case GE:
+                case GREATER_THAN_OR_EQUAL_TO:
                     predicate = cb.greaterThanOrEqualTo(path, value);
                     break;
-                case LE:
+                case LESS_THAN_OR_EQUAL_TO:
                     predicate = cb.lessThanOrEqualTo(path, value);
                     break;
                 default:
