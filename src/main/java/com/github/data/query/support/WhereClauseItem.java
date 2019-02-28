@@ -14,19 +14,19 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 @Getter
 public class WhereClauseItem implements WhereClause {
 
-    final Attribute path;
+    protected final Attribute path;
 
-    boolean compound;
+    protected boolean compound;
 
-    Object value;
+    protected Object value;
 
-    Predicate.BooleanOperator booleanOperator = AND;
+    protected Predicate.BooleanOperator booleanOperator = AND;
 
-    ConditionalOperator conditionalOperator;//条件运算符
+    protected ConditionalOperator conditionalOperator;//条件运算符
 
-    boolean negate = false;//取反
+    protected boolean negate = false;//取反
 
-    final List<WhereClauseItem> compoundItems;
+    protected final List<WhereClauseItem> compoundItems;
 
     public WhereClauseItem(Attribute path) {
         this.path = path;
