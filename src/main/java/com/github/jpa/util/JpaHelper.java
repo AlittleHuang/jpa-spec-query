@@ -13,7 +13,6 @@ public class JpaHelper {
         return path;
     }
 
-
     public static <T> boolean hasAttributeNames(Root<T> root, String attributeNames) {
         return hasAttributeNames(root, attributeNames.split("\\."));
     }

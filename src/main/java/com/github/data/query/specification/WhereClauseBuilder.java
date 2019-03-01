@@ -305,5 +305,5 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
     @SuppressWarnings("unchecked")
     <U, F extends Getter<T, ? super U>> THIS orNotIn(F getters, U... value);
 
-    WhereClause getWhereClause();
+    WhereClause<T> getWhereClause();
 }

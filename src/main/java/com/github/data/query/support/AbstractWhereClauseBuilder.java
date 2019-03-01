@@ -498,7 +498,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public WhereClauseItem getWhereClause() {
+    public WhereClauseItem<T> getWhereClause() {
         return root;
     }
 
