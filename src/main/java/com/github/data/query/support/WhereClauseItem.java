@@ -4,6 +4,7 @@ import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.ConditionalOperator;
 import com.github.data.query.specification.WhereClause;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
 @Getter
+@Setter
 public class WhereClauseItem<T> implements WhereClause<T> {
 
     protected final Attribute path;

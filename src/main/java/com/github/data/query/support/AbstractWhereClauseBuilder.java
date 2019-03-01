@@ -102,9 +102,9 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     private WhereClause<T> sub(WhereClause<T> whereClause,
                                Predicate.BooleanOperator booleanOperator) {
         WhereClause<T> sub;
-        if (whereClause != null && whereClause.getClass() == WhereClauseItem.class) {
+        if (whereClause instanceof WhereClauseItem) {
             sub = whereClause;
-            ((WhereClauseItem) sub).booleanOperator = booleanOperator;
+            ((WhereClauseItem) sub).setBooleanOperator(booleanOperator);
         } else {
             sub = new AbstractWhereClause(whereClause) {
                 @Override
