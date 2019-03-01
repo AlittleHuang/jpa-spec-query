@@ -9,10 +9,14 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
      */
     THIS or();
 
+    THIS or(WhereClause<T> whereClause);
+
     /**
      * 返回一个新的对象,与原条件以AND条件链接
      */
     THIS and();
+
+    THIS and(WhereClause<T> whereClause);
 
     THIS andEq(String name, Object value);
 
@@ -263,43 +267,43 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
 
     THIS orNotLike(Getter<T, String> getters, String value);
 
-    <U, F extends Getter<T, ? super U>> THIS andIn(Getter<T, U> getters, Collection<U> value);
+    <U, F extends Getter<T, ? super U>> THIS andIn(F getters, Collection<U> value);
 
-    default <U, F extends Getter<T, ? super U>> THIS in(Getter<T, U> getters, Collection<U> value) {
+    default <U, F extends Getter<T, ? super U>> THIS in(F getters, Collection<U> value) {
         return andIn(getters, value);
     }
 
     @SuppressWarnings("unchecked")
-    <U, F extends Getter<T, ? super U>> THIS andIn(Getter<T, U> getters, U... value);
+    <U, F extends Getter<T, ? super U>> THIS andIn(F getters, U... value);
 
     @SuppressWarnings("unchecked")
-    default <U, F extends Getter<T, ? super U>> THIS in(Getter<T, U> getters, U... value){
+    default <U, F extends Getter<T, ? super U>> THIS in(F getters, U... value) {
         return andIn(getters, value);
     }
 
-    <U, F extends Getter<T, ? super U>> THIS andNotIn(Getter<T, U> getters, Collection<U> value);
+    <U, F extends Getter<T, ? super U>> THIS andNotIn(F getters, Collection<U> value);
 
-    default <U, F extends Getter<T, ? super U>> THIS notIn(Getter<T, U> getters, Collection<U> value) {
+    default <U, F extends Getter<T, ? super U>> THIS notIn(F getters, Collection<U> value) {
         return andNotIn(getters, value);
     }
 
     @SuppressWarnings("unchecked")
-    <U, F extends Getter<T, ? super U>> THIS andNotIn(Getter<T, U> getters, U... value);
+    <U, F extends Getter<T, ? super U>> THIS andNotIn(F getters, U... value);
 
     @SuppressWarnings("unchecked")
-    default <U, F extends Getter<T, ? super U>> THIS notIn(Getter<T, U> getters, U... value) {
+    default <U, F extends Getter<T, ? super U>> THIS notIn(F getters, U... value) {
         return andNotIn(getters, value);
     }
 
-    <U, F extends Getter<T, ? super U>> THIS orIn(Getter<T, U> getters, Collection<U> value);
+    <U, F extends Getter<T, ? super U>> THIS orIn(F getters, Collection<U> value);
 
     @SuppressWarnings("unchecked")
-    <U, F extends Getter<T, ? super U>> THIS orIn(Getter<T, U> getters, U... value);
+    <U, F extends Getter<T, ? super U>> THIS orIn(F getters, U... value);
 
-    <U, F extends Getter<T, ? super U>> THIS orNotIn(Getter<T, U> getters, Collection<U> value);
+    <U, F extends Getter<T, ? super U>> THIS orNotIn(F getters, Collection<U> value);
 
     @SuppressWarnings("unchecked")
-    <U, F extends Getter<T, ? super U>> THIS orNotIn(Getter<T, U> getters, U... value);
+    <U, F extends Getter<T, ? super U>> THIS orNotIn(F getters, U... value);
 
     WhereClause getWhereClause();
 }

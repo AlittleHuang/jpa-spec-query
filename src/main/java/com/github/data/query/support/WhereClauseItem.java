@@ -12,7 +12,7 @@ import java.util.List;
 import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
 @Getter
-public class WhereClauseItem implements WhereClause {
+public class WhereClauseItem<T> implements WhereClause<T> {
 
     protected final Attribute path;
 
@@ -26,7 +26,7 @@ public class WhereClauseItem implements WhereClause {
 
     protected boolean negate = false;//取反
 
-    protected final List<WhereClauseItem> compoundItems;
+    protected final List<WhereClause<T>> compoundItems;
 
     public WhereClauseItem(Attribute path) {
         this.path = path;

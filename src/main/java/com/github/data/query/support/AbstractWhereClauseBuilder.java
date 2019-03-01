@@ -1,9 +1,7 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.Attribute;
-import com.github.data.query.specification.ConditionalOperator;
-import com.github.data.query.specification.Getter;
-import com.github.data.query.specification.WhereClauseBuilder;
+import com.github.data.query.specification.*;
+import lombok.experimental.Delegate;
 
 import javax.persistence.criteria.Predicate;
 import java.util.Arrays;
@@ -14,13 +12,13 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 import static javax.persistence.criteria.Predicate.BooleanOperator.OR;
 
 public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
-        extends WhereClauseItem
+        extends WhereClauseItem<T>
         implements WhereClauseBuilder<T, THIS> {
 
     private static final boolean NOT = true;
-    private final WhereClauseItem root;
+    private final WhereClauseItem<T> root;
 
-    public AbstractWhereClauseBuilder(Attribute path, WhereClauseItem root) {
+    public AbstractWhereClauseBuilder(Attribute path, WhereClauseItem<T> root) {
         super(path);
         this.root = root;
     }
@@ -44,63 +42,93 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
 
     private THIS add(Attribute<T> paths,
                      Object value,
-                     Predicate.BooleanOperator operator,
+                     Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
         AbstractWhereClauseBuilder<T, THIS> item = sub(paths);
         item.value = value;
-        item.booleanOperator = operator;
+        item.booleanOperator = booleanOperator;
         item.conditionalOperator = conditionalOperator;
         item.negate = negate;
-        assert compoundItems != null;
-        compoundItems.add(item);
+        getCompoundItems().add(item);
         return self();
     }
 
     private THIS add(Getter<T, ?> paths,
                      Object value,
-                     Predicate.BooleanOperator operator,
+                     Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        return add((Attribute<T>) (paths), value, operator, negate, conditionalOperator);
+        return add((Attribute<T>) (paths), value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(String paths,
                      Object value,
-                     Predicate.BooleanOperator operator,
+                     Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
         SimpleAttribute<T> path = new SimpleAttribute<>(paths);
-        return add(path, value, operator, negate, conditionalOperator);
+        return add(path, value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(Getter<T, ?> paths,
                      Object value,
-                     Predicate.BooleanOperator operator,
+                     Predicate.BooleanOperator booleanOperator,
                      ConditionalOperator conditionalOperator) {
-        return add(paths, value, operator, false, conditionalOperator);
+        return add(paths, value, booleanOperator, false, conditionalOperator);
     }
 
     private THIS add(String paths,
                      Object value,
-                     Predicate.BooleanOperator operator,
+                     Predicate.BooleanOperator booleanOperator,
                      ConditionalOperator conditionalOperator) {
-        return add(paths, value, operator, false, conditionalOperator);
+        return add(paths, value, booleanOperator, false, conditionalOperator);
     }
 
     public THIS and() {
         AbstractWhereClauseBuilder<T, THIS> sub = sub(null);
-        assert compoundItems != null;
-        compoundItems.add(sub);
+        getCompoundItems().add(sub);
         return sub.self();
+    }
+
+    @Override
+    public THIS and(WhereClause<T> whereClause) {
+        WhereClause<T> sub;
+        sub = sub(whereClause, AND);
+        getCompoundItems().add(sub);
+        return self();
+    }
+
+    private WhereClause<T> sub(WhereClause<T> whereClause,
+                               Predicate.BooleanOperator booleanOperator) {
+        WhereClause<T> sub;
+        if (whereClause != null && whereClause.getClass() == WhereClauseItem.class) {
+            sub = whereClause;
+            ((WhereClauseItem) sub).booleanOperator = booleanOperator;
+        } else {
+            sub = new AbstractWhereClause(whereClause) {
+                @Override
+                public Predicate.BooleanOperator getBooleanOperator() {
+                    return booleanOperator;
+                }
+            };
+        }
+        return sub;
     }
 
     public THIS or() {
         AbstractWhereClauseBuilder<T, THIS> sub = sub(null);
         sub.booleanOperator = OR;
-        assert compoundItems != null;
-        compoundItems.add(sub);
+        getCompoundItems().add(sub);
         return sub.self();
+    }
+
+    @Override
+    public THIS or(WhereClause<T> whereClause) {
+        WhereClause<T> sub;
+        sub = sub(whereClause, OR);
+        getCompoundItems().add(sub);
+        return self();
     }
 
     @Override
@@ -426,51 +454,61 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS andIn(Getter<T, U> getters, Collection<U> value) {
+    public <U, F extends Getter<T, ? super U>> THIS andIn(F getters, Collection<U> value) {
         return add(getters, value, AND, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS andIn(Getter<T, U> getters, U... value) {
+    public final <U, F extends Getter<T, ? super U>> THIS andIn(F getters, U... value) {
         return andIn(getters, Arrays.asList(value));
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS andNotIn(Getter<T, U> getters, Collection<U> value) {
+    public <U, F extends Getter<T, ? super U>> THIS andNotIn(F getters, Collection<U> value) {
         return add(getters, value, AND, NOT, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS andNotIn(Getter<T, U> getters, U... value) {
+    public final <U, F extends Getter<T, ? super U>> THIS andNotIn(F getters, U... value) {
         return andNotIn(getters, Arrays.asList(value));
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS orIn(Getter<T, U> getters, Collection<U> value) {
+    public <U, F extends Getter<T, ? super U>> THIS orIn(F getters, Collection<U> value) {
         return add(getters, value, OR, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS orIn(Getter<T, U> getters, U... value) {
+    public final <U, F extends Getter<T, ? super U>> THIS orIn(F getters, U... value) {
         return orIn(getters, Arrays.asList(value));
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS orNotIn(Getter<T, U> getters, Collection<U> value) {
+    public <U, F extends Getter<T, ? super U>> THIS orNotIn(F getters, Collection<U> value) {
         return add(getters, value, OR, NOT, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS orNotIn(Getter<T, U> getters, U... value) {
+    public final <U, F extends Getter<T, ? super U>> THIS orNotIn(F getters, U... value) {
         return orNotIn(getters, Arrays.asList(value));
     }
 
     @Override
     public WhereClauseItem getWhereClause() {
         return root;
+    }
+
+    private class AbstractWhereClause implements WhereClause<T> {
+        @Delegate
+        private final WhereClause<T> whereClause;
+
+        private AbstractWhereClause(WhereClause<T> whereClause) {
+            this.whereClause = whereClause;
+        }
+
     }
 }

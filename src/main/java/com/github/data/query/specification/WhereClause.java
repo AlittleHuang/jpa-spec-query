@@ -4,9 +4,9 @@ package com.github.data.query.specification;
 import javax.persistence.criteria.Predicate;
 import java.util.List;
 
-public interface WhereClause {
+public interface WhereClause<T> {
 
-    List<? extends WhereClause> getCompoundItems();
+    List<? extends WhereClause<T>> getCompoundItems();
 
     Attribute getPath();
 
