@@ -74,10 +74,12 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
 
     @Override
     public long count() {
+
         StoredData<Long> data = new StoredData<>(Long.class).initWhere().initGroupBy();
         CriteriaQuery<Long> countQuery = data.query;
         countQuery.select(data.cb.count(data.root));
         return entityManager.createQuery(countQuery).getSingleResult();
+
     }
 
     @Override
@@ -177,7 +179,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
             return initWhere().initGroupBy().initFetch().initOrderBy();
         }
 
-        Predicate toPredicate() {
+        private Predicate toPredicate() {
             WhereClause where = criteria.getWhereClause();
             return new SpecificationImpl<T>(where).toPredicate(root, query, cb);
         }
