@@ -46,11 +46,11 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
         AbstractWhereClauseBuilder<T, THIS> item = sub(paths);
-        item.value = value;
-        item.booleanOperator = booleanOperator;
-        item.conditionalOperator = conditionalOperator;
-        item.negate = negate;
-        getCompoundItems().add(item);
+        item.setValue(value);
+        item.setBooleanOperator(booleanOperator);
+        item.setConditionalOperator(conditionalOperator);
+        item.setNegate(negate);
+        this.getCompoundItems().add(item);
         return self();
     }
 
