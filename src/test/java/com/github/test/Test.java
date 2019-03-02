@@ -1,6 +1,6 @@
 package com.github.test;
 
-import com.github.data.query.specification.Path;
+import com.github.data.query.specification.Getter;
 import com.github.jpa.repostory.TypeRepostory;
 import com.github.test.entity.Company;
 import com.github.test.entity.User;
@@ -21,14 +21,14 @@ public class Test {
 
         //select by id
         User selectById = repostory.query()
-                .andEqual(User::getId, 1)
+                .andEq(User::getId, 1)
                 .getSingleResult();
 
         // fetch:
         // select user inner join company
         User fetch = repostory.query()
-                .andEqual(User::getId, 1)
-                .addFetchs(User::getCompany)
+                .andEq(User::getId, 1)
+                .fetch(User::getCompany)
                 .getSingleResult();
 
         // System.out.println(selectById.getCompany());//no Session
@@ -36,14 +36,20 @@ public class Test {
 
         // select by name and age
         User luna = repostory.query()
-                .andEqual(User::getName, "Luna")
-                .andEqual(User::getAge, 18)
+                .andEq(User::getName, "Luna")
+                .andEq(User::getAge, 18)
                 .getSingleResult();
 
 
         // select user by company name
+        Getter<User, String> companyName = Getter.of(User::getCompany).to(Company::getName);
         List<User> list = repostory.query()
-                .andEqual(Path.of(User::getCompany).to(Company::getName), "Microsoft")
+                .andEq(companyName, "Microsoft")
+                .getResultList();
+
+        Getter<User, String> getName = User::getName;
+        repostory.query()
+                .andEqual(companyName, User::getName)
                 .getResultList();
     }
 }

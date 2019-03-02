@@ -2,6 +2,8 @@ package com.github.test;
 
 import com.github.jpa.support.SpecBuilder;
 import com.github.test.entity.User;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
@@ -11,12 +13,12 @@ public interface UserRepostory extends JpaRepository<User, Integer>, JpaSpecific
 
 
     //↓↓↓↓ test ↓↓↓↓
-
-    UserRepostory userRepostory = Test.appCtx.getBean(UserRepostory.class);
+    ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
+    UserRepostory userRepostory = appCtx.getBean(UserRepostory.class);
     static void main(String[] args) {
         SpecBuilder<User> spec = new SpecBuilder<User>()
-                .andEqual(User::getName, "Luna")
-                .andEqual(User::getAge, 18);
+                .andEq(User::getName, "Luna")
+                .andEq(User::getAge, 18);
         List<User> all = userRepostory.findAll(spec);
     }
 
