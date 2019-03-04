@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 public class SimpleCriteria<T> implements Criteria<T> {
 
-    protected final WhereClauseItem whereClause;
+    protected final WhereClauseItem<T> whereClause;
     protected final List<Attribute<T>> selections = new ArrayList<>();
     protected final List<Attribute<T>> groupings = new ArrayList<>();
     protected final List<SimpleOrders<T>> orders = new ArrayList<>();
@@ -26,7 +26,7 @@ public class SimpleCriteria<T> implements Criteria<T> {
     @Setter
     private Integer maxResults;
 
-    public SimpleCriteria(WhereClauseItem whereClause) {
+    public SimpleCriteria(WhereClauseItem<T> whereClause) {
         this.whereClause = whereClause;
     }
 

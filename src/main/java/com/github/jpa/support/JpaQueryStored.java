@@ -180,8 +180,8 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         }
 
         private Predicate toPredicate() {
-            WhereClause where = criteria.getWhereClause();
-            return new SpecificationImpl<T>(where).toPredicate(root, query, cb);
+            WhereClause<T> where = criteria.getWhereClause();
+            return new SpecificationImpl<>(where).toPredicate(root, query, cb);
         }
     }
 

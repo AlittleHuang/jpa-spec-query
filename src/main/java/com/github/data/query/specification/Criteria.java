@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface Criteria<T> {
 
-    WhereClause getWhereClause();
+    WhereClause<T> getWhereClause();
 
     List<? extends Attribute<T>> getSelections();
 

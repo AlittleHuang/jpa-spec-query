@@ -10,9 +10,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class SpecificationImpl<T> implements Specification<T> {
-    private final WhereClause whereClause;
+    private final WhereClause<T> whereClause;
 
-    public SpecificationImpl(WhereClause whereClause) {
+    public SpecificationImpl(WhereClause<T> whereClause) {
         this.whereClause = whereClause;
     }
 
@@ -25,10 +25,11 @@ public class SpecificationImpl<T> implements Specification<T> {
         private final Root<T> root;
         private final CriteriaQuery<?> query;
         private final CriteriaBuilder cb;
-        private final WhereClause item;
+        private final WhereClause<T> item;
         private Predicate predicate;
 
-        private PredicateBuilder(Root<T> root, CriteriaQuery query, CriteriaBuilder criteriaBuilder, WhereClause item) {
+        private PredicateBuilder(Root<T> root, CriteriaQuery query, CriteriaBuilder criteriaBuilder,
+                                 WhereClause<T> item) {
             this.root = root;
             this.query = query;
             this.cb = criteriaBuilder;
@@ -47,9 +48,9 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         private void recursiveBuild() {
-            List<? extends WhereClause> subItems = item.getCompoundItems();
+            List<? extends WhereClause<T>> subItems = item.getCompoundItems();
             if (subItems != null) {
-                for (WhereClause item : subItems) {
+                for (WhereClause<T> item : subItems) {
                     Predicate predicateItem = new PredicateBuilder(root, query, cb, item).toPredicate();
                     if (this.predicate == null) {
                         this.predicate = predicateItem;
@@ -156,8 +157,7 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         Path toPath(Attribute<T> attribute) {
-            //noinspection unchecked
-            return JpaHelper.getPath(root, attribute.getNames((Class<T>) root.getJavaType()));
+            return JpaHelper.getPath(root, attribute.getNames(root.getJavaType()));
         }
     }
 

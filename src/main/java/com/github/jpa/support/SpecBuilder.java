@@ -16,7 +16,7 @@ public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>
         return new SpecBuilder<>(paths, getWhereClause());
     }
 
-    private SpecBuilder(Attribute path, WhereClauseItem root) {
+    private SpecBuilder(Attribute path, WhereClauseItem<T> root) {
         super(path, root);
     }
 
