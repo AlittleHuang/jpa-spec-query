@@ -1,6 +1,7 @@
 package com.github.jpa.support;
 
 import com.github.data.query.specification.Attribute;
+import com.github.data.query.specification.Criteria;
 import com.github.data.query.specification.Orders;
 import com.github.data.query.specification.WhereClause;
 import com.github.jpa.util.JpaHelper;
@@ -70,6 +71,16 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         List<T> resultList = typedQuery.getResultList();
 
         return new PageImpl<>(resultList, pageable, count);
+    }
+
+    @Override
+    public Page<T> getPage() {
+        Criteria<T> criteria = getCriteria();
+        Integer offset = criteria.getOffset();
+        offset = offset == null ? 0 : offset;
+        Integer maxResults = criteria.getMaxResults();
+        maxResults = maxResults == null ? 20 : maxResults;
+        return getPage(1 + (offset / maxResults), maxResults);
     }
 
     @Override

@@ -26,6 +26,8 @@ public interface QueryStored<T> {
 
     Page<T> getPage(int page, int size);
 
+    Page<T> getPage();
+
     long count();
 
     boolean exists();
