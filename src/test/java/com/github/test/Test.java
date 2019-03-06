@@ -12,10 +12,10 @@ import java.util.List;
 
 public class Test {
 
-    public static ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
-    public static EntityManager entityManager = appCtx.getBean(EntityManager.class);
 
     public static void main(String[] args) {
+        ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
+        EntityManager entityManager = appCtx.getBean(EntityManager.class);
 
         TypeRepostory<User> repostory = new TypeRepostory<>(User.class, entityManager);
 

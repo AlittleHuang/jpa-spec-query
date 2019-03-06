@@ -1,9 +1,6 @@
 package com.github.jpa.support;
 
-import com.github.data.query.specification.Attribute;
-import com.github.data.query.specification.Criteria;
-import com.github.data.query.specification.Orders;
-import com.github.data.query.specification.WhereClause;
+import com.github.data.query.specification.*;
 import com.github.jpa.util.JpaHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,6 +10,7 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -172,14 +170,14 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         }
 
         private StoredData<R> initFetch() {
-            List<? extends Attribute<T>> fetchs = criteria.getFetchs();
-            for (Attribute<T> fidld : fetchs) {
+            List<? extends FetchAttribute<T>> fetchs = criteria.getFetchs();
+            for (FetchAttribute<T> fidld : fetchs) {
                 Fetch fetch = null;
                 for (String stringPath : fidld.getNames(type)) {
                     if (fetch == null) {
-                        fetch = root.fetch(stringPath);
+                        fetch = root.fetch(stringPath, fidld.getJoinType());
                     } else {
-                        fetch = fetch.fetch(stringPath);
+                        fetch = fetch.fetch(stringPath, fidld.getJoinType());
                     }
                 }
             }

@@ -2,6 +2,7 @@ package com.github.data.query.support;
 
 import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.Criteria;
+import com.github.data.query.specification.FetchAttribute;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,7 @@ public class SimpleCriteria<T> implements Criteria<T> {
     protected final List<Attribute<T>> selections = new ArrayList<>();
     protected final List<Attribute<T>> groupings = new ArrayList<>();
     protected final List<SimpleOrders<T>> orders = new ArrayList<>();
-    protected final List<Attribute<T>> fetchs = new ArrayList<>();
+    protected final List<FetchAttribute<T>> fetchs = new ArrayList<>();
 
     @Setter
     private LockModeType lockMode;

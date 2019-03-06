@@ -6,6 +6,7 @@ import com.github.data.query.specification.Getter;
 import org.springframework.data.domain.Sort;
 
 import javax.persistence.LockModeType;
+import javax.persistence.criteria.JoinType;
 
 public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>>
         extends AbstractWhereClauseBuilder<T, THIS>
@@ -82,14 +83,26 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS fetch(String... paths) {
         for (String path : paths) {
-            criteria.fetchs.add(new SimpleAttribute<>(path));
+            criteria.fetchs.add(new SimpleFatchAttribute<T>(path, JoinType.LEFT));
         }
         return self();
     }
 
     @Override
+    public THIS fetch(String paths, JoinType joinType) {
+        criteria.fetchs.add(new SimpleFatchAttribute<T>(paths, JoinType.LEFT));
+        return self();
+    }
+
+    @Override
+    public THIS fetch(Getter<T, ?> paths, JoinType joinType) {
+        criteria.fetchs.add(new SimpleFatchAttribute<T>(paths, JoinType.LEFT));
+        return self();
+    }
+
+    @Override
     public THIS fetch(Getter<T, ?> paths) {
-        criteria.fetchs.add(paths);
+        criteria.fetchs.add(new SimpleFatchAttribute<>(paths, JoinType.LEFT));
         return self();
     }
 

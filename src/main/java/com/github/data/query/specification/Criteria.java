@@ -13,7 +13,7 @@ public interface Criteria<T> {
 
     List<? extends Orders<T>> getOrders();
 
-    List<? extends Attribute<T>> getFetchs();
+    List<? extends FetchAttribute<T>> getFetchs();
 
     Long getOffset();
 
