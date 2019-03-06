@@ -22,9 +22,9 @@ public class SimpleCriteria<T> implements Criteria<T> {
     private LockModeType lockMode;
 
     @Setter
-    private Integer offset;
+    private Long offset;
     @Setter
-    private Integer maxResults;
+    private Long maxResults;
 
     public SimpleCriteria(WhereClauseItem<T> whereClause) {
         this.whereClause = whereClause;

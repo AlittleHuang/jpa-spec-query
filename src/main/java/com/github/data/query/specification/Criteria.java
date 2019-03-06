@@ -15,9 +15,9 @@ public interface Criteria<T> {
 
     List<? extends Attribute<T>> getFetchs();
 
-    Integer getOffset();
+    Long getOffset();
 
-    Integer getMaxResults();
+    Long getMaxResults();
 
     LockModeType getLockModeType();
 

@@ -102,4 +102,23 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     public SimpleCriteria<T> getCriteria() {
         return criteria;
     }
+
+    @Override
+    public THIS setOffset(long offset) {
+        criteria.setOffset(offset);
+        return self();
+    }
+
+    @Override
+    public THIS setMaxResult(long maxResult) {
+        criteria.setMaxResults(maxResult);
+        return null;
+    }
+
+    @Override
+    public THIS setPageable(long page, long size) {
+        criteria.setMaxResults(size);
+        criteria.setOffset(page * size);
+        return self();
+    }
 }

@@ -56,7 +56,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
     }
 
     @Override
-    public Page<T> getPage(int page, int size) {
+    public Page<T> getPage(long page, long size) {
         long count = count();
         if (count == 0) {
             return Page.empty();
@@ -64,8 +64,8 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         StoredData<T> data = new StoredData<>(type).initAll();
         TypedQuery<T> typedQuery = entityManager.createQuery(data.query.select(data.root));
 
-        PageRequest pageable = PageRequest.of(page, size);
-        setLimilt(typedQuery, (int) pageable.getOffset(), size);
+        PageRequest pageable = PageRequest.of((int) page, (int) size);
+        setLimilt(typedQuery, pageable.getOffset(), size);
 
         setLock(typedQuery);
         List<T> resultList = typedQuery.getResultList();
@@ -76,11 +76,11 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
     @Override
     public Page<T> getPage() {
         Criteria<T> criteria = getCriteria();
-        Integer offset = criteria.getOffset();
+        Long offset = criteria.getOffset();
         offset = offset == null ? 0 : offset;
-        Integer maxResults = criteria.getMaxResults();
+        Long maxResults = criteria.getMaxResults();
         maxResults = maxResults == null ? 20 : maxResults;
-        return getPage(1 + (offset / maxResults), maxResults);
+        return getPage((offset / maxResults), maxResults);
     }
 
     @Override
@@ -111,11 +111,11 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         }
     }
 
-    private void setLimilt(TypedQuery<T> typedQuery, Integer offset, Integer maxResults) {
+    private void setLimilt(TypedQuery<T> typedQuery, Long offset, Long maxResults) {
         if (maxResults != null && maxResults > 0) {
-            typedQuery.setMaxResults(maxResults);
+            typedQuery.setMaxResults(maxResults.intValue());
             if (offset != null && offset > 0) {
-                typedQuery.setFirstResult(offset);
+                typedQuery.setFirstResult(offset.intValue());
             }
         }
     }

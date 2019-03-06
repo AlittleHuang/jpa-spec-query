@@ -24,6 +24,19 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
 
     THIS fetch(Getter<T, ?> paths);
 
+    THIS setOffset(long offset);
+
+    THIS setMaxResult(long maxResult);
+
+    /**
+     * set pageable
+     *
+     * @param page Starting from zero
+     * @param size max size per page
+     * @return self
+     */
+    THIS setPageable(long page, long size);
+
     THIS setLockModeType(LockModeType lockModeType);
 
     Criteria getCriteria();

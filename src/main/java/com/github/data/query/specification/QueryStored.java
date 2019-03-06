@@ -24,7 +24,7 @@ public interface QueryStored<T> {
         return list.isEmpty() ? null : list.get(0);
     }
 
-    Page<T> getPage(int page, int size);
+    Page<T> getPage(long page, long size);
 
     Page<T> getPage();
 
