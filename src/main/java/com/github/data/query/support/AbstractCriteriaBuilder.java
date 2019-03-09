@@ -125,7 +125,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS setMaxResult(long maxResult) {
         criteria.setMaxResults(maxResult);
-        return null;
+        return self();
     }
 
     @Override
