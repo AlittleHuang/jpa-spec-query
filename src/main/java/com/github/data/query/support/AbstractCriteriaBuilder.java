@@ -83,26 +83,26 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS fetch(String... paths) {
         for (String path : paths) {
-            criteria.fetchs.add(new SimpleFatchAttribute<T>(path, JoinType.LEFT));
+            criteria.fetchAttributes.add(new SimpleFetchAttribute<>(path, JoinType.LEFT));
         }
         return self();
     }
 
     @Override
     public THIS fetch(String paths, JoinType joinType) {
-        criteria.fetchs.add(new SimpleFatchAttribute<T>(paths, JoinType.LEFT));
+        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, JoinType.LEFT));
         return self();
     }
 
     @Override
     public THIS fetch(Getter<T, ?> paths, JoinType joinType) {
-        criteria.fetchs.add(new SimpleFatchAttribute<T>(paths, JoinType.LEFT));
+        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, JoinType.LEFT));
         return self();
     }
 
     @Override
     public THIS fetch(Getter<T, ?> paths) {
-        criteria.fetchs.add(new SimpleFatchAttribute<>(paths, JoinType.LEFT));
+        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, JoinType.LEFT));
         return self();
     }
 

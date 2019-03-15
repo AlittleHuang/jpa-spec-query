@@ -8,7 +8,7 @@ import lombok.experimental.Delegate;
 
 import javax.persistence.criteria.JoinType;
 
-public class SimpleFatchAttribute<T> implements FetchAttribute<T> {
+public class SimpleFetchAttribute<T> implements FetchAttribute<T> {
 
     @lombok.Getter
     @Setter
@@ -16,12 +16,12 @@ public class SimpleFatchAttribute<T> implements FetchAttribute<T> {
     @Delegate
     private Attribute<T> attribute;
 
-    public SimpleFatchAttribute(String path, JoinType joinType) {
+    public SimpleFetchAttribute(String path, JoinType joinType) {
         attribute = new SimpleAttribute<>(path);
         this.joinType = joinType == null ? JoinType.LEFT : joinType;
     }
 
-    public SimpleFatchAttribute(Getter<T, ?> getter, JoinType joinType) {
+    public SimpleFetchAttribute(Getter<T, ?> getter, JoinType joinType) {
         this.attribute = getter;
         this.joinType = joinType == null ? JoinType.LEFT : joinType;
     }

@@ -11,7 +11,6 @@ import java.util.List;
 
 import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
-@Getter
 public class WhereClauseItem<T> implements WhereClause<T> {
 
     protected final Attribute path;
@@ -37,5 +36,40 @@ public class WhereClauseItem<T> implements WhereClause<T> {
             compound = false;
             compoundItems = null;
         }
+    }
+
+    @Override
+    public Attribute getPath() {
+        return path;
+    }
+
+    @Override
+    public boolean isCompound() {
+        return compound;
+    }
+
+    @Override
+    public Object getValue() {
+        return value;
+    }
+
+    @Override
+    public Predicate.BooleanOperator getBooleanOperator() {
+        return booleanOperator;
+    }
+
+    @Override
+    public ConditionalOperator getConditionalOperator() {
+        return conditionalOperator;
+    }
+
+    @Override
+    public boolean isNegate() {
+        return negate;
+    }
+
+    @Override
+    public List<WhereClause<T>> getCompoundItems() {
+        return compoundItems;
     }
 }

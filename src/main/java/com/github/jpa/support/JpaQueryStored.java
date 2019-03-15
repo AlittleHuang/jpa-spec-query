@@ -170,14 +170,14 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         }
 
         private StoredData<R> initFetch() {
-            List<? extends FetchAttribute<T>> fetchs = criteria.getFetchs();
-            for (FetchAttribute<T> fidld : fetchs) {
+            List<? extends FetchAttribute<T>> list = criteria.getFetchAttributes();
+            for (FetchAttribute<T> attr : list) {
                 Fetch fetch = null;
-                for (String stringPath : fidld.getNames(type)) {
+                for (String stringPath : attr.getNames(type)) {
                     if (fetch == null) {
-                        fetch = root.fetch(stringPath, fidld.getJoinType());
+                        fetch = root.fetch(stringPath, attr.getJoinType());
                     } else {
-                        fetch = fetch.fetch(stringPath, fidld.getJoinType());
+                        fetch = fetch.fetch(stringPath, attr.getJoinType());
                     }
                 }
             }
