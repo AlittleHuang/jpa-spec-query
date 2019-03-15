@@ -81,6 +81,7 @@ CREATE TABLE `user`  (
 INSERT INTO `user` VALUES (1, 18, 1, 'Luna');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
 ```
 
 ### applicationContext.xml
