@@ -6,12 +6,12 @@ import com.github.jpa.support.JpaQueryStored;
 
 import javax.persistence.EntityManager;
 
-public class TypeRepostory<T> {
+public class TypeRepository<T> {
 
     protected final Class<T> entityType;
     protected final EntityManager entityManager;
 
-    public TypeRepostory(Class<T> entityType, EntityManager entityManager) {
+    public TypeRepository(Class<T> entityType, EntityManager entityManager) {
         this.entityType = entityType;
         this.entityManager = entityManager;
     }

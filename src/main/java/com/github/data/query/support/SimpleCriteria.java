@@ -3,7 +3,6 @@ package com.github.data.query.support;
 import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.Criteria;
 import com.github.data.query.specification.FetchAttribute;
-import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.LockModeType;

@@ -6,11 +6,11 @@ import com.github.jpa.support.JpaQueryStored;
 
 import javax.persistence.EntityManager;
 
-public class CommonRepostory {
+public class CommonRepository {
 
     protected final EntityManager entityManager;
 
-    public CommonRepostory(EntityManager entityManager) {
+    public CommonRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

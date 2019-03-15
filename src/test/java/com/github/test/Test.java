@@ -1,7 +1,7 @@
 package com.github.test;
 
 import com.github.data.query.specification.Getter;
-import com.github.jpa.repostory.TypeRepostory;
+import com.github.jpa.repostory.TypeRepository;
 import com.github.test.entity.Company;
 import com.github.test.entity.User;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +17,7 @@ public class Test {
         ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
         EntityManager entityManager = appCtx.getBean(EntityManager.class);
 
-        TypeRepostory<User> repostory = new TypeRepostory<>(User.class, entityManager);
+        TypeRepository<User> repostory = new TypeRepository<>(User.class, entityManager);
 
         //select by id
         User selectById = repostory.query()

@@ -3,7 +3,6 @@ package com.github.data.query.support;
 import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.ConditionalOperator;
 import com.github.data.query.specification.WhereClause;
-import lombok.Getter;
 
 import javax.persistence.criteria.Predicate;
 import java.util.ArrayList;
