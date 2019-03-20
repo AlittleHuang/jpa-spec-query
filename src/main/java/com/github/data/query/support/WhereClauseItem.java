@@ -12,7 +12,7 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
 public class WhereClauseItem<T> implements WhereClause<T> {
 
-    protected final Attribute path;
+    protected final Attribute<T> path;
 
     protected boolean compound;
 
@@ -26,7 +26,7 @@ public class WhereClauseItem<T> implements WhereClause<T> {
 
     protected final List<WhereClause<T>> compoundItems;
 
-    public WhereClauseItem(Attribute path) {
+    public WhereClauseItem(Attribute<T> path) {
         this.path = path;
         if (path == null) {
             compound = true;
@@ -38,7 +38,7 @@ public class WhereClauseItem<T> implements WhereClause<T> {
     }
 
     @Override
-    public Attribute getPath() {
+    public Attribute<T> getPath() {
         return path;
     }
 

@@ -37,25 +37,25 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         private Predicate toPredicate() {
-            if (!item.isCompound()) {
+            if ( !item.isCompound() ) {
                 build();
             } else {
                 recursiveBuild();
             }
             return predicate == null
                     ? null
-                    : (item.isNegate() ? predicate.not() : predicate);
+                    : ( item.isNegate() ? predicate.not() : predicate );
         }
 
         private void recursiveBuild() {
             List<? extends WhereClause<T>> subItems = item.getCompoundItems();
-            if (subItems != null) {
-                for (WhereClause<T> item : subItems) {
+            if ( subItems != null ) {
+                for ( WhereClause<T> item : subItems ) {
                     Predicate predicateItem = new PredicateBuilder(root, query, cb, item).toPredicate();
-                    if (this.predicate == null) {
+                    if ( this.predicate == null ) {
                         this.predicate = predicateItem;
                     } else {
-                        switch (item.getBooleanOperator()) {
+                        switch ( item.getBooleanOperator() ) {
                             case AND:
                                 this.predicate = cb.and(this.predicate, predicateItem);
                                 break;
@@ -68,21 +68,22 @@ public class SpecificationImpl<T> implements Specification<T> {
             }
         }
 
-        @SuppressWarnings("unchecked")
         private void build() {
-            Attribute attribute = item.getPath();
+            Attribute<T> attribute = item.getPath();
             Path path = toPath(attribute);
             Object value = item.getValue();
-            if (value instanceof Attribute) {
-                toPredicateItem(path, toPath((Attribute) value));
+            if ( value instanceof Attribute ) {
+                //noinspection unchecked
+                Attribute<T> attr = (Attribute<T>) value;
+                toPredicateItem(path, toPath(attr));
             } else {
                 toPredicateItem(path, value);
             }
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         private void toPredicateItem(Path path, Object value) {
-            switch (item.getConditionalOperator()) {
+            switch ( item.getConditionalOperator() ) {
                 case EQUAL:
                     predicate = cb.equal(path, value);
                     break;
@@ -98,30 +99,32 @@ public class SpecificationImpl<T> implements Specification<T> {
                 case LESS_THAN_OR_EQUAL_TO:
                     predicate = cb.lessThanOrEqualTo(path, (Comparable) value);
                     break;
-                case BETWEEN:
-                    Iterator<?> bt = ((Iterable<?>) value).iterator();
-                    Object x = bt.next();
-                    Object y = bt.next();
-                    if (x instanceof Expression && y instanceof Expression) {
+                case BETWEEN: {
+                    Iterator<?> values = ( (Iterable<?>) value ).iterator();
+                    Object x = values.next();
+                    Object y = values.next();
+                    if ( x instanceof Expression && y instanceof Expression ) {
                         predicate = cb.between(path, (Expression) x, (Expression) y);
                     } else {
                         predicate = cb.between(path, (Comparable) x, (Comparable) y);
                     }
                     break;
-                case IN:
-                    Iterable<?> valuesIn = (Iterable<Comparable>) value;
-                    Iterator<?> iterator = valuesIn.iterator();
+                }
+                case IN: {
+                    Iterable<?> values = (Iterable<Comparable>) value;
+                    Iterator<?> iterator = values.iterator();
 
-                    if (!iterator.hasNext()) {
+                    if ( !iterator.hasNext() ) {
                         predicate = cb.equal(path, path).not();//will get empty result
                         break;
                     }
                     CriteriaBuilder.In<Object> in = cb.in(path);
-                    for (Object valueIn : valuesIn) {
+                    for ( Object valueIn : values ) {
                         in.value(valueIn);
                     }
                     predicate = in;
                     break;
+                }
                 case LIKE:
                     predicate = cb.like(path, (String) value);
                     break;
@@ -129,13 +132,13 @@ public class SpecificationImpl<T> implements Specification<T> {
                     predicate = cb.isNull(path);
                     break;
                 default:
-                    throw new RuntimeException();
+                    throw new UnsupportedOperationException();
             }
         }
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         private void toPredicateItem(Path path, Expression value) {
-            switch (item.getConditionalOperator()) {
+            switch ( item.getConditionalOperator() ) {
                 case EQUAL:
                     predicate = cb.equal(path, value);
                     break;
@@ -152,7 +155,7 @@ public class SpecificationImpl<T> implements Specification<T> {
                     predicate = cb.lessThanOrEqualTo(path, value);
                     break;
                 default:
-                    throw new RuntimeException();
+                    throw new UnsupportedOperationException();
             }
         }
 
