@@ -65,7 +65,7 @@ public interface Getter<T, R> extends Attribute<T> {
 
         private final static Map<Class, Method> map = new HashMap<>();
 
-        public static <T> String[] getAttrNames(Class<? extends T> type, Getter<T, ?> getters) {
+        private static <T> String[] getAttrNames(Class<? extends T> type, Getter<T, ?> getters) {
             Class cls = type == null ? Object.class : type;
             List<Getter<?, ?>> list = getters.list();
             String[] strings = new String[list.size()];
@@ -79,7 +79,7 @@ public interface Getter<T, R> extends Attribute<T> {
             return strings;
         }
 
-        public static <T> Method getMethod(Class<T> type, Getter<T, ?> getters, boolean cast) {
+        private static <T> Method getMethod(Class<T> type, Getter<T, ?> getters, boolean cast) {
             Class key = getters.getClass();
             Method method = null;
             if (!map.containsKey(key)) {
