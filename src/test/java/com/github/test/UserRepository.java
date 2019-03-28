@@ -14,12 +14,12 @@ public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecifi
 
     //↓↓↓↓ test ↓↓↓↓
     ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
-    UserRepository USER_REPOSITORY = appCtx.getBean(UserRepository.class);
+    UserRepository userRepository = appCtx.getBean(UserRepository.class);
     static void main(String[] args) {
         SpecBuilder<User> spec = new SpecBuilder<User>()
                 .andEq(User::getName, "Luna")
                 .andEq(User::getAge, 18);
-        List<User> all = USER_REPOSITORY.findAll(spec);
+        List<User> all = userRepository.findAll(spec);
     }
 
 }
