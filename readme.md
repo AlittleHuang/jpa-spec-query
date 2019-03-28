@@ -220,7 +220,7 @@ public class Test {
 
 
 ```java
-// com.github.test.UserRepostory
+// com.github.test.UserRepository
 
 SpecBuilder<User> spec = new SpecBuilder<User>()
         .andEqual(User::getName, "Luna")

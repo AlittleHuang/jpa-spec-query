@@ -9,17 +9,17 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface UserRepostory extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
+public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 
 
     //↓↓↓↓ test ↓↓↓↓
     ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
-    UserRepostory userRepostory = appCtx.getBean(UserRepostory.class);
+    UserRepository USER_REPOSITORY = appCtx.getBean(UserRepository.class);
     static void main(String[] args) {
         SpecBuilder<User> spec = new SpecBuilder<User>()
                 .andEq(User::getName, "Luna")
                 .andEq(User::getAge, 18);
-        List<User> all = userRepostory.findAll(spec);
+        List<User> all = USER_REPOSITORY.findAll(spec);
     }
 
 }
