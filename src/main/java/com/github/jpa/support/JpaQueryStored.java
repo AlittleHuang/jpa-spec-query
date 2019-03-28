@@ -94,7 +94,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
     @Override
     public boolean exists() {
         StoredData<Object> data = new StoredData<>(Object.class).initWhere().initGroupBy();
-        JpaEntityInformation<T, ?> information = gettJpaEntityInformation();
+        JpaEntityInformation<T, ?> information = getJpaEntityInformation();
         data.query.select(data.root.get(information.getIdAttribute()));
         return !entityManager.createQuery(data.query)
                 .setMaxResults(1)

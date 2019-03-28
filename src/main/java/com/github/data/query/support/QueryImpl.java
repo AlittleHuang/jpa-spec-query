@@ -5,8 +5,7 @@ import com.github.data.query.specification.Query;
 import com.github.data.query.specification.QueryStored;
 import lombok.experimental.Delegate;
 
-public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implements
-        Query<T> {
+public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implements Query<T> {
 
     protected AbstractQueryStored<T> stored;
 

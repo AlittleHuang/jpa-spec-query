@@ -21,7 +21,7 @@ public abstract class AbstractJpaStored<T> extends AbstractQueryStored<T> {
 
     private static final Map<Class, JpaEntityInformation> INFORMATION_MAP = new ConcurrentHashMap<>();
 
-    protected JpaEntityInformation<T, ?> gettJpaEntityInformation() {
+    protected JpaEntityInformation<T, ?> getJpaEntityInformation() {
         //noinspection unchecked
         return INFORMATION_MAP.computeIfAbsent(
                 type,
