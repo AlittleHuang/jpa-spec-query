@@ -44,11 +44,12 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         List selections = list.stream()
                 .map(it -> {
 
-                    AggregateFunctions aggregate = it.getAggregateFunctions();
                     Path path = JpaHelper.getPath(data.root, it.getNames(type));
+                    AggregateFunctions aggregate = it.getAggregateFunctions();
 
-                    switch ( aggregate ) {
-
+                    switch ( aggregate == null ? AggregateFunctions.NONE : aggregate ) {
+                        case NONE:
+                            return path.as(path.getJavaType());
                         case AVG:
                             return data.cb.avg(path);
                         case SUM:
