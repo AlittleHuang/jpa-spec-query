@@ -6,7 +6,7 @@
 
     <groupId>com.github.alittlehuang</groupId>
     <artifactId>jpa-spec-query</artifactId>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>

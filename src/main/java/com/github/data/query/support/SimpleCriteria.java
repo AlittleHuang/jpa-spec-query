@@ -3,6 +3,7 @@ package com.github.data.query.support;
 import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.Criteria;
 import com.github.data.query.specification.FetchAttribute;
+import com.github.data.query.specification.Selection;
 import lombok.Setter;
 
 import javax.persistence.LockModeType;
@@ -12,7 +13,7 @@ import java.util.List;
 public class SimpleCriteria<T> implements Criteria<T> {
 
     protected final WhereClauseItem<T> whereClause;
-    protected final List<Attribute<T>> selections = new ArrayList<>();
+    protected final List<Selection<T>> selections = new ArrayList<>();
     protected final List<Attribute<T>> groupings = new ArrayList<>();
     protected final List<SimpleOrders<T>> orders = new ArrayList<>();
     protected final List<FetchAttribute<T>> fetchAttributes = new ArrayList<>();
@@ -40,7 +41,7 @@ public class SimpleCriteria<T> implements Criteria<T> {
     }
 
     @Override
-    public List<Attribute<T>> getSelections() {
+    public List<Selection<T>> getSelections() {
         return selections;
     }
 

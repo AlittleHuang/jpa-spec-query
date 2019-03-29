@@ -7,7 +7,7 @@ public interface Criteria<T> {
 
     WhereClause<T> getWhereClause();
 
-    List<? extends Attribute<T>> getSelections();
+    List<? extends Selection<T>> getSelections();
 
     List<? extends Attribute<T>> getGroupings();
 

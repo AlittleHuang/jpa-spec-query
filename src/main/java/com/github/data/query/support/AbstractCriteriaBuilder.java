@@ -1,8 +1,6 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.Attribute;
-import com.github.data.query.specification.CriteriaBuilder;
-import com.github.data.query.specification.Getter;
+import com.github.data.query.specification.*;
 import org.springframework.data.domain.Sort;
 
 import javax.persistence.LockModeType;
@@ -27,7 +25,8 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS addSelect(String... paths) {
         for (String path : paths) {
-            criteria.selections.add(new SimpleAttribute<>(path));
+            Selection<T> selection = cls -> paths;
+            criteria.selections.add(selection);
         }
         return self();
     }
@@ -35,6 +34,27 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS addSelect(Getter<T, ?> paths) {
         criteria.selections.add(paths);
+        return self();
+    }
+
+    @Override
+    public THIS addSelect(Getter<T, ?> paths, AggregateFunctions aggregate) {
+
+        Selection<T> selection = new Selection<T>() {
+
+            @Override
+            public String[] getNames(Class<? extends T> cls) {
+                return paths.getNames(cls);
+            }
+
+            @Override
+            public AggregateFunctions getAggregateFunctions() {
+                return aggregate;
+            }
+
+        };
+
+        criteria.selections.add(selection);
         return self();
     }
 
@@ -48,7 +68,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addGroupings(Getter<T, ?> paths) {
-        criteria.selections.add(paths);
+        criteria.groupings.add(paths);
         return self();
     }
 

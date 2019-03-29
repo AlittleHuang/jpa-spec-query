@@ -1,5 +1,6 @@
 package com.github.jpa.support;
 
+import com.github.data.query.specification.Selection;
 import com.github.data.query.specification.*;
 import com.github.jpa.util.JpaHelper;
 import org.springframework.data.domain.Page;
@@ -34,7 +35,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
     @SuppressWarnings("unchecked")
     @Override
     public <X> List<X> getObjectList() {
-        List<? extends Attribute<T>> list = criteria.getSelections();
+        List<? extends Selection<T>> list = criteria.getSelections();
         if (list == null || list.isEmpty()) {
             return (List<X>) getResultList();
         }
@@ -42,9 +43,26 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         CriteriaQuery<?> query = data.query;
         List selections = list.stream()
                 .map(it -> {
+
+                    AggregateFunctions aggregate = it.getAggregateFunctions();
                     Path path = JpaHelper.getPath(data.root, it.getNames(type));
-                    Class<?> type = path.getJavaType();
-                    return path.as(type);
+
+                    switch ( aggregate ) {
+
+                        case AVG:
+                            return data.cb.avg(path);
+                        case SUM:
+                            return data.cb.sum(path);
+                        case MAX:
+                            return data.cb.max(path);
+                        case MIN:
+                            return data.cb.min(path);
+                        case COUNT:
+                            return data.cb.count(path);
+                        default:
+                            return path.as(path.getJavaType());
+                    }
+
                 }).collect(Collectors.toList());
         TypedQuery typedQuery = entityManager
                 .createQuery(query.multiselect(selections));

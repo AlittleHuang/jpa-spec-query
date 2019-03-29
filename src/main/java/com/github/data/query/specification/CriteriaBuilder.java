@@ -9,6 +9,8 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
 
     THIS addSelect(Getter<T, ?> paths);
 
+    THIS addSelect(Getter<T, ?> paths, AggregateFunctions aggregate);
+
     THIS addGroupings(String... paths);
 
     THIS addGroupings(Getter<T, ?> paths);
