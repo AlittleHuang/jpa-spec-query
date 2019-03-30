@@ -31,11 +31,11 @@ public class Mian {
 //    }
 
     public static void main(String[] args) {
-        Getter<User, String> getter = User::getName;
-        class U extends User {
-
+        Integer x = null;
+        switch ( x ){
+            default:
+                System.out.println(x);
         }
-        System.out.println(Arrays.toString(getter.getNames(U.class)));
     }
 
 }

@@ -44,24 +44,24 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         List selections = list.stream()
                 .map(it -> {
 
-                    Path path = JpaHelper.getPath(data.root, it.getNames(type));
+                    Expression expression = JpaHelper.toExpression(it, data.cb, data.root);
                     AggregateFunctions aggregate = it.getAggregateFunctions();
 
                     switch ( aggregate == null ? AggregateFunctions.NONE : aggregate ) {
                         case NONE:
-                            return path.as(path.getJavaType());
+                            return expression.as(expression.getJavaType());
                         case AVG:
-                            return data.cb.avg(path);
+                            return data.cb.avg(expression);
                         case SUM:
-                            return data.cb.sum(path);
+                            return data.cb.sum(expression);
                         case MAX:
-                            return data.cb.max(path);
+                            return data.cb.max(expression);
                         case MIN:
-                            return data.cb.min(path);
+                            return data.cb.min(expression);
                         case COUNT:
-                            return data.cb.count(path);
+                            return data.cb.count(expression);
                         default:
-                            return path.as(path.getJavaType());
+                            return expression.as(expression.getJavaType());
                     }
 
                 }).collect(Collectors.toList());
