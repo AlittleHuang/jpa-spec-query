@@ -18,19 +18,19 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     private static final boolean NOT = true;
     private final WhereClauseItem<T> root;
 
-    public AbstractWhereClauseBuilder(Attribute path, WhereClauseItem<T> root) {
+    public AbstractWhereClauseBuilder(Expressions<T> path, WhereClauseItem<T> root) {
         super(path);
         this.root = root;
     }
 
-    protected abstract THIS createSubItem(Attribute<T> paths);
+    protected abstract THIS createSubItem(Expressions<T> paths);
 
     protected THIS self(){
         //noinspection unchecked
         return (THIS) this;
     }
 
-    private AbstractWhereClauseBuilder<T, THIS> sub(Attribute<T> paths){
+    private AbstractWhereClauseBuilder<T, THIS> sub(Expressions<T> paths){
         //noinspection unchecked
         return (AbstractWhereClauseBuilder) createSubItem(paths);
     }
@@ -40,7 +40,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         this.root = this;
     }
 
-    private THIS add(Attribute<T> paths,
+    private THIS add(Expressions<T> paths,
                      Object value,
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
@@ -59,7 +59,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        return add((Attribute<T>) (paths), value, booleanOperator, negate, conditionalOperator);
+        return add((Expressions<T>) (paths), value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(String paths,
@@ -67,7 +67,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        SimpleAttribute<T> path = new SimpleAttribute<>(paths);
+        SimpleExpressions<T> path = new SimpleExpressions<>(paths);
         return add(path, value, booleanOperator, negate, conditionalOperator);
     }
 

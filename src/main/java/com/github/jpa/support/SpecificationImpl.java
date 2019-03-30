@@ -1,6 +1,7 @@
 package com.github.jpa.support;
 
 import com.github.data.query.specification.Attribute;
+import com.github.data.query.specification.Expressions;
 import com.github.data.query.specification.WhereClause;
 import com.github.jpa.util.JpaHelper;
 import org.springframework.data.jpa.domain.Specification;
@@ -69,20 +70,21 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         private void build() {
-            Attribute<T> attribute = item.getPath();
-            Path path = toPath(attribute);
+            Expressions<T> expressions = item.getExpression();
+
+            Expression expression = JpaHelper.toExpression(expressions, cb, root);
+
             Object value = item.getValue();
+
             if ( value instanceof Attribute ) {
                 //noinspection unchecked
-                Attribute<T> attr = (Attribute<T>) value;
-                toPredicateItem(path, toPath(attr));
-            } else {
-                toPredicateItem(path, value);
+                value = toPath((Attribute<T>) value);
             }
+            toPredicateItem(expression, value);
         }
 
         @SuppressWarnings( "unchecked" )
-        private void toPredicateItem(Path path, Object value) {
+        private void toPredicateItem(Expression path, Object value) {
             switch ( item.getConditionalOperator() ) {
                 case EQUAL:
                     predicate = cb.equal(path, value);

@@ -8,7 +8,7 @@ public interface WhereClause<T> {
 
     List<? extends WhereClause<T>> getCompoundItems();
 
-    Attribute<T> getPath();
+    Expressions<T> getExpression();
 
     Object getValue();
 

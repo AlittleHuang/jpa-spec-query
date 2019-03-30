@@ -169,15 +169,16 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
 
         private StoredData<R> initOrderBy() {
             ArrayList<Order> orders = new ArrayList<>();
-            if (!criteria.getOrders().isEmpty()) {
-                for (Orders<T> order : criteria.getOrders()) {
-                    Path<?> path = JpaHelper.getPath(root, order.getNames(type));
+            List<? extends Orders<T>> ordersList = criteria.getOrders();
+            if ( !ordersList.isEmpty() ) {
+                for ( Orders<T> order : ordersList ) {
+                    Expression expression = JpaHelper.toExpression(order, cb, root);
                     switch (order.getDirection()) {
                         case DESC:
-                            orders.add(cb.desc(path));
+                            orders.add(cb.desc(expression));
                             break;
                         case ASC:
-                            orders.add(cb.asc(path));
+                            orders.add(cb.asc(expression));
                             break;
                         default:
                             throw new RuntimeException();

@@ -1,6 +1,6 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.Attribute;
+import com.github.data.query.specification.Expressions;
 import com.github.data.query.specification.Query;
 import com.github.data.query.specification.QueryStored;
 import lombok.experimental.Delegate;
@@ -15,7 +15,7 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
     }
 
     @Override
-    protected QueryImpl<T> createSubItem(Attribute<T> paths) {
+    protected QueryImpl<T> createSubItem(Expressions<T> paths) {
         return new QueryImpl<>(paths, getWhereClause(), getCriteria(), stored);
     }
 
@@ -25,7 +25,7 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
         this.stored = stored;
     }
 
-    protected QueryImpl(Attribute<T> path, WhereClauseItem<T> root, SimpleCriteria<T> criteria,
+    protected QueryImpl(Expressions<T> path, WhereClauseItem<T> root, SimpleCriteria<T> criteria,
                         AbstractQueryStored<T> stored) {
         super(path, root, criteria);
         stored.criteria = criteria;

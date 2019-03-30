@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @FunctionalInterface
-public interface Getter<T, R> extends Selection<T> {
+public interface Getter<T, R> extends Selection<T>, Expressions<T> {
 
     @SuppressWarnings("UnusedReturnValue")
     R apply(T t);
