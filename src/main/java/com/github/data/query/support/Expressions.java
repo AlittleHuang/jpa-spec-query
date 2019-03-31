@@ -100,6 +100,17 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
         return new SimpleExpressions<>(expression, Function.SUBSTRING, from, length);
     }
 
+
+    /**
+     * Create an expression for substring extraction.
+     * Extracts a substring of given length starting at the
+     * specified position.
+     * First position is 1.
+     */
+    static <T> Expressions<T, String> substring(Expressions<T, String> expression, int from) {
+        return new SimpleExpressions<>(expression, Function.SUBSTRING, from);
+    }
+
     /**
      * Create expression to trim blanks from both ends of
      * a string.
