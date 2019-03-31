@@ -2,12 +2,13 @@ package com.github.data.query.support;
 
 import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.specification.Orders;
+import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.domain.Sort;
 
 public class SimpleOrders<T> implements Orders<T> {
 
-    @lombok.Getter
+    @Getter
     @Setter
     private Sort.Direction direction;
 
@@ -37,4 +38,6 @@ public class SimpleOrders<T> implements Orders<T> {
     public String[] getNames(Class<? extends T> cls) {
         return attribute.getNames(cls);
     }
+
+
 }
