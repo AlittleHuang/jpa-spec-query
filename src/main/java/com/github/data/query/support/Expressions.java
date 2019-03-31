@@ -10,6 +10,7 @@ import java.util.List;
 @FunctionalInterface
 public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
 
+    @SuppressWarnings( "UnusedReturnValue" )
     R apply(T t);
 
     static <T, R> Expressions<T, R> of(Expressions<T, R> getters) {
