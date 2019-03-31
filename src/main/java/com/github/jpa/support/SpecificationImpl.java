@@ -79,8 +79,9 @@ public class SpecificationImpl<T> implements Specification<T> {
                 //noinspection unchecked
                 AttrExpression<T> attr = (AttrExpression<T>) value;
                 toPredicateItem(expression, JpaHelper.toExpression(attr, cb, root));
+            }else {
+                toPredicateItem(expression, value);
             }
-            toPredicateItem(expression, value);
         }
 
         @SuppressWarnings( "unchecked" )
