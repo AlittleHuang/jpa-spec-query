@@ -2,7 +2,7 @@ package com.github.jpa.support;
 
 import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.support.AbstractWhereClauseBuilder;
-import com.github.data.query.support.WhereClauseItem;
+import com.github.data.query.support.SimpleWhereClause;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Delegate;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,7 +15,7 @@ public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>
         return new SpecBuilder<>(paths, getWhereClause());
     }
 
-    private SpecBuilder(AttrExpression<T> path, WhereClauseItem<T> root) {
+    private SpecBuilder(AttrExpression<T> path, SimpleWhereClause<T> root) {
         super(path, root);
     }
 

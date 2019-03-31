@@ -25,7 +25,7 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
         this.stored = stored;
     }
 
-    protected QueryImpl(AttrExpression<T> path, WhereClauseItem<T> root, SimpleCriteria<T> criteria,
+    protected QueryImpl(AttrExpression<T> path, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
                         AbstractQueryStored<T> stored) {
         super(path, root, criteria);
         stored.criteria = criteria;

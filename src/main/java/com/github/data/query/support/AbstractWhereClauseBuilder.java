@@ -15,13 +15,13 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 import static javax.persistence.criteria.Predicate.BooleanOperator.OR;
 
 public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
-        extends WhereClauseItem<T>
+        extends SimpleWhereClause<T>
         implements WhereClauseBuilder<T, THIS> {
 
     private static final boolean NOT = true;
-    private final WhereClauseItem<T> root;
+    private final SimpleWhereClause<T> root;
 
-    public AbstractWhereClauseBuilder(AttrExpression<T> path, WhereClauseItem<T> root) {
+    public AbstractWhereClauseBuilder(AttrExpression<T> path, SimpleWhereClause<T> root) {
         super(path);
         this.root = root;
     }
@@ -105,9 +105,9 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     private WhereClause<T> sub(WhereClause<T> whereClause,
                                Predicate.BooleanOperator booleanOperator) {
         WhereClause<T> sub;
-        if (whereClause instanceof WhereClauseItem) {
+        if (whereClause instanceof SimpleWhereClause ) {
             sub = whereClause;
-            ((WhereClauseItem) sub).booleanOperator = booleanOperator;
+            ((SimpleWhereClause) sub).booleanOperator = booleanOperator;
         } else {
             sub = new AbstractWhereClause(whereClause) {
                 @Override
@@ -501,7 +501,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public WhereClauseItem<T> getWhereClause() {
+    public SimpleWhereClause<T> getWhereClause() {
         return root;
     }
 
