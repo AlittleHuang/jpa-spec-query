@@ -1,7 +1,7 @@
 package com.github.jpa.util;
 
 import com.github.data.query.specification.Attribute;
-import com.github.data.query.specification.Expressions;
+import com.github.data.query.specification.AttrExpression;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -32,10 +32,10 @@ public class JpaHelper {
         return true;
     }
 
-    public static <T> Expression toExpression(Expressions<T> expressions, CriteriaBuilder cb, Root<T> root) {
+    public static <T> Expression toExpression(AttrExpression<T> expressions, CriteriaBuilder cb, Root<T> root) {
         Path path = toPath(root, expressions);
-        Expressions.Type type = expressions.getType();
-        if ( type == null ) type = Expressions.Type.NONE;
+        AttrExpression.Function type = expressions.getFunction();
+        if ( type == null ) type = AttrExpression.Function.NONE;
         Object[] args = expressions.getArgs();
 
         Expression expression = path;

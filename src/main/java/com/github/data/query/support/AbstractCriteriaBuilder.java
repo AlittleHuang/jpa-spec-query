@@ -17,7 +17,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         this.criteria = new SimpleCriteria<>(getWhereClause());
     }
 
-    public AbstractCriteriaBuilder(Expressions<T> path, WhereClauseItem<T> root, SimpleCriteria<T> criteria) {
+    public AbstractCriteriaBuilder(AttrExpression<T> path, WhereClauseItem<T> root, SimpleCriteria<T> criteria) {
         super(path, root);
         this.criteria = criteria;
     }
@@ -32,13 +32,13 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS addSelect(Getter<T, ?> paths) {
+    public THIS addSelect(Expressions<T, ?> paths) {
         criteria.selections.add(paths);
         return self();
     }
 
     @Override
-    public THIS addSelect(Getter<T, ?> paths, AggregateFunctions aggregate) {
+    public THIS addSelect(Expressions<T, ?> paths, AggregateFunctions aggregate) {
 
         Selection<T> selection = new Selection<T>() {
 
@@ -67,7 +67,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS addGroupings(Getter<T, ?> paths) {
+    public THIS addGroupings(Expressions<T, ?> paths) {
         criteria.groupings.add(paths);
         return self();
     }
@@ -81,7 +81,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS addOrdersAsc(Getter<T, ?> paths) {
+    public THIS addOrdersAsc(Expressions<T, ?> paths) {
         criteria.orders.add(new SimpleOrders<>(Sort.Direction.ASC, paths));
         return self();
     }
@@ -95,7 +95,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS addOrdersDesc(Getter<T, ?> paths) {
+    public THIS addOrdersDesc(Expressions<T, ?> paths) {
         criteria.orders.add(new SimpleOrders<>(Sort.Direction.DESC, paths));
         return self();
     }
@@ -115,13 +115,13 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS fetch(Getter<T, ?> paths, JoinType joinType) {
+    public THIS fetch(Expressions<T, ?> paths, JoinType joinType) {
         criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, JoinType.LEFT));
         return self();
     }
 
     @Override
-    public THIS fetch(Getter<T, ?> paths) {
+    public THIS fetch(Expressions<T, ?> paths) {
         criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, JoinType.LEFT));
         return self();
     }

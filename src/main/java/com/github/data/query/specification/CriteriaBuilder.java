@@ -1,5 +1,7 @@
 package com.github.data.query.specification;
 
+import com.github.data.query.support.Expressions;
+
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
 
@@ -7,29 +9,29 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
 
     THIS addSelect(String... paths);
 
-    THIS addSelect(Getter<T, ?> paths);
+    THIS addSelect(Expressions<T, ?> paths);
 
-    THIS addSelect(Getter<T, ?> paths, AggregateFunctions aggregate);
+    THIS addSelect(Expressions<T, ?> paths, AggregateFunctions aggregate);
 
     THIS addGroupings(String... paths);
 
-    THIS addGroupings(Getter<T, ?> paths);
+    THIS addGroupings(Expressions<T, ?> paths);
 
     THIS addOrdersAsc(String... paths);
 
-    THIS addOrdersAsc(Getter<T, ?> paths);
+    THIS addOrdersAsc(Expressions<T, ?> paths);
 
     THIS addOrdersDesc(String... paths);
 
-    THIS addOrdersDesc(Getter<T, ?> paths);
+    THIS addOrdersDesc(Expressions<T, ?> paths);
 
     THIS fetch(String... paths);
 
     THIS fetch(String paths, JoinType joinType);
 
-    THIS fetch(Getter<T, ?> paths);
+    THIS fetch(Expressions<T, ?> paths);
 
-    THIS fetch(Getter<T, ?> paths, JoinType joinType);
+    THIS fetch(Expressions<T, ?> paths, JoinType joinType);
 
     THIS setOffset(long offset);
 

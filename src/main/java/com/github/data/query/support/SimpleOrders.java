@@ -1,10 +1,8 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.Expressions;
-import com.github.data.query.specification.Getter;
+import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.specification.Orders;
 import lombok.Setter;
-import lombok.experimental.Delegate;
 import org.springframework.data.domain.Sort;
 
 public class SimpleOrders<T> implements Orders<T> {
@@ -13,15 +11,15 @@ public class SimpleOrders<T> implements Orders<T> {
     @Setter
     private Sort.Direction direction;
 
-    private Expressions<T> attribute;
+    private AttrExpression<T> attribute;
 
     public SimpleOrders(Sort.Direction direction, String path) {
         attribute = new SimpleExpressions<>(path);
         this.direction = direction;
     }
 
-    public SimpleOrders(Sort.Direction direction, Getter<T, ?> getter) {
-        this.attribute = getter;
+    public SimpleOrders(Sort.Direction direction, Expressions<T, ?> expression) {
+        this.attribute = expression;
         this.direction = direction;
     }
 
@@ -31,8 +29,8 @@ public class SimpleOrders<T> implements Orders<T> {
     }
 
     @Override
-    public Type getType() {
-        return attribute.getType();
+    public Function getFunction() {
+        return attribute.getFunction();
     }
 
     @Override

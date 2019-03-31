@@ -1,6 +1,9 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.*;
+import com.github.data.query.specification.ConditionalOperator;
+import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.WhereClause;
+import com.github.data.query.specification.WhereClauseBuilder;
 import lombok.experimental.Delegate;
 
 import javax.persistence.criteria.Predicate;
@@ -18,19 +21,19 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     private static final boolean NOT = true;
     private final WhereClauseItem<T> root;
 
-    public AbstractWhereClauseBuilder(Expressions<T> path, WhereClauseItem<T> root) {
+    public AbstractWhereClauseBuilder(AttrExpression<T> path, WhereClauseItem<T> root) {
         super(path);
         this.root = root;
     }
 
-    protected abstract THIS createSubItem(Expressions<T> paths);
+    protected abstract THIS createSubItem(AttrExpression<T> paths);
 
     protected THIS self(){
         //noinspection unchecked
         return (THIS) this;
     }
 
-    private AbstractWhereClauseBuilder<T, THIS> sub(Expressions<T> paths){
+    private AbstractWhereClauseBuilder<T, THIS> sub(AttrExpression<T> paths){
         //noinspection unchecked
         return (AbstractWhereClauseBuilder) createSubItem(paths);
     }
@@ -40,7 +43,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         this.root = this;
     }
 
-    private THIS add(Expressions<T> paths,
+    private THIS add(AttrExpression<T> paths,
                      Object value,
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
@@ -54,12 +57,12 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         return self();
     }
 
-    private THIS add(Getter<T, ?> paths,
+    private THIS add(Expressions<T, ?> paths,
                      Object value,
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        return add((Expressions<T>) (paths), value, booleanOperator, negate, conditionalOperator);
+        return add((AttrExpression<T>) (paths), value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(String paths,
@@ -67,11 +70,11 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        SimpleExpressions<T> path = new SimpleExpressions<>(paths);
+        SimpleExpressions<T, ?> path = new SimpleExpressions<>(paths);
         return add(path, value, booleanOperator, negate, conditionalOperator);
     }
 
-    private THIS add(Getter<T, ?> paths,
+    private THIS add(Expressions<T, ?> paths,
                      Object value,
                      Predicate.BooleanOperator booleanOperator,
                      ConditionalOperator conditionalOperator) {
@@ -192,22 +195,22 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public THIS andIsNull(Getter<T, ?> name) {
+    public THIS andIsNull(Expressions<T, ?> name) {
         return add(name, null, AND, IS_NULL);
     }
 
     @Override
-    public THIS andIsNotNull(Getter<T, ?> name) {
+    public THIS andIsNotNull(Expressions<T, ?> name) {
         return add(name, null, AND, NOT, IS_NULL);
     }
 
     @Override
-    public THIS orIsNotNull(Getter<T, ?> name) {
+    public THIS orIsNotNull(Expressions<T, ?> name) {
         return add(name, null, OR, NOT, IS_NULL);
     }
 
     @Override
-    public THIS orIsNull(Getter<T, ?> name) {
+    public THIS orIsNull(Expressions<T, ?> name) {
         return add(name, null, OR, IS_NULL);
     }
 
@@ -276,42 +279,42 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U, G extends Getter<T, ? super U>> THIS andEqual(G path, G other) {
+    public <U, G extends Expressions<T, ? super U>> THIS andEqual(G path, G other) {
         return add(path, other, AND, EQUAL);
     }
 
     @Override
-    public <U, G extends Getter<T, ? super U>> THIS orEqual(G path, G other) {
+    public <U, G extends Expressions<T, ? super U>> THIS orEqual(G path, G other) {
         return add(path, other, OR, EQUAL);
     }
 
     @Override
-    public <U, G extends Getter<T, ? super U>> THIS andNotEqual(G path, G other) {
+    public <U, G extends Expressions<T, ? super U>> THIS andNotEqual(G path, G other) {
         return add(path, other, AND, NOT, EQUAL);
     }
 
     @Override
-    public <U, G extends Getter<T, ? super U>> THIS orNotEqual(G path, G other) {
+    public <U, G extends Expressions<T, ? super U>> THIS orNotEqual(G path, G other) {
         return add(path, other, OR, NOT, EQUAL);
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS andEq(F getter, U value) {
+    public <U, F extends Expressions<T, ? super U>> THIS andEq(F getter, U value) {
         return add(getter, value, AND, EQUAL);
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS orEq(F getter, U value) {
+    public <U, F extends Expressions<T, ? super U>> THIS orEq(F getter, U value) {
         return add(getter, value, OR, EQUAL);
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS andNotEq(F getter, U value) {
+    public <U, F extends Expressions<T, ? super U>> THIS andNotEq(F getter, U value) {
         return add(getter, value, AND, NOT, EQUAL);
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS orNotEq(F getter, U value) {
+    public <U, F extends Expressions<T, ? super U>> THIS orNotEq(F getter, U value) {
         return add(getter, value, OR, NOT, EQUAL);
     }
 
@@ -321,7 +324,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andGe(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andGe(F getter, U value) {
         return add(getter, value, AND, GREATER_THAN_OR_EQUAL_TO);
     }
 
@@ -331,7 +334,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orGe(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orGe(F getter, U value) {
         return add(getter, value, OR, GREATER_THAN_OR_EQUAL_TO);
     }
 
@@ -341,7 +344,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andLe(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andLe(F getter, U value) {
         return add(getter, value, AND, LESS_THAN_OR_EQUAL_TO);
     }
 
@@ -351,7 +354,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orLe(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orLe(F getter, U value) {
         return add(getter, value, OR, LESS_THAN_OR_EQUAL_TO);
     }
 
@@ -361,7 +364,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andGt(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andGt(F getter, U value) {
         return add(getter, value, AND, GREATER_THAN);
     }
 
@@ -371,7 +374,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orGt(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orGt(F getter, U value) {
         return add(getter, value, OR, GREATER_THAN);
     }
 
@@ -381,7 +384,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andLt(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andLt(F getter, U value) {
         return add(getter, value, AND, LESS_THAN);
     }
 
@@ -391,27 +394,27 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orLt(F getter, U value) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orLt(F getter, U value) {
         return add(getter, value, OR, LESS_THAN);
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andBetween(F getter, U value, U otherValue) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andBetween(F getter, U value, U otherValue) {
         return add(getter, Arrays.asList(value, otherValue), AND, BETWEEN);
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orBetween(F getter, U value, U otherValue) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orBetween(F getter, U value, U otherValue) {
         return add(getter, Arrays.asList(value, otherValue), OR, BETWEEN);
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS andNotBetween(F getter, U value, U otherValue) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andNotBetween(F getter, U value, U otherValue) {
         return add(getter, Arrays.asList(value, otherValue), AND, NOT, BETWEEN);
     }
 
     @Override
-    public <U extends Comparable<? super U>, F extends Getter<T, ? super U>> THIS orNotBetween(F getter, U value, U otherValue) {
+    public <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orNotBetween(F getter, U value, U otherValue) {
         return add(getter, Arrays.asList(value, otherValue), OR, NOT, BETWEEN);
     }
 
@@ -434,66 +437,66 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public THIS andLike(Getter<T, String> getters, String value) {
+    public THIS andLike(Expressions<T, String> getters, String value) {
         return add(getters, value, AND, LIKE);
     }
 
     @Override
-    public THIS andNotLike(Getter<T, String> getters, String value) {
+    public THIS andNotLike(Expressions<T, String> getters, String value) {
         return add(getters, value, AND, NOT, LIKE);
     }
 
     @Override
-    public THIS orLike(Getter<T, String> getters, String value) {
+    public THIS orLike(Expressions<T, String> getters, String value) {
         return add(getters, value, OR, LIKE);
     }
 
     @Override
-    public THIS orNotLike(Getter<T, String> getters, String value) {
+    public THIS orNotLike(Expressions<T, String> getters, String value) {
         return add(getters, value, OR, NOT, LIKE);
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS andIn(F getters, Collection<U> value) {
+    public <U, F extends Expressions<T, ? super U>> THIS andIn(F getters, Collection<U> value) {
         return add(getters, value, AND, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS andIn(F getters, U... value) {
+    public final <U, F extends Expressions<T, ? super U>> THIS andIn(F getters, U... value) {
         return andIn(getters, Arrays.asList(value));
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS andNotIn(F getters, Collection<U> value) {
+    public <U, F extends Expressions<T, ? super U>> THIS andNotIn(F getters, Collection<U> value) {
         return add(getters, value, AND, NOT, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS andNotIn(F getters, U... value) {
+    public final <U, F extends Expressions<T, ? super U>> THIS andNotIn(F getters, U... value) {
         return andNotIn(getters, Arrays.asList(value));
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS orIn(F getters, Collection<U> value) {
+    public <U, F extends Expressions<T, ? super U>> THIS orIn(F getters, Collection<U> value) {
         return add(getters, value, OR, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS orIn(F getters, U... value) {
+    public final <U, F extends Expressions<T, ? super U>> THIS orIn(F getters, U... value) {
         return orIn(getters, Arrays.asList(value));
     }
 
     @Override
-    public <U, F extends Getter<T, ? super U>> THIS orNotIn(F getters, Collection<U> value) {
+    public <U, F extends Expressions<T, ? super U>> THIS orNotIn(F getters, Collection<U> value) {
         return add(getters, value, OR, NOT, IN);
     }
 
     @SafeVarargs
     @Override
-    public final <U, F extends Getter<T, ? super U>> THIS orNotIn(F getters, U... value) {
+    public final <U, F extends Expressions<T, ? super U>> THIS orNotIn(F getters, U... value) {
         return orNotIn(getters, Arrays.asList(value));
     }
 

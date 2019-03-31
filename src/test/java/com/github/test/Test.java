@@ -1,6 +1,6 @@
 package com.github.test;
 
-import com.github.data.query.specification.Getter;
+import com.github.data.query.support.Expressions;
 import com.github.jpa.repostory.TypeRepository;
 import com.github.test.entity.Company;
 import com.github.test.entity.User;
@@ -42,12 +42,12 @@ public class Test {
 
 
         // select user by company name
-        Getter<User, String> companyName = Getter.of(User::getCompany).to(Company::getName);
+        Expressions<User, String> companyName = Expressions.of(User::getCompany).to(Company::getName);
         List<User> list = repostory.query()
                 .andEq(companyName, "Microsoft")
                 .getResultList();
 
-        Getter<User, String> getName = User::getName;
+        Expressions<User, String> getName = User::getName;
         repostory.query()
                 .andEqual(companyName, User::getName)
                 .getResultList();

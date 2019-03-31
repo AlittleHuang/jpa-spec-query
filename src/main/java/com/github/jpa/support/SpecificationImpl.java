@@ -1,7 +1,7 @@
 package com.github.jpa.support;
 
 import com.github.data.query.specification.Attribute;
-import com.github.data.query.specification.Expressions;
+import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.specification.WhereClause;
 import com.github.jpa.util.JpaHelper;
 import org.springframework.data.jpa.domain.Specification;
@@ -70,7 +70,7 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         private void build() {
-            Expressions<T> expressions = item.getExpression();
+            AttrExpression<T> expressions = item.getExpression();
 
             Expression expression = JpaHelper.toExpression(expressions, cb, root);
 

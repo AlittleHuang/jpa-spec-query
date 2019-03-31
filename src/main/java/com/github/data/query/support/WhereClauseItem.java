@@ -1,7 +1,7 @@
 package com.github.data.query.support;
 
 import com.github.data.query.specification.ConditionalOperator;
-import com.github.data.query.specification.Expressions;
+import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.specification.WhereClause;
 
 import javax.persistence.criteria.Predicate;
@@ -12,7 +12,7 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
 public class WhereClauseItem<T> implements WhereClause<T> {
 
-    protected final Expressions<T> path;
+    protected final AttrExpression<T> path;
 
     protected boolean compound;
 
@@ -26,7 +26,7 @@ public class WhereClauseItem<T> implements WhereClause<T> {
 
     protected final List<WhereClause<T>> compoundItems;
 
-    public WhereClauseItem(Expressions<T> path) {
+    public WhereClauseItem(AttrExpression<T> path) {
         this.path = path;
         if (path == null) {
             compound = true;
@@ -38,7 +38,7 @@ public class WhereClauseItem<T> implements WhereClause<T> {
     }
 
     @Override
-    public Expressions<T> getExpression() {
+    public AttrExpression<T> getExpression() {
         return path;
     }
 

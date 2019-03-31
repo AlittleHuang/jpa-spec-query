@@ -1,10 +1,5 @@
 package com.github.test;
 
-import com.github.data.query.specification.Getter;
-import com.github.test.entity.User;
-
-import java.util.Arrays;
-
 public class Mian {
 
 //    public static void main(String[] args) {
