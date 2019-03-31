@@ -139,22 +139,22 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         @SuppressWarnings( "unchecked" )
-        private void toPredicateItem(Expression path, Expression value) {
+        private void toPredicateItem(Expression expression, Expression other) {
             switch ( item.getConditionalOperator() ) {
                 case EQUAL:
-                    predicate = cb.equal(path, value);
+                    predicate = cb.equal(expression, other);
                     break;
                 case GREATER_THAN:
-                    predicate = cb.greaterThan(path, value);
+                    predicate = cb.greaterThan(expression, other);
                     break;
                 case LESS_THAN:
-                    predicate = cb.lessThan(path, value);
+                    predicate = cb.lessThan(expression, other);
                     break;
                 case GREATER_THAN_OR_EQUAL_TO:
-                    predicate = cb.greaterThanOrEqualTo(path, value);
+                    predicate = cb.greaterThanOrEqualTo(expression, other);
                     break;
                 case LESS_THAN_OR_EQUAL_TO:
-                    predicate = cb.lessThanOrEqualTo(path, value);
+                    predicate = cb.lessThanOrEqualTo(expression, other);
                     break;
                 default:
                     throw new UnsupportedOperationException();
