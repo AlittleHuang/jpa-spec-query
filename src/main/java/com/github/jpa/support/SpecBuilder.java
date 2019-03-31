@@ -4,8 +4,12 @@ import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.support.AbstractWhereClauseBuilder;
 import com.github.data.query.support.SimpleWhereClause;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Delegate;
 import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 @NoArgsConstructor
 public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>> implements Specification<T> {
@@ -19,8 +23,8 @@ public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>
         super(path, root);
     }
 
-    @Delegate
-    private Specification<T> getSpecification() {
-        return new SpecificationImpl<>(getWhereClause());
+    @Override
+    public Predicate toPredicate(Root<T> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+        return new SpecificationImpl<>(getWhereClause()).toPredicate(root, criteriaQuery, criteriaBuilder);
     }
 }

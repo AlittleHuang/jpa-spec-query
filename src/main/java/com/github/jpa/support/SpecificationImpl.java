@@ -1,6 +1,5 @@
 package com.github.jpa.support;
 
-import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.specification.WhereClause;
 import com.github.jpa.util.JpaHelper;
@@ -76,9 +75,10 @@ public class SpecificationImpl<T> implements Specification<T> {
 
             Object value = item.getValue();
 
-            if ( value instanceof Attribute ) {
+            if ( value instanceof AttrExpression ) {
                 //noinspection unchecked
-                value = toPath((Attribute<T>) value);
+                AttrExpression<T> attr = (AttrExpression<T>) value;
+                toPredicateItem(expression, JpaHelper.toExpression(attr, cb, root));
             }
             toPredicateItem(expression, value);
         }
@@ -139,7 +139,7 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         @SuppressWarnings( "unchecked" )
-        private void toPredicateItem(Path path, Expression value) {
+        private void toPredicateItem(Expression path, Expression value) {
             switch ( item.getConditionalOperator() ) {
                 case EQUAL:
                     predicate = cb.equal(path, value);
@@ -161,9 +161,6 @@ public class SpecificationImpl<T> implements Specification<T> {
             }
         }
 
-        Path toPath(Attribute<T> attribute) {
-            return JpaHelper.getPath(root, attribute.getNames(root.getJavaType()));
-        }
     }
 
 }
