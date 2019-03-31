@@ -79,7 +79,7 @@ public class SpecificationImpl<T> implements Specification<T> {
                 //noinspection unchecked
                 AttrExpression<T> attr = (AttrExpression<T>) value;
                 toPredicateItem(expression, JpaHelper.toExpression(attr, cb, root));
-            }else {
+            } else {
                 toPredicateItem(expression, value);
             }
         }
