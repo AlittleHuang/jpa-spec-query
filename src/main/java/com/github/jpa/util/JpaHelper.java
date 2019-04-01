@@ -165,6 +165,7 @@ public class JpaHelper {
 
             case LOCATE:
                 if ( args[0] instanceof Attribute ) {
+                    //noinspection unchecked
                     result = cb.locate(expression, getExpression(cb, root, args));
                 } else {
                     //noinspection unchecked
