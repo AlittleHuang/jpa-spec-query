@@ -86,6 +86,10 @@ public class SpecificationImpl<T> implements Specification<T> {
 
         @SuppressWarnings( "unchecked" )
         private void toPredicateItem(Expression path, Object value) {
+
+            if ( path.getJavaType() == Number.class ) {
+                path = path.as(value.getClass());
+            }
             switch ( item.getConditionalOperator() ) {
                 case EQUAL:
                     predicate = cb.equal(path, value);

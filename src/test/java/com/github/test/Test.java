@@ -51,5 +51,10 @@ public class Test {
         repostory.query()
                 .andEqual(companyName, User::getName)
                 .getResultList();
+
+        repostory.query().eq(Expressions.coalesceVal(User::getName, ""), "");
+        repostory.query().eq(Expressions.nullifVal(User::getName, ""), "");
+        repostory.query().eq(Expressions.nullif(User::getName, User::getName), "");
+        repostory.query().eq(Expressions.sum(User::getId, User::getId), 1);
     }
 }

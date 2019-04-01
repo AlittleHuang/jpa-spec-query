@@ -4,13 +4,13 @@ import com.github.data.query.specification.AttrExpression;
 
 public class SimpleExpression<T, R> implements Expressions<T, R> {
 
-    private Expressions<T, R> expressions;
+    private Expressions<T, ?> expressions;
 
     private Function type;
 
     private Object[] args;
 
-    public SimpleExpression(Expressions<T, R> expressions, Function type, Object... args) {
+    public SimpleExpression(Expressions<T, ?> expressions, Function type, Object... args) {
         this.expressions = expressions;
         this.type = type;
         this.args = args;

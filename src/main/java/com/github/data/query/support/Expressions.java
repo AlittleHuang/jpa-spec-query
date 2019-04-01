@@ -68,28 +68,28 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
         return new SimpleExpression<>(expression, Function.SUM, other);
     }
 
-    static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, R other) {
-        return new SimpleExpression<>(expression, Function.SUM, other);
+    static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, Number val) {
+        return new SimpleExpression<>(expression, Function.SUM, val);
     }
 
     static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.PROD, other);
     }
 
-    static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, R other) {
-        return new SimpleExpression<>(expression, Function.PROD, other);
+    static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Number val) {
+        return new SimpleExpression<>(expression, Function.PROD, val);
     }
 
     static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.DIFF, other);
     }
 
-    static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, R other) {
-        return new SimpleExpression<>(expression, Function.DIFF, other);
+    static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Number val) {
+        return new SimpleExpression<>(expression, Function.DIFF, val);
     }
 
-    static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, R other) {
-        return new SimpleExpression<>(expression, Function.QUOT, other);
+    static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Number val) {
+        return new SimpleExpression<>(expression, Function.QUOT, val);
     }
 
     static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Expressions<T, R> other) {
@@ -190,7 +190,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
         return new SimpleExpression<>(expression, Function.UPPER);
     }
 
-    static <T> Expressions<T, String> length(Expressions<T, String> expression) {
+    static <T> Expressions<T, Integer> length(Expressions<T, String> expression) {
         return new SimpleExpression<>(expression, Function.LENGTH);
     }
 
@@ -201,7 +201,18 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * The first position in a string is denoted by 1.  If the
      * string to be located is not found, 0 is returned.
      */
-    static <T> Expressions<T, String> locate(Expressions<T, String> expression, String pattern) {
+    static <T> Expressions<T, Integer> locate(Expressions<T, String> expression, String pattern) {
+        return new SimpleExpression<>(expression, Function.LOCATE, pattern);
+    }
+
+    /**
+     * Create expression to locate the position of one string
+     * within another, returning position of first character
+     * if found.
+     * The first position in a string is denoted by 1.  If the
+     * string to be located is not found, 0 is returned.
+     */
+    static <T> Expressions<T, Integer> locate(Expressions<T, String> expression, Expressions<T, String> pattern) {
         return new SimpleExpression<>(expression, Function.LOCATE, pattern);
     }
 
@@ -209,7 +220,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * Create an expression that returns null if all its arguments evaluate to null,
      * and the value of the first non-null argument otherwise.
      */
-    static <X, Y> Expressions<X, Y> coalesce(Expressions<X, Y> expression, Y y) {
+    static <X, Y,E extends Expressions<X, ? super Y>> Expressions<X, Y> coalesceVal(E expression, Y y) {
         return new SimpleExpression<>(expression, Function.COALESCE, y);
     }
 
@@ -217,7 +228,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * Create an expression that returns null if all its arguments evaluate to null,
      * and the value of the first non-null argument otherwise.
      */
-    static <X, Y> Expressions<X, Y> coalesce(Expressions<X, Y> expression, Expressions<X, Y> y) {
+    static <X, Y, E extends Expressions<X, ? extends Y>> Expressions<X, Y> coalesce(E expression, E y) {
         return new SimpleExpression<>(expression, Function.COALESCE, y);
     }
 
@@ -226,7 +237,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * equal, returning null if they are and the value of the
      * first expression if they are not.
      */
-    static <T, Y> Expressions<T, Y> nullif(Expressions<T, Y> expression, Y val) {
+    static <T, Y, E extends Expressions<T, ? super Y>> Expressions<T, Y> nullifVal(E expression, Y val) {
         return new SimpleExpression<>(expression, Function.NULLIF, val);
     }
 
@@ -235,7 +246,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * equal, returning null if they are and the value of the
      * first expression if they are not.
      */
-    static <T, Y> Expressions<T, Y> nullif(Expressions<T, Y> expression, Expressions<T, Y> val) {
+    static <T, Y, E extends Expressions<T, ? extends Y>> Expressions<T, Y> nullif(E expression, E val) {
         return new SimpleExpression<>(expression, Function.NULLIF, val);
     }
 

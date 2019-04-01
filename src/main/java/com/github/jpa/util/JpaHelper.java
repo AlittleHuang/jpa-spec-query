@@ -164,8 +164,12 @@ public class JpaHelper {
 
 
             case LOCATE:
-                //noinspection unchecked
-                result = cb.locate(expression, (String) args[0]);
+                if ( args[0] instanceof Attribute ) {
+                    result = cb.locate(expression, getExpression(cb, root, args));
+                } else {
+                    //noinspection unchecked
+                    result = cb.locate(expression, (String) args[0]);
+                }
                 break;
 
 
@@ -180,10 +184,10 @@ public class JpaHelper {
 
             case NULLIF:
                 if ( isNotAttrExpression(args) ) {
-                    result = cb.nullif((Expression<?>) expression, getExpression(cb, root, args));
-                } else {
                     //noinspection unchecked
                     result = cb.nullif(expression, args[0]);
+                } else {
+                    result = cb.nullif((Expression<?>) expression, getExpression(cb, root, args));
                 }
                 break;
         }
