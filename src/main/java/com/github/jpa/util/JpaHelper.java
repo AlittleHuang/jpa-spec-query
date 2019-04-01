@@ -1,7 +1,7 @@
 package com.github.jpa.util;
 
-import com.github.data.query.specification.Attribute;
 import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Attribute;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Expression;
@@ -33,126 +33,170 @@ public class JpaHelper {
     }
 
     public static <T> Expression toExpression(AttrExpression<T> expressions, CriteriaBuilder cb, Root<T> root) {
-        Path path = toPath(root, expressions);
+        AttrExpression<T> subexpression = expressions.getSubexpression();
+        Expression expression = ( subexpression != null )
+                        ? toExpression(subexpression, cb, root)
+                        : toPath(root, expressions);
+        
         AttrExpression.Function type = expressions.getFunction();
         if ( type == null ) type = AttrExpression.Function.NONE;
         Object[] args = expressions.getArgs();
 
-        Expression expression = path;
+        Expression result = expression;
+
         switch ( type ) {
 
             case NONE:
                 break;
             case ABS:
                 //noinspection unchecked
-                expression = cb.abs(path);
+                result = cb.abs(expression);
                 break;
 
 
             case SUM:
-                //noinspection unchecked
-                expression = cb.sum(path);
+                if ( isNotAttrExpression(args) ) {
+                    //noinspection unchecked
+                    result = cb.sum(expression, (Number) args[0]);
+                } else
+                    //noinspection unchecked
+                    result = cb.sum(expression, getExpression(cb, root, args));
                 break;
 
 
             case PROD:
-                //noinspection unchecked
-                expression = cb.prod(path, toPath(root, (Attribute) args[0]));
+                if ( isNotAttrExpression(args) ) {
+                    //noinspection unchecked
+                    result = cb.prod(expression, (Number) args[0]);
+                } else
+                    //noinspection unchecked
+                    result = cb.prod(expression, getExpression(cb, root, args));
                 break;
 
 
             case DIFF:
-                //noinspection unchecked
-                expression = cb.diff(path, toPath(root, (Attribute) args[0]));
+                if ( isNotAttrExpression(args) ) {
+                    //noinspection unchecked
+                    result = cb.diff(expression, (Number) args[0]);
+                } else
+                    //noinspection unchecked
+                    result = cb.diff(expression, getExpression(cb, root, args));
                 break;
 
 
             case QUOT:
-                //noinspection unchecked
-                expression = cb.quot(path, toPath(root, (Attribute) args[0]));
+                if ( isNotAttrExpression(args) ) {
+                    //noinspection unchecked
+                    result = cb.quot(expression, (Number) args[0]);
+                } else
+                    //noinspection unchecked
+                    result = cb.quot(expression, getExpression(cb, root, args));
                 break;
 
 
             case MOD:
-                //noinspection unchecked
-                expression = cb.mod(path, toPath(root, (Attribute) args[0]));
+                if ( isNotAttrExpression(args) ) {
+                    //noinspection unchecked
+                    result = cb.mod(expression, (Integer) args[0]);
+                } else
+                    //noinspection unchecked
+                    result = cb.mod(expression, getExpression(cb, root, args));
                 break;
 
 
             case SQRT:
                 //noinspection unchecked
-                expression = cb.sqrt(path);
+                result = cb.sqrt(expression);
                 break;
 
 
             case CONCAT:
-                //noinspection unchecked
-                expression = cb.concat(path, toPath(root, (Attribute) args[0]));
+                if ( isNotAttrExpression(args) ) {
+                    //noinspection unchecked
+                    result = cb.concat(expression, (String) args[0]);
+                } else
+                    //noinspection unchecked
+                    result = cb.concat(expression, getExpression(cb, root, args));
                 break;
 
 
             case SUBSTRING:
                 if ( args.length == 2 ) {
                     //noinspection unchecked
-                    expression = cb.substring(path, (Integer) args[0], (Integer) args[1]);
+                    result = cb.substring(expression, (Integer) args[0], (Integer) args[1]);
                 } else if ( args.length == 1 ) {
                     //noinspection unchecked
-                    expression = cb.substring(path, (Integer) args[0]);
+                    result = cb.substring(expression, (Integer) args[0]);
                 }
                 break;
 
 
             case TRIM:
-                //noinspection unchecked
-                expression = cb.trim(path);
+                if ( args == null || args.length == 0 ) {
+                    //noinspection unchecked
+                    result = cb.trim(expression);
+                } else if ( args.length == 1 ) {
+                    //noinspection unchecked
+                    result = cb.trim((CriteriaBuilder.Trimspec) args[0], expression);
+                } else if ( args.length == 2 ) {
+                    //noinspection unchecked
+                    result = cb.trim((CriteriaBuilder.Trimspec) args[0], (char) args[1], expression);
+                }
                 break;
 
 
             case LOWER:
                 //noinspection unchecked
-                expression = cb.lower(path);
+                result = cb.lower(expression);
                 break;
 
 
             case UPPER:
                 //noinspection unchecked
-                expression = cb.upper(path);
+                result = cb.upper(expression);
                 break;
 
 
             case LENGTH:
                 //noinspection unchecked
-                expression = cb.length(path);
+                result = cb.length(expression);
                 break;
 
 
             case LOCATE:
                 //noinspection unchecked
-                expression = cb.locate(path, (String) args[0]);
+                result = cb.locate(expression, (String) args[0]);
                 break;
 
 
             case COALESCE:
                 if ( args[0] instanceof Attribute ) {
-                    //noinspection unchecked
-                    expression = cb.coalesce(path, toPath(root, (Attribute) args[0]));
+                    result = cb.coalesce(expression, getExpression(cb, root, args));
                 } else {
-                    expression = cb.coalesce(path, args[0]);
+                    result = cb.coalesce(expression, args[0]);
                 }
                 break;
 
 
             case NULLIF:
-                if ( args[0] instanceof Attribute ) {
-                    //noinspection unchecked
-                    expression = cb.nullif((Expression<?>) path, (Expression<?>) toPath(root, (Attribute) args[0]));
+                if ( isNotAttrExpression(args) ) {
+                    result = cb.nullif((Expression<?>) expression, getExpression(cb, root, args));
                 } else {
                     //noinspection unchecked
-                    expression = cb.nullif(path, args[0]);
+                    result = cb.nullif(expression, args[0]);
                 }
                 break;
         }
-        return expression;
+        return result;
+    }
+
+    private static <T> Expression getExpression(CriteriaBuilder cb, Root<T> root, Object[] args) {
+        //noinspection unchecked
+        return toExpression((AttrExpression) args[0], cb, root);
+    }
+
+    private static boolean isNotAttrExpression(Object[] args) {
+        return args == null || args.length <= 0 || args[0] == null || !( args[0] instanceof AttrExpression );
     }
 
     private static <T> Path<?> toPath(Root<T> root, Attribute<T> attribute) {

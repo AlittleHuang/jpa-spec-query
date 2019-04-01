@@ -8,6 +8,10 @@ public interface AttrExpression<T> extends Attribute<T> {
         return EMPTY_ARGS;
     }
 
+    default AttrExpression<T> getSubexpression() {
+        return null;
+    }
+
     default Function getFunction(){
         return Function.NONE;
     }

@@ -15,7 +15,7 @@ public class SimpleOrders<T> implements Orders<T> {
     private AttrExpression<T> attribute;
 
     public SimpleOrders(Sort.Direction direction, String path) {
-        attribute = new SimpleExpressions<>(path);
+        attribute = new SimpleExpression<>(path);
         this.direction = direction;
     }
 

@@ -3,6 +3,7 @@ package com.github.data.query.support;
 import com.github.data.query.specification.AttrExpression;
 import com.github.data.query.specification.Selection;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -60,35 +61,59 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
     }
 
     static <T, R extends Number> Expressions<T, R> abs(Expressions<T, R> expression) {
-        return new SimpleExpressions<>(expression, Function.ABS);
+        return new SimpleExpression<>(expression, Function.ABS);
     }
 
     static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new SimpleExpressions<>(expression, Function.SUM, other);
+        return new SimpleExpression<>(expression, Function.SUM, other);
+    }
+
+    static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, R other) {
+        return new SimpleExpression<>(expression, Function.SUM, other);
     }
 
     static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new SimpleExpressions<>(expression, Function.PROD, other);
+        return new SimpleExpression<>(expression, Function.PROD, other);
+    }
+
+    static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, R other) {
+        return new SimpleExpression<>(expression, Function.PROD, other);
     }
 
     static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new SimpleExpressions<>(expression, Function.DIFF, other);
+        return new SimpleExpression<>(expression, Function.DIFF, other);
+    }
+
+    static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, R other) {
+        return new SimpleExpression<>(expression, Function.DIFF, other);
+    }
+
+    static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, R other) {
+        return new SimpleExpression<>(expression, Function.QUOT, other);
     }
 
     static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new SimpleExpressions<>(expression, Function.QUOT, other);
+        return new SimpleExpression<>(expression, Function.QUOT, other);
     }
 
-    static <T, R extends Number> Expressions<T, R> mod(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new SimpleExpressions<>(expression, Function.MOD, other);
+    static <T> Expressions<T, Integer> mod(Expressions<T, Integer> expression, Expressions<T, Integer> other) {
+        return new SimpleExpression<>(expression, Function.MOD, other);
+    }
+
+    static <T> Expressions<T, Integer> mod(Expressions<T, Integer> expression, Integer other) {
+        return new SimpleExpression<>(expression, Function.MOD, other);
     }
 
     static <T, R extends Number> Expressions<T, R> sqrt(Expressions<T, R> expression) {
-        return new SimpleExpressions<>(expression, Function.SQRT);
+        return new SimpleExpression<>(expression, Function.SQRT);
     }
 
     static <T> Expressions<T, String> concat(Expressions<T, String> expression, Expressions<T, String> other) {
-        return new SimpleExpressions<>(expression, Function.CONCAT, other);
+        return new SimpleExpression<>(expression, Function.CONCAT, other);
+    }
+
+    static <T> Expressions<T, String> concat(Expressions<T, String> expression, String other) {
+        return new SimpleExpression<>(expression, Function.CONCAT, other);
     }
 
     /**
@@ -98,7 +123,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * First position is 1.
      */
     static <T> Expressions<T, String> substring(Expressions<T, String> expression, int from, int length) {
-        return new SimpleExpressions<>(expression, Function.SUBSTRING, from, length);
+        return new SimpleExpression<>(expression, Function.SUBSTRING, from, length);
     }
 
 
@@ -109,7 +134,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * First position is 1.
      */
     static <T> Expressions<T, String> substring(Expressions<T, String> expression, int from) {
-        return new SimpleExpressions<>(expression, Function.SUBSTRING, from);
+        return new SimpleExpression<>(expression, Function.SUBSTRING, from);
     }
 
     /**
@@ -117,19 +142,56 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * a string.
      */
     static <T> Expressions<T, String> trim(Expressions<T, String> expression) {
-        return new SimpleExpressions<>(expression, Function.TRIM);
+        return new SimpleExpression<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.BOTH);
+    }
+
+    /**
+     * Trim from leading end
+     */
+    static <T> Expressions<T, String> trimLeading(Expressions<T, String> expression) {
+        return new SimpleExpression<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.LEADING);
+    }
+
+    /**
+     * Trim from trailing end.
+     */
+    static <T> Expressions<T, String> trimTrailing(Expressions<T, String> expression) {
+        return new SimpleExpression<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.TRAILING);
+    }
+
+
+    /**
+     * Create expression to trim blanks from both ends of
+     * a string.
+     */
+    static <T> Expressions<T, String> trim(Expressions<T, String> expression, char beTrimmed) {
+        return new SimpleExpression<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.BOTH, beTrimmed);
+    }
+
+    /**
+     * Trim from leading end
+     */
+    static <T> Expressions<T, String> trimLeading(Expressions<T, String> expression, char beTrimmed) {
+        return new SimpleExpression<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.LEADING, beTrimmed);
+    }
+
+    /**
+     * Trim from trailing end.
+     */
+    static <T> Expressions<T, String> trimTrailing(Expressions<T, String> expression, char beTrimmed) {
+        return new SimpleExpression<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.TRAILING, beTrimmed);
     }
 
     static <T> Expressions<T, String> lower(Expressions<T, String> expression) {
-        return new SimpleExpressions<>(expression, Function.LOWER);
+        return new SimpleExpression<>(expression, Function.LOWER);
     }
 
     static <T> Expressions<T, String> upper(Expressions<T, String> expression) {
-        return new SimpleExpressions<>(expression, Function.UPPER);
+        return new SimpleExpression<>(expression, Function.UPPER);
     }
 
     static <T> Expressions<T, String> length(Expressions<T, String> expression) {
-        return new SimpleExpressions<>(expression, Function.LENGTH);
+        return new SimpleExpression<>(expression, Function.LENGTH);
     }
 
     /**
@@ -140,7 +202,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * string to be located is not found, 0 is returned.
      */
     static <T> Expressions<T, String> locate(Expressions<T, String> expression, String pattern) {
-        return new SimpleExpressions<>(expression, Function.LOCATE, pattern);
+        return new SimpleExpression<>(expression, Function.LOCATE, pattern);
     }
 
     /**
@@ -148,7 +210,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * and the value of the first non-null argument otherwise.
      */
     static <X, Y> Expressions<X, Y> coalesce(Expressions<X, Y> expression, Y y) {
-        return new SimpleExpressions<>(expression, Function.COALESCE, y);
+        return new SimpleExpression<>(expression, Function.COALESCE, y);
     }
 
     /**
@@ -156,7 +218,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * and the value of the first non-null argument otherwise.
      */
     static <X, Y> Expressions<X, Y> coalesce(Expressions<X, Y> expression, Expressions<X, Y> y) {
-        return new SimpleExpressions<>(expression, Function.COALESCE, y);
+        return new SimpleExpression<>(expression, Function.COALESCE, y);
     }
 
     /**
@@ -165,7 +227,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * first expression if they are not.
      */
     static <T, Y> Expressions<T, Y> nullif(Expressions<T, Y> expression, Y val) {
-        return new SimpleExpressions<>(expression, Function.NULLIF, val);
+        return new SimpleExpression<>(expression, Function.NULLIF, val);
     }
 
     /**
@@ -174,7 +236,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
      * first expression if they are not.
      */
     static <T, Y> Expressions<T, Y> nullif(Expressions<T, Y> expression, Expressions<T, Y> val) {
-        return new SimpleExpressions<>(expression, Function.NULLIF, val);
+        return new SimpleExpression<>(expression, Function.NULLIF, val);
     }
 
 }

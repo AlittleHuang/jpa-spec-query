@@ -70,7 +70,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        SimpleExpressions<T, ?> path = new SimpleExpressions<>(paths);
+        SimpleExpression<T, ?> path = new SimpleExpression<>(paths);
         return add(path, value, booleanOperator, negate, conditionalOperator);
     }
 
