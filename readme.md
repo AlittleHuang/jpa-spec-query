@@ -8,7 +8,7 @@
         <dependency>
           <groupId>com.github.alittlehuang</groupId>
           <artifactId>jpa-spec-query</artifactId>
-          <version>1.0.4</version>
+          <version>1.0.9</version>
         </dependency>
 
         <dependency>
