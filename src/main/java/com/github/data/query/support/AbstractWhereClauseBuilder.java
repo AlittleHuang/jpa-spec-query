@@ -298,7 +298,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS andGe(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS andGe(String name, X value) {
         return add(name, value, AND, GREATER_THAN_OR_EQUAL_TO);
     }
 
@@ -308,7 +308,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS orGe(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS orGe(String name, X value) {
         return add(name, value, OR, GREATER_THAN_OR_EQUAL_TO);
     }
 
@@ -338,7 +338,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS andLe(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS andLe(String name, X value) {
         return add(name, value, AND, LESS_THAN_OR_EQUAL_TO);
     }
 
@@ -348,7 +348,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS orLe(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS orLe(String name, X value) {
         return add(name, value, OR, LESS_THAN_OR_EQUAL_TO);
     }
 
@@ -378,7 +378,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS andGt(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS andGt(String name, X value) {
         return add(name, value, AND, GREATER_THAN);
     }
 
@@ -388,7 +388,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS orGt(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS orGt(String name, X value) {
         return add(name, value, OR, GREATER_THAN);
     }
 
@@ -418,7 +418,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS andLt(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS andLt(String name, X value) {
         return add(name, value, AND, LESS_THAN);
     }
 
@@ -428,7 +428,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS orLt(String name, Y value) {
+    public <X extends Comparable<? super X>> THIS orLt(String name, X value) {
         return add(name, value, OR, LESS_THAN);
     }
 
@@ -478,22 +478,22 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS andBetween(String name, Y value0, Y value1) {
+    public <X extends Comparable<? super X>> THIS andBetween(String name, X value0, X value1) {
         return add(name, Arrays.asList(value0, value1), AND, BETWEEN);
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS orBetween(String name, Y value0, Y value1) {
+    public <X extends Comparable<? super X>> THIS orBetween(String name, X value0, X value1) {
         return add(name, Arrays.asList(value0, value1), OR, BETWEEN);
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS andNotBetween(String name, Y value0, Y value1) {
+    public <X extends Comparable<? super X>> THIS andNotBetween(String name, X value0, X value1) {
         return add(name, Arrays.asList(value0, value1), AND, NOT, BETWEEN);
     }
 
     @Override
-    public <Y extends Comparable<? super Y>> THIS orNotBetween(String name, Y value0, Y value1) {
+    public <X extends Comparable<? super X>> THIS orNotBetween(String name, X value0, X value1) {
         return add(name, Arrays.asList(value0, value1), OR, NOT, BETWEEN);
     }
 
