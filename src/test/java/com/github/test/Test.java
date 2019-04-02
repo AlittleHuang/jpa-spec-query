@@ -56,5 +56,10 @@ public class Test {
         repostory.query().eq(Expressions.nullifVal(User::getName, ""), "");
         repostory.query().eq(Expressions.nullif(User::getName, User::getName), "");
         repostory.query().eq(Expressions.sum(User::getId, User::getId), 1);
+
+        repostory.query()
+                .andGreaterThan(User::getName, User::getName)
+                .equal(User::getName, User::getAge)
+                .getResultList();
     }
 }

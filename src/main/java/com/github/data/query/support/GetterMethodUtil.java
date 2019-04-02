@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class MethodInfoUtil {
+class GetterMethodUtil {
 
     private final static Map<Class, Method> map = new HashMap<>();
 
@@ -36,7 +36,7 @@ public class MethodInfoUtil {
             synchronized ( map ) {
                 method = map.get(key);
                 if ( method == null ) {
-                    method = MethodInfoUtil.Proxy.getMethod(type, getters, cast);
+                    method = GetterMethodUtil.Proxy.getMethod(type, getters, cast);
                     map.put(key, method);
                 }
             }
@@ -65,16 +65,16 @@ public class MethodInfoUtil {
     private static class Proxy implements MethodInterceptor {
 
         private static Map<Class<?>, Object> instanceMap = new ConcurrentHashMap<>();
-        private static MethodInfoUtil.Proxy proxy = new MethodInfoUtil.Proxy();
+        private static GetterMethodUtil.Proxy proxy = new GetterMethodUtil.Proxy();
 
         private static <T> Method getMethod(Class<T> type, Expressions<T, ?> getters, boolean cast) {
             T target = proxy.getProxyInstance(type);
             try {
                 getters.apply(target);
             } catch ( Exception e ) {
-                if ( e.getClass() == MethodInfoUtil.Proxy.MethodInfo.class )
+                if ( e.getClass() == GetterMethodUtil.Proxy.MethodInfo.class )
                     //noinspection ConstantConditions
-                    return ( (MethodInfoUtil.Proxy.MethodInfo) e ).getMethod();
+                    return ( (GetterMethodUtil.Proxy.MethodInfo) e ).getMethod();
                 if ( cast && e.getClass() == ClassCastException.class ) {
                     String message = e.getMessage();
                     int i = message.lastIndexOf(' ');
@@ -103,7 +103,7 @@ public class MethodInfoUtil {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy)
                 throws Throwable {
-            throw new MethodInfoUtil.Proxy.MethodInfo(method);
+            throw new GetterMethodUtil.Proxy.MethodInfo(method);
         }
 
         private static class MethodInfo extends Exception {

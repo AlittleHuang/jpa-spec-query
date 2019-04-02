@@ -106,7 +106,7 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
         return andIn(name, value);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     <X> THIS andIn(String name, X... value);
 
     default THIS in(String name, Object... value) {
@@ -119,7 +119,7 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
         return andNotIn(name, value);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     <X> THIS andNotIn(String name, X... value);
 
     default THIS notIn(String name, Object... value) {
@@ -128,73 +128,111 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
 
     <X> THIS orIn(String name, Collection<X> value);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     <X> THIS orIn(String name, X... value);
 
     <X> THIS orNotIn(String name, Collection<X> value);
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     <X> THIS orNotIn(String name, X... value);
 
-    <U, G extends Expressions<T, ? super U>> THIS andEqual(G path, G other);
+    <U, G extends Expressions<T, ?>> THIS andEqual(G expression, G other);
 
-    default <U, G extends Expressions<T, ? super U>> THIS equal(G path, G other) {
-        return andEqual(path, other);
+    default <U, G extends Expressions<T, ?>> THIS equal(G expression, G other) {
+        return andEqual(expression, other);
     }
 
-    <U, G extends Expressions<T, ? super U>> THIS orEqual(G path, G other);
+    <U, G extends Expressions<T, ?>> THIS orEqual(G expression, G other);
 
-    <U, G extends Expressions<T, ? super U>> THIS andNotEqual(G path, G other);
+    <U, G extends Expressions<T, ?>> THIS andNotEqual(G expression, G other);
 
-    default <U, G extends Expressions<T, ? super U>> THIS notEqual(G path, G other) {
-        return andNotEqual(path, other);
+    default <U, G extends Expressions<T, ?>> THIS notEqual(G expression, G other) {
+        return andNotEqual(expression, other);
     }
 
-    <U, G extends Expressions<T, ? super U>> THIS orNotEqual(G path, G other);
+    <U, G extends Expressions<T, ?>> THIS orNotEqual(G expression, G other);
 
-    <U, F extends Expressions<T, ? super U>> THIS andEq(F getter, U value);
+    <U, E extends Expressions<T, ? super U>> THIS andEq(E expression, U value);
 
-    default <U, F extends Expressions<T, ? super U>> THIS eq(F getter, U value) {
-        return andEq(getter, value);
+    default <U, E extends Expressions<T, ? super U>> THIS eq(E expression, U value) {
+        return andEq(expression, value);
     }
 
-    <U, F extends Expressions<T, ? super U>> THIS orEq(F getter, U value);
+    <U, E extends Expressions<T, ? super U>> THIS orEq(E expression, U value);
 
-    <U, F extends Expressions<T, ? super U>> THIS andNotEq(F getter, U value);
-    default <U, F extends Expressions<T, ? super U>> THIS notEq(F getter, U value){
-        return andNotEq(getter, value);
+    <U, E extends Expressions<T, ? super U>> THIS andNotEq(E expression, U value);
+
+    default <U, E extends Expressions<T, ? super U>> THIS notEq(E expression, U value) {
+        return andNotEq(expression, value);
     }
 
-    <U, F extends Expressions<T, ? super U>> THIS orNotEq(F getter, U value);
+    <U, E extends Expressions<T, ? super U>> THIS orNotEq(E expression, U value);
 
     <Y extends Comparable<? super Y>> THIS andGe(String name, Y value);
-    default <Y extends Comparable<? super Y>> THIS ge(String name, Y value){
+
+    default <Y extends Comparable<? super Y>> THIS ge(String name, Y value) {
         return andGe(name, value);
     }
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andGe(F getter, U value);
-    default <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS ge(F getter, U value){
-        return andGe(getter, value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS andGe(E expression, U value);
+
+    default <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS ge(E expression, U value) {
+        return andGe(expression, value);
     }
 
     <Y extends Comparable<? super Y>> THIS orGe(String name, Y value);
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orGe(F getter, U value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS orGe(E expression, U value);
+
+
+    <U extends Comparable<? super U>> THIS andGreaterThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    default <U extends Comparable<? super U>> THIS greaterThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andGreaterThanOrEqual(expression, other);
+    }
+
+    <U extends Comparable<? super U>> THIS orGreaterThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    <U extends Comparable<? super U>> THIS andNotGreaterThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    default <U extends Comparable<? super U>> THIS notGreaterThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andNotGreaterThanOrEqual(expression, other);
+    }
+
+    <U extends Comparable<? super U>> THIS orNotGreaterThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
 
     <Y extends Comparable<? super Y>> THIS andLe(String name, Y value);
-    default <Y extends Comparable<? super Y>> THIS le(String name, Y value){
+
+    default <Y extends Comparable<? super Y>> THIS le(String name, Y value) {
         return andLe(name, value);
     }
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andLe(F getter, U value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS andLe(E expression, U value);
 
-    default <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS le(F getter, U value) {
-        return andLe(getter, value);
+    default <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS le(E expression, U value) {
+        return andLe(expression, value);
     }
 
     <Y extends Comparable<? super Y>> THIS orLe(String name, Y value);
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orLe(F getter, U value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS orLe(E expression, U value);
+
+    <U extends Comparable<? super U>> THIS andLessThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    default <U extends Comparable<? super U>> THIS lessThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andLessThanOrEqual(expression, other);
+    }
+
+    <U extends Comparable<? super U>> THIS orLessThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    <U extends Comparable<? super U>> THIS andNotLessThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    default <U extends Comparable<? super U>> THIS notLessThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andNotLessThanOrEqual(expression, other);
+    }
+
+    <U extends Comparable<? super U>> THIS orNotLessThanOrEqual(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
 
     <Y extends Comparable<? super Y>> THIS andGt(String name, Y value);
 
@@ -202,15 +240,31 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
         return andGt(name, value);
     }
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andGt(F getter, U value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS andGt(E expression, U value);
 
-    default <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS gt(F getter, U value) {
-        return andGt(getter, value);
+    default <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS gt(E expression, U value) {
+        return andGt(expression, value);
     }
 
     <Y extends Comparable<? super Y>> THIS orGt(String name, Y value);
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orGt(F getter, U value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS orGt(E expression, U value);
+
+    <U extends Comparable<? super U>> THIS andGreaterThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    default <U extends Comparable<? super U>> THIS greaterThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andGreaterThan(expression, other);
+    }
+
+    <U extends Comparable<? super U>> THIS orGreaterThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    <U extends Comparable<? super U>> THIS andNotGreaterThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    default <U extends Comparable<? super U>> THIS notGreaterThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andNotGreaterThan(expression, other);
+    }
+
+    <U extends Comparable<? super U>> THIS orNotGreaterThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
 
     <Y extends Comparable<? super Y>> THIS andLt(String name, Y value);
 
@@ -218,94 +272,126 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
         return andLt(name, value);
     }
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andLt(F getter, U value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS andLt(E expression, U value);
 
-    default <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS lt(F getter, U value) {
-        return andLt(getter, value);
+    default <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS lt(E expression, U value) {
+        return andLt(expression, value);
     }
 
     <Y extends Comparable<? super Y>> THIS orLt(String name, Y value);
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orLt(F getter, U value);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS orLt(E expression, U value);
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andBetween(F getter, U value, U otherValue);
+    <U extends Comparable<? super U>> THIS andLessThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
 
-    default <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS between(F getter, U value, U otherValue) {
-        return andBetween(getter, value, otherValue);
+    default <U extends Comparable<? super U>> THIS lessThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andLessThan(expression, other);
     }
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orBetween(F getter, U value, U otherValue);
+    <U extends Comparable<? super U>> THIS orLessThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS andNotBetween(F getter, U value, U otherValue);
+    <U extends Comparable<? super U>> THIS andNotLessThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
 
-    default <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS notBetween(F getter, U value,
+    default <U extends Comparable<? super U>> THIS notLessThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other) {
+        return andNotLessThan(expression, other);
+    }
+
+    <U extends Comparable<? super U>> THIS orNotLessThan(Expressions<T, ? extends U> expression, Expressions<T, ? extends U> other);
+
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS andBetween(E expression, U value, U otherValue);
+
+    default <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS between(E expression, U value, U otherValue) {
+        return andBetween(expression, value, otherValue);
+    }
+
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS orBetween(E expression, U value, U otherValue);
+
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS andNotBetween(E expression, U value, U otherValue);
+
+    default <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS notBetween(E expression, U value,
                                                                                                    U otherValue) {
-        return andNotBetween(getter, value, otherValue);
+        return andNotBetween(expression, value, otherValue);
     }
 
-    <U extends Comparable<? super U>, F extends Expressions<T, ? super U>> THIS orNotBetween(F getter, U value, U otherValue);
+    <U extends Comparable<? super U>, E extends Expressions<T, ? super U>> THIS orNotBetween(E expression, U value, U otherValue);
 
-    THIS andIsNull(String name, Boolean isNull);
-
-    default THIS isNull(String name, Boolean isNull) {
-        return andIsNull(name,isNull);
+    default THIS andIsNull(String name, boolean isNull) {
+        return isNull ? isNull(name) : isNotNull(name);
     }
 
-    THIS orIsNull(String name, Boolean isNull);
-
-    THIS andLike(Expressions<T, String> getters, String value);
-
-    default THIS like(Expressions<T, String> getters, String value) {
-        return andLt(getters, value);
+    default THIS andIsNull(Expressions<T, ?> expressions, boolean isNull) {
+        return isNull ? isNull(expressions) : isNotNull(expressions);
     }
 
-    THIS andNotLike(Expressions<T, String> getters, String value);
-
-    default THIS notLike(Expressions<T, String> getters, String value) {
-        return andNotLike(getters, value);
+    default THIS isNull(String name, boolean isNull) {
+        return andIsNull(name, isNull);
     }
 
-    THIS orLike(Expressions<T, String> getters, String value);
-
-    THIS orNotLike(Expressions<T, String> getters, String value);
-
-    <U, F extends Expressions<T, ? super U>> THIS andIn(F getters, Collection<U> value);
-
-    default <U, F extends Expressions<T, ? super U>> THIS in(F getters, Collection<U> value) {
-        return andIn(getters, value);
+    default THIS isNull(Expressions<T, ?> expressions, boolean isNull) {
+        return andIsNull(expressions, isNull);
     }
 
-    @SuppressWarnings("unchecked")
-    <U, F extends Expressions<T, ? super U>> THIS andIn(F getters, U... value);
-
-    @SuppressWarnings("unchecked")
-    default <U, F extends Expressions<T, ? super U>> THIS in(F getters, U... value) {
-        return andIn(getters, value);
+    default THIS orIsNull(String name, boolean isNull) {
+        return isNull ? orIsNull(name) : orIsNotNull(name);
     }
 
-    <U, F extends Expressions<T, ? super U>> THIS andNotIn(F getters, Collection<U> value);
-
-    default <U, F extends Expressions<T, ? super U>> THIS notIn(F getters, Collection<U> value) {
-        return andNotIn(getters, value);
+    default THIS orIsNull(Expressions<T, ?> expressions, boolean isNull) {
+        return isNull ? orIsNull(expressions) : orIsNotNull(expressions);
     }
 
-    @SuppressWarnings("unchecked")
-    <U, F extends Expressions<T, ? super U>> THIS andNotIn(F getters, U... value);
+    THIS andLike(Expressions<T, String> expression, String value);
 
-    @SuppressWarnings("unchecked")
-    default <U, F extends Expressions<T, ? super U>> THIS notIn(F getters, U... value) {
-        return andNotIn(getters, value);
+    default THIS like(Expressions<T, String> expression, String value) {
+        return andLike(expression, value);
     }
 
-    <U, F extends Expressions<T, ? super U>> THIS orIn(F getters, Collection<U> value);
+    THIS andNotLike(Expressions<T, String> expression, String value);
 
-    @SuppressWarnings("unchecked")
-    <U, F extends Expressions<T, ? super U>> THIS orIn(F getters, U... value);
+    default THIS notLike(Expressions<T, String> expression, String value) {
+        return andNotLike(expression, value);
+    }
 
-    <U, F extends Expressions<T, ? super U>> THIS orNotIn(F getters, Collection<U> value);
+    THIS orLike(Expressions<T, String> expression, String value);
 
-    @SuppressWarnings("unchecked")
-    <U, F extends Expressions<T, ? super U>> THIS orNotIn(F getters, U... value);
+    THIS orNotLike(Expressions<T, String> expression, String value);
+
+    <U, E extends Expressions<T, ? super U>> THIS andIn(E expression, Collection<U> value);
+
+    default <U, E extends Expressions<T, ? super U>> THIS in(E expression, Collection<U> value) {
+        return andIn(expression, value);
+    }
+
+    @SuppressWarnings( "unchecked" )
+    <U, E extends Expressions<T, ? super U>> THIS andIn(E expression, U... value);
+
+    @SuppressWarnings( "unchecked" )
+    default <U, E extends Expressions<T, ? super U>> THIS in(E expression, U... value) {
+        return andIn(expression, value);
+    }
+
+    <U, E extends Expressions<T, ? super U>> THIS andNotIn(E expression, Collection<U> value);
+
+    default <U, E extends Expressions<T, ? super U>> THIS notIn(E expression, Collection<U> value) {
+        return andNotIn(expression, value);
+    }
+
+    @SuppressWarnings( "unchecked" )
+    <U, E extends Expressions<T, ? super U>> THIS andNotIn(E expression, U... value);
+
+    @SuppressWarnings( "unchecked" )
+    default <U, E extends Expressions<T, ? super U>> THIS notIn(E expression, U... value) {
+        return andNotIn(expression, value);
+    }
+
+    <U, E extends Expressions<T, ? super U>> THIS orIn(E expression, Collection<U> value);
+
+    @SuppressWarnings( "unchecked" )
+    <U, E extends Expressions<T, ? super U>> THIS orIn(E expression, U... value);
+
+    <U, E extends Expressions<T, ? super U>> THIS orNotIn(E expression, Collection<U> value);
+
+    @SuppressWarnings( "unchecked" )
+    <U, E extends Expressions<T, ? super U>> THIS orNotIn(E expression, U... value);
 
     WhereClause getWhereClause();
 }

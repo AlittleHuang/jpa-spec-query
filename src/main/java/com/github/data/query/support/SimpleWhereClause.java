@@ -12,7 +12,7 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
 public class SimpleWhereClause<T> implements WhereClause<T> {
 
-    protected final AttrExpression<T> path;
+    protected final AttrExpression<T> attrExpression;
 
     protected boolean compound;
 
@@ -26,9 +26,9 @@ public class SimpleWhereClause<T> implements WhereClause<T> {
 
     protected final List<WhereClause<T>> compoundItems;
 
-    public SimpleWhereClause(AttrExpression<T> path) {
-        this.path = path;
-        if (path == null) {
+    public SimpleWhereClause(AttrExpression<T> attrExpression) {
+        this.attrExpression = attrExpression;
+        if ( attrExpression == null) {
             compound = true;
             compoundItems = new ArrayList<>();
         } else {
@@ -39,7 +39,7 @@ public class SimpleWhereClause<T> implements WhereClause<T> {
 
     @Override
     public AttrExpression<T> getExpression() {
-        return path;
+        return attrExpression;
     }
 
     @Override

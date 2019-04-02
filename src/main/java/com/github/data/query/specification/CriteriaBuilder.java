@@ -9,29 +9,29 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
 
     THIS addSelect(String... paths);
 
-    THIS addSelect(Expressions<T, ?> paths);
+    THIS addSelect(Expressions<T, ?> expression);
 
-    THIS addSelect(Expressions<T, ?> paths, AggregateFunctions aggregate);
+    THIS addSelect(Expressions<T, ?> expression, AggregateFunctions aggregate);
 
     THIS addGroupings(String... paths);
 
-    THIS addGroupings(Expressions<T, ?> paths);
+    THIS addGroupings(Expressions<T, ?> expression);
 
     THIS addOrdersAsc(String... paths);
 
-    THIS addOrdersAsc(Expressions<T, ?> paths);
+    THIS addOrdersAsc(Expressions<T, ?> expression);
 
     THIS addOrdersDesc(String... paths);
 
-    THIS addOrdersDesc(Expressions<T, ?> paths);
+    THIS addOrdersDesc(Expressions<T, ?> expression);
 
     THIS fetch(String... paths);
 
     THIS fetch(String paths, JoinType joinType);
 
-    THIS fetch(Expressions<T, ?> paths);
+    THIS fetch(Expressions<T, ?> expression);
 
-    THIS fetch(Expressions<T, ?> paths, JoinType joinType);
+    THIS fetch(Expressions<T, ?> expression, JoinType joinType);
 
     THIS setOffset(long offset);
 

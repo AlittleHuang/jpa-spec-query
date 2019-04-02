@@ -16,8 +16,8 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
     }
 
     @Override
-    protected QueryImpl<T> createSubItem(AttrExpression<T> paths) {
-        return new QueryImpl<>(paths, getWhereClause(), getCriteria(), stored);
+    protected QueryImpl<T> createSubItem(AttrExpression<T> expression) {
+        return new QueryImpl<>(expression, getWhereClause(), getCriteria(), stored);
     }
 
     public QueryImpl(AbstractQueryStored<T> stored) {
@@ -26,9 +26,9 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
         this.stored = stored;
     }
 
-    protected QueryImpl(AttrExpression<T> path, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
+    protected QueryImpl(AttrExpression<T> expression, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
                         AbstractQueryStored<T> stored) {
-        super(path, root, criteria);
+        super(expression, root, criteria);
         stored.criteria = criteria;
         this.stored = stored;
     }

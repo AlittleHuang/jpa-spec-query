@@ -53,7 +53,7 @@ public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
     }
 
     default String[] getNames(Class<? extends T> type) {
-        return MethodInfoUtil.getAttrNames(type, this);
+        return GetterMethodUtil.getAttrNames(type, this);
     }
 
     default String[] getNames() {
