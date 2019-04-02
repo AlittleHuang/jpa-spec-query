@@ -49,7 +49,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
         AbstractWhereClauseBuilder<T, THIS> item = sub(expression);
-        item.value = value;
+        item.parameter = value;
         item.booleanOperator = booleanOperator;
         item.conditionalOperator = conditionalOperator;
         item.negate = negate;

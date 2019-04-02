@@ -16,7 +16,7 @@ public class SimpleWhereClause<T> implements WhereClause<T> {
 
     protected boolean compound;
 
-    protected Object value;
+    protected Object parameter;//参数
 
     protected Predicate.BooleanOperator booleanOperator = AND;
 
@@ -48,8 +48,8 @@ public class SimpleWhereClause<T> implements WhereClause<T> {
     }
 
     @Override
-    public Object getValue() {
-        return value;
+    public Object getParameter() {
+        return parameter;
     }
 
     @Override

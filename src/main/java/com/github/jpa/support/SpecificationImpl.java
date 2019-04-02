@@ -73,7 +73,7 @@ public class SpecificationImpl<T> implements Specification<T> {
 
             Expression expression = JpaHelper.toExpression(expressions, cb, root);
 
-            Object value = item.getValue();
+            Object value = item.getParameter();
 
             if ( value instanceof AttrExpression ) {
                 //noinspection unchecked

@@ -10,7 +10,7 @@ public interface WhereClause<T> {
 
     AttrExpression<T> getExpression();
 
-    Object getValue();
+    Object getParameter();
 
     Predicate.BooleanOperator getBooleanOperator();
 
