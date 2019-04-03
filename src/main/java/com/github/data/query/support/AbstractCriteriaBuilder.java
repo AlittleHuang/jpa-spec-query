@@ -41,7 +41,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public THIS addSelect(Expressions<T, ?> expression, AggregateFunctions aggregate) {
+    public THIS addSelect(Expressions<T, Number> expression, AggregateFunctions aggregate) {
 
         Selection<T> selection = new Selection<T>() {
 

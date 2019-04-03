@@ -11,7 +11,7 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
 
     THIS addSelect(Expressions<T, ?> expression);
 
-    THIS addSelect(Expressions<T, ?> expression, AggregateFunctions aggregate);
+    THIS addSelect(Expressions<T, Number> expression, AggregateFunctions aggregate);
 
     THIS addGroupings(String... paths);
 
