@@ -49,7 +49,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
 
                     switch ( aggregate == null ? AggregateFunctions.NONE : aggregate ) {
                         case NONE:
-                            return expression.as(expression.getJavaType());
+                            return expression;
                         case AVG:
                             return data.cb.avg(expression);
                         case SUM:
@@ -61,7 +61,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
                         case COUNT:
                             return data.cb.count(expression);
                         default:
-                            return expression.as(expression.getJavaType());
+                            return expression;
                     }
 
                 }).collect(Collectors.toList());

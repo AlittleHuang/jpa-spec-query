@@ -21,5 +21,9 @@ public class User {
     @JoinColumn(name = "company_id", updatable = false, insertable = false)
     private Company company;
 
+    private String nName;
 
+    public String getnName() {
+        return nName;
+    }
 }

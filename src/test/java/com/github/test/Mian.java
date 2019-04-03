@@ -1,5 +1,10 @@
 package com.github.test;
 
+import com.github.data.query.support.Expressions;
+import com.github.test.entity.User;
+
+import java.util.Arrays;
+
 public class Mian {
 
 //    public static void main(String[] args) {
@@ -26,11 +31,8 @@ public class Mian {
 //    }
 
     public static void main(String[] args) {
-        Integer x = null;
-        switch ( x ){
-            default:
-                System.out.println(x);
-        }
+        Expressions<User,String> expressions = t -> t.getnName();
+        System.out.println(Arrays.toString(expressions.getNames(User.class)));
     }
 
 }

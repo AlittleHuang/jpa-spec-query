@@ -1,6 +1,9 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.*;
+import com.github.data.query.specification.AggregateFunctions;
+import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.CriteriaBuilder;
+import com.github.data.query.specification.Selection;
 import org.springframework.data.domain.Sort;
 
 import javax.persistence.LockModeType;
@@ -110,13 +113,13 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS fetch(String paths, JoinType joinType) {
-        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, JoinType.LEFT));
+        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, joinType));
         return self();
     }
 
     @Override
     public THIS fetch(Expressions<T, ?> expression, JoinType joinType) {
-        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(expression, JoinType.LEFT));
+        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(expression, joinType));
         return self();
     }
 
