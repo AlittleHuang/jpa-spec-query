@@ -1,6 +1,6 @@
 package com.github.data.query.specification;
 
-public interface AttrExpression<T> extends Attribute<T> {
+public interface Expression<T> extends Attribute<T> {
 
     Object[] EMPTY_ARGS = {};
 
@@ -8,7 +8,7 @@ public interface AttrExpression<T> extends Attribute<T> {
         return EMPTY_ARGS;
     }
 
-    default AttrExpression<T> getSubexpression() {
+    default Expression<T> getSubexpression() {
         return null;
     }
 

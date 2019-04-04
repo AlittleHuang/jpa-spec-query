@@ -1,10 +1,9 @@
 package com.github.jpa.util;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.specification.Attribute;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
@@ -32,17 +31,17 @@ public class JpaHelper {
         return true;
     }
 
-    public static <T> Expression toExpression(AttrExpression<T> expressions, CriteriaBuilder cb, Root<T> root) {
-        AttrExpression<T> subexpression = expressions.getSubexpression();
-        Expression expression = ( subexpression != null )
+    public static <T> javax.persistence.criteria.Expression toExpression(Expression<T> expressions, CriteriaBuilder cb, Root<T> root) {
+        Expression<T> subexpression = expressions.getSubexpression();
+        javax.persistence.criteria.Expression expression = ( subexpression != null )
                         ? toExpression(subexpression, cb, root)
                         : toPath(root, expressions);
         
-        AttrExpression.Function type = expressions.getFunction();
-        if ( type == null ) type = AttrExpression.Function.NONE;
+        Expression.Function type = expressions.getFunction();
+        if ( type == null ) type = Expression.Function.NONE;
         Object[] args = expressions.getArgs();
 
-        Expression result = expression;
+        javax.persistence.criteria.Expression result = expression;
 
         switch ( type ) {
 
@@ -188,20 +187,20 @@ public class JpaHelper {
                     //noinspection unchecked
                     result = cb.nullif(expression, args[0]);
                 } else {
-                    result = cb.nullif((Expression<?>) expression, getExpression(cb, root, args));
+                    result = cb.nullif((javax.persistence.criteria.Expression<?>) expression, getExpression(cb, root, args));
                 }
                 break;
         }
         return result;
     }
 
-    private static <T> Expression getExpression(CriteriaBuilder cb, Root<T> root, Object[] args) {
+    private static <T> javax.persistence.criteria.Expression getExpression(CriteriaBuilder cb, Root<T> root, Object[] args) {
         //noinspection unchecked
-        return toExpression((AttrExpression) args[0], cb, root);
+        return toExpression((Expression) args[0], cb, root);
     }
 
     private static boolean isNotAttrExpression(Object[] args) {
-        return args == null || args.length <= 0 || args[0] == null || !( args[0] instanceof AttrExpression );
+        return args == null || args.length <= 0 || args[0] == null || !( args[0] instanceof Expression );
     }
 
     private static <T> Path<?> toPath(Root<T> root, Attribute<T> attribute) {

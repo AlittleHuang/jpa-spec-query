@@ -1,6 +1,6 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.specification.Query;
 import com.github.data.query.specification.QueryStored;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,7 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
     }
 
     @Override
-    protected QueryImpl<T> createSubItem(AttrExpression<T> expression) {
+    protected QueryImpl<T> createSubItem(Expression<T> expression) {
         return new QueryImpl<>(expression, getWhereClause(), getCriteria(), stored);
     }
 
@@ -26,7 +26,7 @@ public class QueryImpl<T> extends AbstractCriteriaBuilder<T, Query<T>> implement
         this.stored = stored;
     }
 
-    protected QueryImpl(AttrExpression<T> expression, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
+    protected QueryImpl(Expression<T> expression, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
                         AbstractQueryStored<T> stored) {
         super(expression, root, criteria);
         stored.criteria = criteria;

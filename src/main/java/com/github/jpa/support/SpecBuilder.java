@@ -1,6 +1,6 @@
 package com.github.jpa.support;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.support.AbstractWhereClauseBuilder;
 import com.github.data.query.support.SimpleWhereClause;
 import lombok.NoArgsConstructor;
@@ -15,11 +15,11 @@ import javax.persistence.criteria.Root;
 public class SpecBuilder<T> extends AbstractWhereClauseBuilder<T, SpecBuilder<T>> implements Specification<T> {
 
     @Override
-    protected SpecBuilder<T> createSubItem(AttrExpression<T> paths) {
+    protected SpecBuilder<T> createSubItem(Expression<T> paths) {
         return new SpecBuilder<>(paths, getWhereClause());
     }
 
-    private SpecBuilder(AttrExpression<T> path, SimpleWhereClause<T> root) {
+    private SpecBuilder(Expression<T> path, SimpleWhereClause<T> root) {
         super(path, root);
     }
 

@@ -1,6 +1,6 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.specification.Selection;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 @FunctionalInterface
-public interface Expressions<T, R> extends Selection<T>, AttrExpression<T> {
+public interface Expressions<T, R> extends Selection<T>, Expression<T> {
 
     @SuppressWarnings( "UnusedReturnValue" )
     R apply(T t);

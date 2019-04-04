@@ -1,7 +1,7 @@
 package com.github.data.query.support;
 
 import com.github.data.query.specification.AggregateFunctions;
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.specification.CriteriaBuilder;
 import com.github.data.query.specification.Selection;
 import org.springframework.data.domain.Sort;
@@ -20,7 +20,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         this.criteria = new SimpleCriteria<>(getWhereClause());
     }
 
-    public AbstractCriteriaBuilder(AttrExpression<T> path, SimpleWhereClause<T> root, SimpleCriteria<T> criteria) {
+    public AbstractCriteriaBuilder(Expression<T> path, SimpleWhereClause<T> root, SimpleCriteria<T> criteria) {
         super(path, root);
         this.criteria = criteria;
     }

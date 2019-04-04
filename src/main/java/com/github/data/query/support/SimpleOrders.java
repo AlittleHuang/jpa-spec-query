@@ -1,6 +1,6 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.specification.Orders;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +12,7 @@ public class SimpleOrders<T> implements Orders<T> {
     @Setter
     private Sort.Direction direction;
 
-    private AttrExpression<T> attribute;
+    private Expression<T> attribute;
 
     public SimpleOrders(Sort.Direction direction, String path) {
         attribute = new SimpleExpression<>(path);

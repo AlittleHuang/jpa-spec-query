@@ -1,6 +1,6 @@
 package com.github.jpa.support;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.specification.WhereClause;
 import com.github.jpa.util.JpaHelper;
 import org.springframework.data.jpa.domain.Specification;
@@ -69,15 +69,15 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         private void build() {
-            AttrExpression<T> expressions = item.getExpression();
+            Expression<T> expressions = item.getExpression();
 
-            Expression expression = JpaHelper.toExpression(expressions, cb, root);
+            javax.persistence.criteria.Expression expression = JpaHelper.toExpression(expressions, cb, root);
 
             Object value = item.getParameter();
 
-            if ( value instanceof AttrExpression ) {
+            if ( value instanceof Expression ) {
                 //noinspection unchecked
-                AttrExpression<T> attr = (AttrExpression<T>) value;
+                Expression<T> attr = (Expression<T>) value;
                 toPredicateItem(expression, JpaHelper.toExpression(attr, cb, root));
             } else {
                 toPredicateItem(expression, value);
@@ -85,7 +85,7 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         @SuppressWarnings( "unchecked" )
-        private void toPredicateItem(Expression path, Object value) {
+        private void toPredicateItem(javax.persistence.criteria.Expression path, Object value) {
 
             if ( path.getJavaType() == Number.class ) {
                 path = path.as(value.getClass());
@@ -110,8 +110,8 @@ public class SpecificationImpl<T> implements Specification<T> {
                     Iterator<?> values = ( (Iterable<?>) value ).iterator();
                     Object x = values.next();
                     Object y = values.next();
-                    if ( x instanceof Expression && y instanceof Expression ) {
-                        predicate = cb.between(path, (Expression) x, (Expression) y);
+                    if ( x instanceof javax.persistence.criteria.Expression && y instanceof javax.persistence.criteria.Expression ) {
+                        predicate = cb.between(path, (javax.persistence.criteria.Expression) x, (javax.persistence.criteria.Expression) y);
                     } else {
                         predicate = cb.between(path, (Comparable) x, (Comparable) y);
                     }
@@ -144,7 +144,7 @@ public class SpecificationImpl<T> implements Specification<T> {
         }
 
         @SuppressWarnings( "unchecked" )
-        private void toPredicateItem(Expression expression, Expression other) {
+        private void toPredicateItem(javax.persistence.criteria.Expression expression, javax.persistence.criteria.Expression other) {
             switch ( item.getConditionalOperator() ) {
                 case EQUAL:
                     predicate = cb.equal(expression, other);

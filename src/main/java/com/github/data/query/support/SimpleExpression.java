@@ -1,6 +1,6 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 
 public class SimpleExpression<T, R> implements Expressions<T, R> {
 
@@ -58,7 +58,7 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
     }
 
     @Override
-    public AttrExpression getSubexpression() {
+    public Expression<T> getSubexpression() {
         return expressions;
     }
 }

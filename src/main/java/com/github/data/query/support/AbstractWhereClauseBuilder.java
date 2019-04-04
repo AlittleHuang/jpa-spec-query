@@ -1,6 +1,6 @@
 package com.github.data.query.support;
 
-import com.github.data.query.specification.AttrExpression;
+import com.github.data.query.specification.Expression;
 import com.github.data.query.specification.ConditionalOperator;
 import com.github.data.query.specification.WhereClause;
 import com.github.data.query.specification.WhereClauseBuilder;
@@ -21,19 +21,19 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     private static final boolean NOT = true;
     private final SimpleWhereClause<T> root;
 
-    public AbstractWhereClauseBuilder(AttrExpression<T> expression, SimpleWhereClause<T> root) {
+    public AbstractWhereClauseBuilder(Expression<T> expression, SimpleWhereClause<T> root) {
         super(expression);
         this.root = root;
     }
 
-    protected abstract THIS createSubItem(AttrExpression<T> expression);
+    protected abstract THIS createSubItem(Expression<T> expression);
 
     protected THIS self() {
         //noinspection unchecked
         return (THIS) this;
     }
 
-    private AbstractWhereClauseBuilder<T, THIS> sub(AttrExpression<T> expression) {
+    private AbstractWhereClauseBuilder<T, THIS> sub(Expression<T> expression) {
         //noinspection unchecked
         return (AbstractWhereClauseBuilder) createSubItem(expression);
     }
@@ -43,7 +43,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         this.root = this;
     }
 
-    private THIS add(AttrExpression<T> expression,
+    private THIS add(Expression<T> expression,
                      Object value,
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
@@ -62,7 +62,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        return add((AttrExpression<T>) ( expression ), value, booleanOperator, negate, conditionalOperator);
+        return add((Expression<T>) ( expression ), value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(String expression,

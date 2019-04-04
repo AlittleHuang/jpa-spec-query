@@ -13,6 +13,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.*;
+import javax.persistence.criteria.Expression;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
