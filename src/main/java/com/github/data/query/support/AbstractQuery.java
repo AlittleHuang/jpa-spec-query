@@ -16,7 +16,7 @@ public abstract class AbstractQuery<T> extends AbstractCriteriaBuilder<T, Query<
     }
 
     public AbstractQuery(AbstractQueryStored<T> stored) {
-        super();
+        super(stored.getJavaType());
         stored.criteria = getCriteria();
         this.stored = stored;
     }
@@ -66,5 +66,10 @@ public abstract class AbstractQuery<T> extends AbstractCriteriaBuilder<T, Query<
     @Override
     public boolean exists() {
         return getStored().exists();
+    }
+
+    @Override
+    public Class<T> getJavaType() {
+        return getStored().getJavaType();
     }
 }

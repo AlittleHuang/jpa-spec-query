@@ -21,4 +21,6 @@ public interface Criteria<T> {
 
     LockModeType getLockModeType();
 
+    Class<T> getJavaType();
+
 }

@@ -15,9 +15,9 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     private final SimpleCriteria<T> criteria;
 
-    protected AbstractCriteriaBuilder() {
+    protected AbstractCriteriaBuilder(Class<T> type) {
         super();
-        this.criteria = new SimpleCriteria<>(getWhereClause());
+        this.criteria = new SimpleCriteria<>(getWhereClause(), type);
     }
 
     public AbstractCriteriaBuilder(Expression<T> path, SimpleWhereClause<T> root, SimpleCriteria<T> criteria) {

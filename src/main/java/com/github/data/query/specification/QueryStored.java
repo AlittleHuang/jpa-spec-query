@@ -32,5 +32,7 @@ public interface QueryStored<T> {
 
     boolean exists();
 
+    Class<T> getJavaType();
+
 
 }

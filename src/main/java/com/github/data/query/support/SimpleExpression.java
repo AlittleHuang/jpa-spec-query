@@ -48,7 +48,7 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
     }
 
     @Override
-    public <V, U extends Expressions<? super R, ? extends V>> Expressions<T, V> to(U expression) {
+    public <V> Expressions<T, V> to(Expressions<? extends R, ? super V> expression) {
         throw new UnsupportedOperationException();
     }
 

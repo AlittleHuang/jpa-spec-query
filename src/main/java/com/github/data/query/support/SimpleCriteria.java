@@ -17,6 +17,7 @@ public class SimpleCriteria<T> implements Criteria<T> {
     protected final List<Attribute<T>> groupings = new ArrayList<>();
     protected final List<SimpleOrders<T>> orders = new ArrayList<>();
     protected final List<FetchAttribute<T>> fetchAttributes = new ArrayList<>();
+    private final Class<T> javaType;
 
     @Setter
     private LockModeType lockModeType;
@@ -26,8 +27,9 @@ public class SimpleCriteria<T> implements Criteria<T> {
     @Setter
     private Long maxResults;
 
-    public SimpleCriteria(SimpleWhereClause<T> whereClause) {
+    public SimpleCriteria(SimpleWhereClause<T> whereClause, Class<T> type) {
         this.whereClause = whereClause;
+        this.javaType = type;
     }
 
     @Override
@@ -68,5 +70,10 @@ public class SimpleCriteria<T> implements Criteria<T> {
     @Override
     public Long getMaxResults() {
         return maxResults;
+    }
+
+    @Override
+    public Class<T> getJavaType() {
+        return javaType;
     }
 }

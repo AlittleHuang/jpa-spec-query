@@ -29,4 +29,8 @@ public abstract class AbstractJpaStored<T> extends AbstractQueryStored<T> {
         );
     }
 
+    @Override
+    public Class<T> getJavaType() {
+        return type;
+    }
 }

@@ -11,15 +11,14 @@ import java.util.List;
 
 public interface UserRepository extends JpaRepository<User, Integer>, JpaSpecificationExecutor<User> {
 
-
-    //↓↓↓↓ test ↓↓↓↓
-    ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
-    UserRepository userRepository = appCtx.getBean(UserRepository.class);
-    static void main(String[] args) {
-        SpecBuilder<User> spec = new SpecBuilder<User>()
-                .andEq(User::getName, "Luna")
-                .andEq(User::getAge, 18);
-        List<User> all = userRepository.findAll(spec);
-    }
+//    //↓↓↓↓ test ↓↓↓↓
+//    ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
+//    UserRepository userRepository = appCtx.getBean(UserRepository.class);
+//    static void main(String[] args) {
+//        SpecBuilder<User> spec = new SpecBuilder<User>()
+//                .andEq(User::getName, "Luna")
+//                .andEq(User::getAge, 18);
+//        List<User> all = userRepository.findAll(spec);
+//    }
 
 }
