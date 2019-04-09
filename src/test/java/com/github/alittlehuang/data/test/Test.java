@@ -2,10 +2,10 @@ package com.github.alittlehuang.data.test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
-import com.github.data.query.specification.AggregateFunctions;
-import com.github.data.query.support.Expressions;
-import com.github.jpa.repostory.TypeRepository;
-import com.github.test.entity.User;
+import com.github.alittlehuang.data.query.specification.AggregateFunctions;
+import com.github.alittlehuang.data.query.support.Expressions;
+import com.github.alittlehuang.jpa.repostory.TypeRepository;
+import com.github.alittlehuang.test.entity.User;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
