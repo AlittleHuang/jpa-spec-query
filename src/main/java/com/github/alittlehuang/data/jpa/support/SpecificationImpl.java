@@ -1,7 +1,7 @@
-package com.github.alittlehuang.jpa.support;
+package com.github.alittlehuang.data.jpa.support;
 
+import com.github.alittlehuang.data.jpa.util.JpaHelper;
 import com.github.alittlehuang.data.query.specification.WhereClause;
-import com.github.alittlehuang.jpa.util.JpaHelper;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.*;

@@ -1,4 +1,4 @@
-package com.github.alittlehuang.jpa.support;
+package com.github.alittlehuang.data.jpa.support;
 
 import com.github.alittlehuang.data.query.support.AbstractQueryStored;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;

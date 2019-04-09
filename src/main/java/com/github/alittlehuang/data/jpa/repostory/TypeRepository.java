@@ -1,7 +1,7 @@
-package com.github.alittlehuang.jpa.repostory;
+package com.github.alittlehuang.data.jpa.repostory;
 
 import com.github.alittlehuang.data.query.support.QueryImpl;
-import com.github.alittlehuang.jpa.support.JpaQueryStored;
+import com.github.alittlehuang.data.jpa.support.JpaQueryStored;
 import com.github.alittlehuang.data.query.specification.Query;
 
 import javax.persistence.EntityManager;

@@ -1,4 +1,4 @@
-package com.github.alittlehuang.jpa.support;
+package com.github.alittlehuang.data.jpa.support;
 
 import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.support.AbstractWhereClauseBuilder;

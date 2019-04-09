@@ -1,4 +1,4 @@
-package com.github.alittlehuang.jpa.util;
+package com.github.alittlehuang.data.jpa.util;
 
 import com.github.alittlehuang.data.query.specification.Attribute;
 import com.github.alittlehuang.data.query.specification.Expression;
