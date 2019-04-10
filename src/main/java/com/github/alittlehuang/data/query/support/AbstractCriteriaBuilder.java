@@ -131,6 +131,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS setLockModeType(LockModeType lockModeType) {
+        criteria.setLockModeType(lockModeType);
         return self();
     }
 

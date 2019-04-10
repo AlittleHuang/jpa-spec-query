@@ -34,7 +34,7 @@ public class SimpleCriteria<T> implements Criteria<T> {
 
     @Override
     public LockModeType getLockModeType() {
-        return null;
+        return lockModeType;
     }
 
     @Override

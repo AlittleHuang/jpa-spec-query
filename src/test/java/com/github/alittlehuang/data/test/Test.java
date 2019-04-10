@@ -3,8 +3,10 @@ package com.github.alittlehuang.data.test;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.github.alittlehuang.data.query.specification.AggregateFunctions;
+import com.github.alittlehuang.data.query.specification.Query;
 import com.github.alittlehuang.data.query.support.Expressions;
 import com.github.alittlehuang.data.jpa.repostory.TypeRepository;
+import com.github.alittlehuang.test.TransactionalService;
 import com.github.alittlehuang.test.entity.User;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -17,24 +19,28 @@ import javax.persistence.LockModeType;
 public class Test {
 
     static TypeRepository<User> repository;
-
+    static ApplicationContext appCtx;
     static {
         ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
         LoggerContext context = (LoggerContext) iLoggerFactory;
         context.getLogger("ROOT").setLevel(Level.ERROR);
         context.getLogger("org.hibernate.SQL").setLevel(Level.DEBUG);
         ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
+        Test.appCtx = appCtx;
         EntityManager entityManager = appCtx.getBean(EntityManager.class);
         repository = new TypeRepository<>(User.class, entityManager);
 
     }
 
     public static void main(String[] args) {
-        test();
-        test0();
-        test1();
-        test2();
-        testAbstractCriteriaBuilder();
+//        test();
+//        test0();
+//        test1();
+//        test2();
+//        testAbstractCriteriaBuilder();
+        TransactionalService transactional = appCtx.getBean(TransactionalService.class);
+        transactional.required(Test::testLock);
+//        System.out.println(transactional.getClass());
     }
 
     public static void test() {
@@ -249,6 +255,15 @@ public class Test {
 //                .fetch(User::getCompany3, JoinType.INNER)
 //                .setPageable(2, 5).getResultList();
 
+    }
+
+    private static void testLock(){
+        Query<User> userQuery = repository.query().setLockModeType(LockModeType.OPTIMISTIC);
+        userQuery.getResultList();
+        repository.query().setLockModeType(LockModeType.OPTIMISTIC_FORCE_INCREMENT).getResultList();
+        repository.query().setLockModeType(LockModeType.PESSIMISTIC_READ).getResultList();//in share mode
+        repository.query().setLockModeType(LockModeType.PESSIMISTIC_WRITE).getResultList();//for update
+        repository.query().setLockModeType(LockModeType.PESSIMISTIC_FORCE_INCREMENT).getResultList();//for update
     }
 
 }
