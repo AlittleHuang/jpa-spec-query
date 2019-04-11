@@ -33,13 +33,13 @@ public class Test {
     }
 
     public static void main(String[] args) {
-//        test();
-//        test0();
-//        test1();
-//        test2();
-//        testAbstractCriteriaBuilder();
-        TransactionalService transactional = appCtx.getBean(TransactionalService.class);
-        transactional.required(Test::testLock);
+        test();
+        test0();
+        test1();
+        test2();
+        testAbstractCriteriaBuilder();
+//        TransactionalService transactional = appCtx.getBean(TransactionalService.class);
+//        transactional.required(Test::testLock);
 //        System.out.println(transactional.getClass());
     }
 
@@ -245,7 +245,7 @@ public class Test {
 
                 .setOffset(5)
                 .setMaxResult(3)
-                .setLockModeType(LockModeType.WRITE)
+                //.setLockModeType(LockModeType.WRITE)
                 .getObjectList();
 
 
@@ -261,7 +261,7 @@ public class Test {
         Query<User> userQuery = repository.query().setLockModeType(LockModeType.OPTIMISTIC);
         userQuery.getResultList();
         repository.query().setLockModeType(LockModeType.OPTIMISTIC_FORCE_INCREMENT).getResultList();
-        repository.query().setLockModeType(LockModeType.PESSIMISTIC_READ).getResultList();//in share mode
+        repository.query().setLockModeType(LockModeType.PESSIMISTIC_READ).getResultList();//lock in share mode
         repository.query().setLockModeType(LockModeType.PESSIMISTIC_WRITE).getResultList();//for update
         repository.query().setLockModeType(LockModeType.PESSIMISTIC_FORCE_INCREMENT).getResultList();//for update
     }

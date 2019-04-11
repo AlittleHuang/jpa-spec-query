@@ -1,21 +1,21 @@
 package com.github.alittlehuang.data.jpa.support;
 
-import com.github.alittlehuang.data.jpa.util.JpaHelper;
 import com.github.alittlehuang.data.query.specification.WhereClause;
-import org.springframework.data.jpa.domain.Specification;
+import com.github.alittlehuang.data.jpa.util.JpaHelper;
+//import org.springframework.data.jpa.page.Specification;
 
 import javax.persistence.criteria.*;
 import java.util.Iterator;
 import java.util.List;
 
-public class SpecificationImpl<T> implements Specification<T> {
+public class SpecificationImpl<T>/* implements Specification<T>*/ {
     private final WhereClause<T> whereClause;
 
     public SpecificationImpl(WhereClause<T> whereClause) {
         this.whereClause = whereClause;
     }
 
-    @Override
+    //@Override
     public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         return new PredicateBuilder(root, query, criteriaBuilder, whereClause).toPredicate();
     }

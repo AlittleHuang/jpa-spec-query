@@ -1,25 +1,25 @@
 package com.github.alittlehuang.data.query.support;
 
+import com.github.alittlehuang.data.query.specification.Direction;
 import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.specification.Orders;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.domain.Sort;
 
 public class SimpleOrders<T> implements Orders<T> {
 
     @Getter
     @Setter
-    private Sort.Direction direction;
+    private Direction direction;
 
     private Expression<T> attribute;
 
-    public SimpleOrders(Sort.Direction direction, String path) {
+    public SimpleOrders(Direction direction, String path) {
         attribute = new SimpleExpression<>(path);
         this.direction = direction;
     }
 
-    public SimpleOrders(Sort.Direction direction, Expressions<T, ?> expression) {
+    public SimpleOrders(Direction direction, Expressions<T, ?> expression) {
         this.attribute = expression;
         this.direction = direction;
     }
@@ -35,8 +35,8 @@ public class SimpleOrders<T> implements Orders<T> {
     }
 
     @Override
-    public String[] getNames(Class<? extends T> cls) {
-        return attribute.getNames(cls);
+    public String[] getNames() {
+        return attribute.getNames();
     }
 
 

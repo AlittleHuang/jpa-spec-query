@@ -1,33 +1,37 @@
 package com.github.alittlehuang.data.jpa.support;
 
+import com.github.alittlehuang.data.metamodel.EntityInformation;
 import com.github.alittlehuang.data.jpa.util.JpaHelper;
+import com.github.alittlehuang.data.query.page.Page;
+import com.github.alittlehuang.data.query.page.Pageable;
+import com.github.alittlehuang.data.query.specification.Selection;
 import com.github.alittlehuang.data.query.specification.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import com.github.alittlehuang.data.query.support.AbstractQueryStored;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.*;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JpaQueryStored<T> extends AbstractJpaStored<T> {
+public class JpaQueryStored<T> extends AbstractQueryStored<T> {
+
+    protected EntityManager entityManager;
 
     public JpaQueryStored(EntityManager entityManager, Class<T> type) {
-        super(entityManager, type);
+        this.entityManager = entityManager;
+        this.type = type;
     }
 
     @Override
     public List<T> getResultList() {
         StoredData<T> data = new StoredData<>(type).initAll();
         TypedQuery<T> typedQuery = entityManager.createQuery(data.query.select(data.root));
-        setLimilt(typedQuery, criteria.getOffset(), criteria.getMaxResults());
+        setLimit(typedQuery, criteria.getOffset(), criteria.getMaxResults());
         setLock(typedQuery);
         return typedQuery.getResultList();
     }
@@ -35,7 +39,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
     @SuppressWarnings("unchecked")
     @Override
     public <X> List<X> getObjectList() {
-        List<? extends com.github.alittlehuang.data.query.specification.Selection<T>> list = criteria.getSelections();
+        List<? extends Selection<T>> list = criteria.getSelections();
         if (list == null || list.isEmpty()) {
             return (List<X>) getResultList();
         }
@@ -67,7 +71,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
                 }).collect(Collectors.toList());
         TypedQuery typedQuery = entityManager
                 .createQuery(query.multiselect(selections));
-        setLimilt(typedQuery, criteria.getOffset(), criteria.getMaxResults());
+        setLimit(typedQuery, criteria.getOffset(), criteria.getMaxResults());
         setLock(typedQuery);
         return (List<X>) typedQuery.getResultList();
     }
@@ -75,29 +79,19 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
     @Override
     public Page<T> getPage(long page, long size) {
         long count = count();
+        Pageable pageable = new Pageable((int) page, (int) size);
         if (count == 0) {
-            return Page.empty();
+            return Page.empty(pageable);
         }
         StoredData<T> data = new StoredData<>(type).initAll();
         TypedQuery<T> typedQuery = entityManager.createQuery(data.query.select(data.root));
 
-        PageRequest pageable = PageRequest.of((int) page, (int) size);
-        setLimilt(typedQuery, pageable.getOffset(), size);
+        setLimit(typedQuery, pageable.getOffset(), size);
 
         setLock(typedQuery);
         List<T> resultList = typedQuery.getResultList();
 
-        return new PageImpl<>(resultList, pageable, count);
-    }
-
-    @Override
-    public Page<T> getPage() {
-        Criteria<T> criteria = getCriteria();
-        Long offset = criteria.getOffset();
-        offset = offset == null ? 0 : offset;
-        Long maxResults = criteria.getMaxResults();
-        maxResults = maxResults == null ? 20 : maxResults;
-        return getPage((offset / maxResults), maxResults);
+        return new Page<>(resultList, pageable, count);
     }
 
     @Override
@@ -113,8 +107,8 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
     @Override
     public boolean exists() {
         StoredData<Object> data = new StoredData<>(Object.class).initWhere().initGroupBy();
-        JpaEntityInformation<T, ?> information = getJpaEntityInformation();
-        data.query.select(data.root.get(information.getIdAttribute()));
+        EntityInformation<T, ?> information = EntityInformation.getInstance(type);
+        data.query.select(data.root.get(information.getIdAttribute().getFieldName()));
         return !entityManager.createQuery(data.query)
                 .setMaxResults(1)
                 .getResultList()
@@ -128,7 +122,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         }
     }
 
-    private void setLimilt(TypedQuery<T> typedQuery, Long offset, Long maxResults) {
+    private void setLimit(TypedQuery<T> typedQuery, Long offset, Long maxResults) {
         if (maxResults != null && maxResults > 0) {
             typedQuery.setMaxResults(maxResults.intValue());
             if (offset != null && offset > 0) {
@@ -137,7 +131,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         }
     }
 
-    private class StoredData<R> {//中间值
+    private class StoredData<R> {
         final CriteriaBuilder cb;
         final CriteriaQuery<R> query;
         final Root<T> root;
@@ -160,7 +154,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
         private StoredData<R> initGroupBy() {
             if (!criteria.getGroupings().isEmpty()) {
                 List<Expression<?>> paths = criteria.getGroupings().stream()
-                        .map(it -> JpaHelper.getPath(root, it.getNames(type)))
+                        .map(it -> JpaHelper.getPath(root, it.getNames()))
                         .collect(Collectors.toList());
                 query.groupBy(paths);
             }
@@ -193,7 +187,7 @@ public class JpaQueryStored<T> extends AbstractJpaStored<T> {
             List<? extends FetchAttribute<T>> list = criteria.getFetchAttributes();
             for (FetchAttribute<T> attr : list) {
                 Fetch fetch = null;
-                for (String stringPath : attr.getNames(type)) {
+                for (String stringPath : attr.getNames()) {
                     if (fetch == null) {
                         fetch = root.fetch(stringPath, attr.getJoinType());
                     } else {

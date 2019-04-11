@@ -1,17 +1,19 @@
 package com.github.alittlehuang.data.query.support;
 
-import org.springframework.cglib.proxy.Enhancer;
-import org.springframework.cglib.proxy.MethodInterceptor;
-import org.springframework.cglib.proxy.MethodProxy;
-import org.springframework.util.Assert;
+
+import com.github.alittlehuang.data.util.Assert;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-class GetterMethodUtil {
+public class GetterMethodUtil {
 
     private final static Map<Class, Method> map = new HashMap<>();
 
@@ -36,19 +38,19 @@ class GetterMethodUtil {
             synchronized ( map ) {
                 method = map.get(key);
                 if ( method == null ) {
-                    method = GetterMethodUtil.Proxy.getMethod(type, getters, cast);
+                    method = Proxy.getMethod(type, getters, cast);
                     map.put(key, method);
                 }
             }
         }
         if ( method == null ) {
             method = map.get(key);
-            Assert.notNull(method, "The function is not getter of " + type.getName());
+            Objects.requireNonNull(method,"The function is not getter of " + type.getName());
         }
         return method;
     }
 
-    private static String toAttrName(String getterName) {
+    public static String toAttrName(String getterName) {
         boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
         Assert.state(check, "the function is not getters");
         StringBuilder builder = new StringBuilder(getterName.substring(3));
@@ -65,16 +67,16 @@ class GetterMethodUtil {
     private static class Proxy implements MethodInterceptor {
 
         private static Map<Class<?>, Object> instanceMap = new ConcurrentHashMap<>();
-        private static GetterMethodUtil.Proxy proxy = new GetterMethodUtil.Proxy();
+        private static Proxy proxy = new Proxy();
 
         private static <T> Method getMethod(Class<T> type, Expressions<T, ?> getters, boolean cast) {
             T target = proxy.getProxyInstance(type);
             try {
                 getters.apply(target);
             } catch ( Exception e ) {
-                if ( e.getClass() == GetterMethodUtil.Proxy.MethodInfo.class )
+                if ( e.getClass() == MethodInfo.class )
                     //noinspection ConstantConditions
-                    return ( (GetterMethodUtil.Proxy.MethodInfo) e ).getMethod();
+                    return ( (MethodInfo) e ).getMethod();
                 if ( cast && e.getClass() == ClassCastException.class ) {
                     String message = e.getMessage();
                     int i = message.lastIndexOf(' ');
@@ -103,7 +105,7 @@ class GetterMethodUtil {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy)
                 throws Throwable {
-            throw new GetterMethodUtil.Proxy.MethodInfo(method);
+            throw new MethodInfo(method);
         }
 
         private static class MethodInfo extends Exception {

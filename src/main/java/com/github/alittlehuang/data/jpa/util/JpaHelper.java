@@ -1,7 +1,7 @@
 package com.github.alittlehuang.data.jpa.util;
 
-import com.github.alittlehuang.data.query.specification.Attribute;
 import com.github.alittlehuang.data.query.specification.Expression;
+import com.github.alittlehuang.data.query.specification.Attribute;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
@@ -204,7 +204,7 @@ public class JpaHelper {
     }
 
     private static <T> Path<?> toPath(Root<T> root, Attribute<T> attribute) {
-        return getPath(root, attribute.getNames(root.getJavaType()));
+        return getPath(root, attribute.getNames());
     }
 
 }

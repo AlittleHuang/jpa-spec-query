@@ -6,11 +6,11 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
 
     private Expressions<T, ?> expressions;
 
-    private Function type;
+    private Expression.Function type;
 
     private Object[] args;
 
-    public SimpleExpression(Expressions<T, ?> expressions, Function type, Object... args) {
+    public SimpleExpression(Expressions<T, ?> expressions, Expression.Function type, Object... args) {
         this.expressions = expressions;
         this.type = type;
         this.args = args;
@@ -33,7 +33,7 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
     }
 
     @Override
-    public Function getFunction() {
+    public Expression.Function getFunction() {
         return type;
     }
 

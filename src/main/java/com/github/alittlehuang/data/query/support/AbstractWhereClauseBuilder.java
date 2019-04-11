@@ -1,9 +1,9 @@
 package com.github.alittlehuang.data.query.support;
 
-import com.github.alittlehuang.data.query.specification.ConditionalOperator;
 import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.specification.WhereClause;
 import com.github.alittlehuang.data.query.specification.WhereClauseBuilder;
+import com.github.alittlehuang.data.query.specification.ConditionalOperator;
 import lombok.experimental.Delegate;
 
 import javax.persistence.criteria.Predicate;

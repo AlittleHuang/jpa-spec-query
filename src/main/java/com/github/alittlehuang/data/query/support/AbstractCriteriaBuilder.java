@@ -1,10 +1,6 @@
 package com.github.alittlehuang.data.query.support;
 
-import com.github.alittlehuang.data.query.specification.AggregateFunctions;
-import com.github.alittlehuang.data.query.specification.CriteriaBuilder;
-import com.github.alittlehuang.data.query.specification.Expression;
-import com.github.alittlehuang.data.query.specification.Selection;
-import org.springframework.data.domain.Sort;
+import com.github.alittlehuang.data.query.specification.*;
 
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
@@ -27,8 +23,8 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addSelect(String... paths) {
-        for (String path : paths) {
-            Selection<T> selection = cls -> paths;
+        for (String ignored : paths) {
+            Selection<T> selection = () -> paths;
             criteria.selections.add(selection);
         }
         return self();
@@ -46,8 +42,23 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         Selection<T> selection = new Selection<T>() {
 
             @Override
-            public String[] getNames(Class<? extends T> cls) {
-                return expression.getNames(cls);
+            public String[] getNames() {
+                return expression.getNames();
+            }
+
+            @Override
+            public Object[] getArgs() {
+                return expression.getArgs();
+            }
+
+            @Override
+            public Expression<T> getSubexpression() {
+                return expression.getSubexpression();
+            }
+
+            @Override
+            public Function getFunction() {
+                return expression.getFunction();
             }
 
             @Override
@@ -78,28 +89,28 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS addOrdersAsc(String... paths) {
         for (String path : paths) {
-            criteria.orders.add(new SimpleOrders<>(Sort.Direction.ASC, path));
+            criteria.orders.add(new SimpleOrders<>(Direction.ASC, path));
         }
         return self();
     }
 
     @Override
     public THIS addOrdersAsc(Expressions<T, ?> expression) {
-        criteria.orders.add(new SimpleOrders<>(Sort.Direction.ASC, expression));
+        criteria.orders.add(new SimpleOrders<>(Direction.ASC, expression));
         return self();
     }
 
     @Override
     public THIS addOrdersDesc(String... paths) {
         for (String path : paths) {
-            criteria.orders.add(new SimpleOrders<>(Sort.Direction.DESC, path));
+            criteria.orders.add(new SimpleOrders<>(Direction.DESC, path));
         }
         return self();
     }
 
     @Override
     public THIS addOrdersDesc(Expressions<T, ?> expression) {
-        criteria.orders.add(new SimpleOrders<>(Sort.Direction.DESC, expression));
+        criteria.orders.add(new SimpleOrders<>(Direction.DESC, expression));
         return self();
     }
 
