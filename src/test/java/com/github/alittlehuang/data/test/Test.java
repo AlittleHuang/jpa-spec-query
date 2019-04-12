@@ -40,6 +40,11 @@ public class Test {
 //        TransactionalService transactional = appCtx.getBean(TransactionalService.class);
 //        transactional.required(Test::testLock);
 //        System.out.println(transactional.getClass());
+        Expressions<User, Integer> getPassword = Expressions.abs(User::getId);
+        repository.query().addSelect(getPassword).addGroupings(getPassword)
+                .addOrdersAsc(User::getId)
+                .setMaxResult(10)
+                .getObjectList();
     }
 
     public static void test() {

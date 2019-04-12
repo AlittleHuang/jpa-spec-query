@@ -11,7 +11,15 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
 
     private Object[] args;
 
+    private String functionName;
+
     public SimpleExpression(Expressions<T, ?> expressions, Expression.Function type, Object... args) {
+        this.expressions = expressions;
+        this.type = type;
+        this.args = args;
+    }
+
+    public SimpleExpression(String functionName, Expressions<T, ?> expressions, Expression.Function type, Object... args) {
         this.expressions = expressions;
         this.type = type;
         this.args = args;
@@ -61,5 +69,10 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
     @Override
     public Expression<T> getSubexpression() {
         return expressions;
+    }
+
+    @Override
+    public String getFunctionName() {
+        return functionName;
     }
 }

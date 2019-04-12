@@ -16,6 +16,10 @@ public interface Expression<T> extends AttributePath {
         return Function.NONE;
     }
 
+    default String getFunctionName(){
+        return null;
+    }
+
     enum Function {
         NONE,
         ABS,
@@ -33,7 +37,8 @@ public interface Expression<T> extends AttributePath {
         LENGTH,
         LOCATE,
         COALESCE,
-        NULLIF
+        NULLIF,
+        CUSTOMIZE,
     }
 
 }
