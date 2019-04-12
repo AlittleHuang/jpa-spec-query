@@ -1,7 +1,7 @@
 package com.github.alittlehuang.data.jpa.util;
 
-import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.specification.AttributePath;
+import com.github.alittlehuang.data.query.specification.Expression;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
@@ -31,17 +31,19 @@ public class JpaHelper {
         return true;
     }
 
-    public static <T> javax.persistence.criteria.Expression toExpression(Expression<T> expressions, CriteriaBuilder cb, Root<T> root) {
-        Expression<T> subexpression = expressions.getSubexpression();
-        javax.persistence.criteria.Expression expression = ( subexpression != null )
+    public static <T> javax.persistence.criteria.Expression toExpression(Expression<T> expression, CriteriaBuilder cb, Root<T> root) {
+        Expression<T> subexpression = expression.getSubexpression();
+        javax.persistence.criteria.Expression exp = ( subexpression != null )
                         ? toExpression(subexpression, cb, root)
-                        : toPath(root, expressions);
-        
-        Expression.Function type = expressions.getFunction();
-        if ( type == null ) type = Expression.Function.NONE;
-        Object[] args = expressions.getArgs();
+                : toPath(root, expression);
 
-        javax.persistence.criteria.Expression result = expression;
+        Expression.Function type = expression.getFunction();
+        if ( type == null ) type = Expression.Function.NONE;
+
+        Object[] args = expression.getArgs();
+        args = args == null ? Expression.EMPTY_ARGS : args;
+
+        javax.persistence.criteria.Expression result = exp;
 
         switch ( type ) {
 
@@ -49,83 +51,83 @@ public class JpaHelper {
                 break;
             case ABS:
                 //noinspection unchecked
-                result = cb.abs(expression);
+                result = cb.abs(exp);
                 break;
 
 
             case SUM:
-                if ( isNotAttrExpression(args) ) {
+                if ( isFirstArgNotAttrExpression(args) ) {
                     //noinspection unchecked
-                    result = cb.sum(expression, (Number) args[0]);
+                    result = cb.sum(exp, (Number) args[0]);
                 } else
                     //noinspection unchecked
-                    result = cb.sum(expression, getExpression(cb, root, args));
+                    result = cb.sum(exp, getExpression(cb, root, args));
                 break;
 
 
             case PROD:
-                if ( isNotAttrExpression(args) ) {
+                if ( isFirstArgNotAttrExpression(args) ) {
                     //noinspection unchecked
-                    result = cb.prod(expression, (Number) args[0]);
+                    result = cb.prod(exp, (Number) args[0]);
                 } else
                     //noinspection unchecked
-                    result = cb.prod(expression, getExpression(cb, root, args));
+                    result = cb.prod(exp, getExpression(cb, root, args));
                 break;
 
 
             case DIFF:
-                if ( isNotAttrExpression(args) ) {
+                if ( isFirstArgNotAttrExpression(args) ) {
                     //noinspection unchecked
-                    result = cb.diff(expression, (Number) args[0]);
+                    result = cb.diff(exp, (Number) args[0]);
                 } else
                     //noinspection unchecked
-                    result = cb.diff(expression, getExpression(cb, root, args));
+                    result = cb.diff(exp, getExpression(cb, root, args));
                 break;
 
 
             case QUOT:
-                if ( isNotAttrExpression(args) ) {
+                if ( isFirstArgNotAttrExpression(args) ) {
                     //noinspection unchecked
-                    result = cb.quot(expression, (Number) args[0]);
+                    result = cb.quot(exp, (Number) args[0]);
                 } else
                     //noinspection unchecked
-                    result = cb.quot(expression, getExpression(cb, root, args));
+                    result = cb.quot(exp, getExpression(cb, root, args));
                 break;
 
 
             case MOD:
-                if ( isNotAttrExpression(args) ) {
+                if ( isFirstArgNotAttrExpression(args) ) {
                     //noinspection unchecked
-                    result = cb.mod(expression, (Integer) args[0]);
+                    result = cb.mod(exp, (Integer) args[0]);
                 } else
                     //noinspection unchecked
-                    result = cb.mod(expression, getExpression(cb, root, args));
+                    result = cb.mod(exp, getExpression(cb, root, args));
                 break;
 
 
             case SQRT:
                 //noinspection unchecked
-                result = cb.sqrt(expression);
+                result = cb.sqrt(exp);
                 break;
 
 
             case CONCAT:
-                if ( isNotAttrExpression(args) ) {
+                if ( isFirstArgNotAttrExpression(args) ) {
                     //noinspection unchecked
-                    result = cb.concat(expression, (String) args[0]);
+                    result = cb.concat(exp, (String) args[0]);
                 } else
                     //noinspection unchecked
-                    result = cb.concat(expression, getExpression(cb, root, args));
+                    result = cb.concat(exp, getExpression(cb, root, args));
                 break;
 
 
             case SUBSTRING:
                 if ( args.length == 2 ) {
                     //noinspection unchecked
-                    result = cb.substring(expression, (Integer) args[0], (Integer) args[1]);
+                    result = cb.substring(exp, (Integer) args[0], (Integer) args[1]);
                 } else if ( args.length == 1 ) {
                     //noinspection unchecked
-                    result = cb.substring(expression, (Integer) args[0]);
+                    result = cb.substring(exp, (Integer) args[0]);
                 }
                 break;
 
@@ -133,63 +135,72 @@ public class JpaHelper {
             case TRIM:
                 if ( args == null || args.length == 0 ) {
                     //noinspection unchecked
-                    result = cb.trim(expression);
+                    result = cb.trim(exp);
                 } else if ( args.length == 1 ) {
                     //noinspection unchecked
-                    result = cb.trim((CriteriaBuilder.Trimspec) args[0], expression);
+                    result = cb.trim((CriteriaBuilder.Trimspec) args[0], exp);
                 } else if ( args.length == 2 ) {
                     //noinspection unchecked
-                    result = cb.trim((CriteriaBuilder.Trimspec) args[0], (char) args[1], expression);
+                    result = cb.trim((CriteriaBuilder.Trimspec) args[0], (char) args[1], exp);
                 }
                 break;
 
 
             case LOWER:
                 //noinspection unchecked
-                result = cb.lower(expression);
+                result = cb.lower(exp);
                 break;
 
 
             case UPPER:
                 //noinspection unchecked
-                result = cb.upper(expression);
+                result = cb.upper(exp);
                 break;
 
 
             case LENGTH:
                 //noinspection unchecked
-                result = cb.length(expression);
+                result = cb.length(exp);
                 break;
 
 
             case LOCATE:
                 if ( args[0] instanceof AttributePath) {
                     //noinspection unchecked
-                    result = cb.locate(expression, getExpression(cb, root, args));
+                    result = cb.locate(exp, getExpression(cb, root, args));
                 } else {
                     //noinspection unchecked
-                    result = cb.locate(expression, (String) args[0]);
+                    result = cb.locate(exp, (String) args[0]);
                 }
                 break;
 
 
             case COALESCE:
                 if ( args[0] instanceof AttributePath) {
-                    result = cb.coalesce(expression, getExpression(cb, root, args));
+                    result = cb.coalesce(exp, getExpression(cb, root, args));
                 } else {
-                    result = cb.coalesce(expression, args[0]);
+                    result = cb.coalesce(exp, args[0]);
                 }
                 break;
 
 
             case NULLIF:
-                if ( isNotAttrExpression(args) ) {
+                if ( isFirstArgNotAttrExpression(args) ) {
                     //noinspection unchecked
-                    result = cb.nullif(expression, args[0]);
+                    result = cb.nullif(exp, args[0]);
                 } else {
-                    result = cb.nullif((javax.persistence.criteria.Expression<?>) expression, getExpression(cb, root, args));
+                    result = cb.nullif((javax.persistence.criteria.Expression<?>) exp, getExpression(cb, root, args));
                 }
                 break;
+            case CUSTOMIZE: {
+                javax.persistence.criteria.Expression[] expressions = new javax.persistence.criteria.Expression[args.length + 1];
+                int index = 0;
+                expressions[index++] = exp;
+                for ( Object arg : args ) {
+                    expressions[index++] = cb.parameter(arg.getClass());
+                }
+                result = cb.function(expression.getFunctionName(), Object.class, expressions);
+            }
         }
         return result;
     }
@@ -199,8 +210,8 @@ public class JpaHelper {
         return toExpression((Expression) args[0], cb, root);
     }
 
-    private static boolean isNotAttrExpression(Object[] args) {
-        return args == null || args.length <= 0 || args[0] == null || !( args[0] instanceof Expression );
+    private static boolean isFirstArgNotAttrExpression(Object[] args) {
+        return args == null || args.length == 0 || args[0] == null || !( args[0] instanceof Expression );
     }
 
     private static <T> Path<?> toPath(Root<T> root, AttributePath attribute) {

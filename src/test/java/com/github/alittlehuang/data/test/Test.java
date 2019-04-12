@@ -32,6 +32,10 @@ public class Test {
     }
 
     public static void main(String[] args) {
+        repository.query()
+                .notEq(Expressions.function("LOG10", User::getId),1)
+                .notEq(Expressions.function("LOG", User::getId),2)
+                .getPage();
         test();
         test0();
         test1();
@@ -155,7 +159,7 @@ public class Test {
                 .orIsNotNull(User::getUsername)
                 .orIsNull(User::getUsername)
                 .setMaxResult(1)
-                .getSingleResult();
+                .getPage();
 
     }
 

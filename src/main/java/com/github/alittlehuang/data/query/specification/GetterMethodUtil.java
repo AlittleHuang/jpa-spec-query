@@ -54,6 +54,7 @@ public class GetterMethodUtil {
     public static String toAttrName(String getterName) {
         boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
         Assert.state(check, "the function is not getters");
+        //noinspection ConstantConditions
         StringBuilder builder = new StringBuilder(getterName.substring(3));
         if ( builder.length() == 1 ) {
             return builder.toString().toLowerCase();

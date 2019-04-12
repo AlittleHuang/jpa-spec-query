@@ -19,10 +19,11 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
         this.args = args;
     }
 
-    public SimpleExpression(String functionName, Expressions<T, ?> expressions, Expression.Function type, Object... args) {
+    public SimpleExpression(String function, Expressions<T, ?> expressions, Expression.Function type, Object... args) {
         this.expressions = expressions;
         this.type = type;
         this.args = args;
+        functionName = function;
     }
 
     public SimpleExpression(String path) {

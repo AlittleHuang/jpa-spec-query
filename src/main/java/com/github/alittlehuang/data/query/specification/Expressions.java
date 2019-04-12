@@ -56,39 +56,39 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
         return GetterMethodUtil.getAttrNames(null, this);
     }
 
-    static <T, N extends Number> Expressions<T, N> abs(Expressions<T, N> expression) {
+    static <T, R extends Number> Expressions<T, R> abs(Expressions<T, R> expression) {
         return new SimpleExpression<>(expression, Function.ABS);
     }
 
-    static <T, N extends Number> Expressions<T, N> sum(Expressions<T, N> expression, Expressions<T, N> other) {
+    static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.SUM, other);
     }
 
-    static <T, N extends Number> Expressions<T, N> sum(Expressions<T, N> expression, Number val) {
+    static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, Number val) {
         return new SimpleExpression<>(expression, Function.SUM, val);
     }
 
-    static <T, N extends Number> Expressions<T, N> prod(Expressions<T, N> expression, Expressions<T, N> other) {
+    static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.PROD, other);
     }
 
-    static <T, N extends Number> Expressions<T, N> prod(Expressions<T, N> expression, Number val) {
+    static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Number val) {
         return new SimpleExpression<>(expression, Function.PROD, val);
     }
 
-    static <T, N extends Number> Expressions<T, N> diff(Expressions<T, N> expression, Expressions<T, N> other) {
+    static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.DIFF, other);
     }
 
-    static <T, N extends Number> Expressions<T, N> diff(Expressions<T, N> expression, Number val) {
+    static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Number val) {
         return new SimpleExpression<>(expression, Function.DIFF, val);
     }
 
-    static <T, N extends Number> Expressions<T, N> quot(Expressions<T, N> expression, Number val) {
+    static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Number val) {
         return new SimpleExpression<>(expression, Function.QUOT, val);
     }
 
-    static <T, N extends Number> Expressions<T, N> quot(Expressions<T, N> expression, Expressions<T, N> other) {
+    static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.QUOT, other);
     }
 
@@ -246,12 +246,6 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
         return new SimpleExpression<>(expression, Function.NULLIF, val);
     }
 
-
-    /**
-     * Create an expression that tests whether its argument are
-     * equal, returning null if they are and the value of the
-     * first expression if they are not.
-     */
     static <T, Y> Expressions<T, Y> function(String function, Expressions<T, ?> expression, Object... val) {
         return new SimpleExpression<>(function, expression, Function.CUSTOMIZE, val);
     }
