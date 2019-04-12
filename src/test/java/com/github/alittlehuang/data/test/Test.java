@@ -2,11 +2,10 @@ package com.github.alittlehuang.data.test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
-import com.github.alittlehuang.data.query.specification.AggregateFunctions;
-import com.github.alittlehuang.data.query.specification.Query;
-import com.github.alittlehuang.data.query.support.Expressions;
 import com.github.alittlehuang.data.jpa.repostory.TypeRepository;
-import com.github.alittlehuang.test.TransactionalService;
+import com.github.alittlehuang.data.query.specification.AggregateFunctions;
+import com.github.alittlehuang.data.query.specification.Expressions;
+import com.github.alittlehuang.data.query.specification.Query;
 import com.github.alittlehuang.test.entity.User;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;

@@ -1,10 +1,11 @@
 package com.github.alittlehuang.data.query.support;
 
 import com.github.alittlehuang.data.query.specification.Expression;
+import com.github.alittlehuang.data.query.specification.Expressions;
 
 public class SimpleExpression<T, R> implements Expressions<T, R> {
 
-    private Expressions<T, ?> expressions;
+    private Expression<T> expressions;
 
     private Expression.Function type;
 
@@ -21,7 +22,7 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
             private String[] names = path.split("\\.");
 
             @Override
-            public String[] getNames(Class<? extends T> root) {
+            public String[] getNames() {
                 return names;
             }
 
@@ -53,8 +54,8 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
     }
 
     @Override
-    public String[] getNames(Class<? extends T> type) {
-        return expressions.getNames(type);
+    public String[] getNames() {
+        return expressions.getNames();
     }
 
     @Override

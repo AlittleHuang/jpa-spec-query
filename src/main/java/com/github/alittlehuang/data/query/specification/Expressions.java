@@ -1,7 +1,6 @@
-package com.github.alittlehuang.data.query.support;
+package com.github.alittlehuang.data.query.specification;
 
-import com.github.alittlehuang.data.query.specification.Expression;
-import com.github.alittlehuang.data.query.specification.Selection;
+import com.github.alittlehuang.data.query.support.SimpleExpression;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
@@ -53,12 +52,8 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
         return Collections.singletonList(this);
     }
 
-    default String[] getNames(Class<? extends T> type) {
-        return GetterMethodUtil.getAttrNames(type, this);
-    }
-
     default String[] getNames() {
-        return getNames(null);
+        return GetterMethodUtil.getAttrNames(null, this);
     }
 
     static <T, R extends Number> Expressions<T, R> abs(Expressions<T, R> expression) {

@@ -1,7 +1,7 @@
 package com.github.alittlehuang.data.jpa.util;
 
 import com.github.alittlehuang.data.query.specification.Expression;
-import com.github.alittlehuang.data.query.specification.Attribute;
+import com.github.alittlehuang.data.query.specification.AttributePath;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
@@ -163,7 +163,7 @@ public class JpaHelper {
 
 
             case LOCATE:
-                if ( args[0] instanceof Attribute ) {
+                if ( args[0] instanceof AttributePath) {
                     //noinspection unchecked
                     result = cb.locate(expression, getExpression(cb, root, args));
                 } else {
@@ -174,7 +174,7 @@ public class JpaHelper {
 
 
             case COALESCE:
-                if ( args[0] instanceof Attribute ) {
+                if ( args[0] instanceof AttributePath) {
                     result = cb.coalesce(expression, getExpression(cb, root, args));
                 } else {
                     result = cb.coalesce(expression, args[0]);
@@ -203,7 +203,7 @@ public class JpaHelper {
         return args == null || args.length <= 0 || args[0] == null || !( args[0] instanceof Expression );
     }
 
-    private static <T> Path<?> toPath(Root<T> root, Attribute<T> attribute) {
+    private static <T> Path<?> toPath(Root<T> root, AttributePath attribute) {
         return getPath(root, attribute.getNames());
     }
 

@@ -75,7 +75,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS addGroupings(String... paths) {
         for (String path : paths) {
-            criteria.groupings.add(new SimpleAttribute<>(path));
+            criteria.groupings.add(new SimpleExpression<>(path));
         }
         return self();
     }

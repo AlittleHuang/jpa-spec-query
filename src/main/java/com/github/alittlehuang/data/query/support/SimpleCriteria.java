@@ -1,9 +1,6 @@
 package com.github.alittlehuang.data.query.support;
 
-import com.github.alittlehuang.data.query.specification.Attribute;
-import com.github.alittlehuang.data.query.specification.Selection;
-import com.github.alittlehuang.data.query.specification.Criteria;
-import com.github.alittlehuang.data.query.specification.FetchAttribute;
+import com.github.alittlehuang.data.query.specification.*;
 import lombok.Setter;
 
 import javax.persistence.LockModeType;
@@ -14,7 +11,7 @@ public class SimpleCriteria<T> implements Criteria<T> {
 
     protected final SimpleWhereClause<T> whereClause;
     protected final List<Selection<T>> selections = new ArrayList<>();
-    protected final List<Attribute<T>> groupings = new ArrayList<>();
+    protected final List<Expression<T>> groupings = new ArrayList<>();
     protected final List<SimpleOrders<T>> orders = new ArrayList<>();
     protected final List<FetchAttribute<T>> fetchAttributes = new ArrayList<>();
     private final Class<T> javaType;
@@ -48,7 +45,7 @@ public class SimpleCriteria<T> implements Criteria<T> {
     }
 
     @Override
-    public List<Attribute<T>> getGroupings() {
+    public List<Expression<T>> getGroupings() {
         return groupings;
     }
 

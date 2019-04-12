@@ -1,7 +1,5 @@
 package com.github.alittlehuang.data.query.specification;
 
-import com.github.alittlehuang.data.query.support.Expressions;
-
 import java.util.Collection;
 
 public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>> {
@@ -136,21 +134,21 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
     @SuppressWarnings( "unchecked" )
     <X> THIS orNotIn(String name, X... value);
 
-    <X, E extends Expressions<T, ?>> THIS andEqual(E expression, E other);
+    <E extends Expressions<T, ?>> THIS andEqual(E expression, E other);
 
     default <X, E extends Expressions<T, ?>> THIS equal(E expression, E other) {
         return andEqual(expression, other);
     }
 
-    <X, E extends Expressions<T, ?>> THIS orEqual(E expression, E other);
+    <E extends Expressions<T, ?>> THIS orEqual(E expression, E other);
 
-    <X, E extends Expressions<T, ?>> THIS andNotEqual(E expression, E other);
+    <E extends Expressions<T, ?>> THIS andNotEqual(E expression, E other);
 
     default <X, E extends Expressions<T, ?>> THIS notEqual(E expression, E other) {
         return andNotEqual(expression, other);
     }
 
-    <X, E extends Expressions<T, ?>> THIS orNotEqual(E expression, E other);
+    <E extends Expressions<T, ?>> THIS orNotEqual(E expression, E other);
 
     <X, E extends Expressions<T, ? super X>> THIS andEq(E expression, X value);
 

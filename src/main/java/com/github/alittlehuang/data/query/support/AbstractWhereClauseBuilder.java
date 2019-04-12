@@ -1,9 +1,6 @@
 package com.github.alittlehuang.data.query.support;
 
-import com.github.alittlehuang.data.query.specification.Expression;
-import com.github.alittlehuang.data.query.specification.WhereClause;
-import com.github.alittlehuang.data.query.specification.WhereClauseBuilder;
-import com.github.alittlehuang.data.query.specification.ConditionalOperator;
+import com.github.alittlehuang.data.query.specification.*;
 import lombok.experimental.Delegate;
 
 import javax.persistence.criteria.Predicate;
@@ -257,22 +254,22 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public <X, E extends Expressions<T, ?>> THIS andEqual(E expression, E other) {
+    public <E extends Expressions<T, ?>> THIS andEqual(E expression, E other) {
         return add(expression, other, AND, ConditionalOperator.EQUAL);
     }
 
     @Override
-    public <X, E extends Expressions<T, ?>> THIS orEqual(E expression, E other) {
+    public <E extends Expressions<T, ?>> THIS orEqual(E expression, E other) {
         return add(expression, other, OR, ConditionalOperator.EQUAL);
     }
 
     @Override
-    public <X, E extends Expressions<T, ?>> THIS andNotEqual(E expression, E other) {
+    public <E extends Expressions<T, ?>> THIS andNotEqual(E expression, E other) {
         return add(expression, other, AND, NOT, ConditionalOperator.EQUAL);
     }
 
     @Override
-    public <X, E extends Expressions<T, ?>> THIS orNotEqual(E expression, E other) {
+    public <E extends Expressions<T, ?>> THIS orNotEqual(E expression, E other) {
         return add(expression, other, OR, NOT, ConditionalOperator.EQUAL);
     }
 

@@ -1,12 +1,12 @@
 package com.github.alittlehuang.data.query.support;
 
-import com.github.alittlehuang.data.query.specification.Attribute;
+import com.github.alittlehuang.data.query.specification.AttributePath;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode
-public class SimpleAttribute<T> implements Attribute<T> {
+public class SimpleAttribute<T> implements AttributePath {
 
     private String[] names;
 

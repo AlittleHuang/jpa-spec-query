@@ -1,6 +1,7 @@
-package com.github.alittlehuang.data.query.support;
+package com.github.alittlehuang.data.query.specification;
 
 
+import com.github.alittlehuang.data.query.specification.Expressions;
 import com.github.alittlehuang.data.util.Assert;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;

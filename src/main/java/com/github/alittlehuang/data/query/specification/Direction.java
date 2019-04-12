@@ -1,7 +1,5 @@
 package com.github.alittlehuang.data.query.specification;
 
-public interface Attribute<T> {
-
-    String[] getNames();
-
+public enum Direction {
+    ASC, DESC
 }

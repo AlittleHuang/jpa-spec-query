@@ -1,7 +1,5 @@
 package com.github.alittlehuang.data.query.specification;
 
-import com.github.alittlehuang.data.query.support.Expressions;
-
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
 
