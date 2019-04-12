@@ -16,6 +16,7 @@
 package com.github.alittlehuang.data.query.page;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Abstract Java Bean implementation of {@code Pageable}.
@@ -26,8 +27,8 @@ import java.io.Serializable;
  */
 public class Pageable implements Serializable {
 
-    private final int page;
-    private final int size;
+    private final long page;
+    private final long size;
 
     /**
      * Creates a new {@link Pageable}. Pages are zero indexed, thus providing 0 for {@code page} will return
@@ -36,7 +37,7 @@ public class Pageable implements Serializable {
      * @param page must not be less than zero.
      * @param size must not be less than one.
      */
-    public Pageable(int page, int size) {
+    public Pageable(long page, long size) {
 
         if ( page < 0 ) {
             throw new IllegalArgumentException("Page index must not be less than zero!");
@@ -50,16 +51,16 @@ public class Pageable implements Serializable {
         this.size = size;
     }
 
-    public int getPageSize() {
+    public long getPageSize() {
         return size;
     }
 
-    public int getPageNumber() {
+    public long getPageNumber() {
         return page;
     }
 
     public long getOffset() {
-        return (long) page * (long) size;
+        return page * size;
     }
 
     public boolean hasPrevious() {
@@ -67,29 +68,16 @@ public class Pageable implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-
-        final int prime = 31;
-        int result = 1;
-
-        result = prime * result + page;
-        result = prime * result + size;
-
-        return result;
+    public boolean equals(Object o) {
+        if ( this == o ) return true;
+        if ( o == null || getClass() != o.getClass() ) return false;
+        Pageable pageable = (Pageable) o;
+        return page == pageable.page &&
+                size == pageable.size;
     }
 
     @Override
-    public boolean equals(Object obj) {
-
-        if ( this == obj ) {
-            return true;
-        }
-
-        if ( obj == null || getClass() != obj.getClass() ) {
-            return false;
-        }
-
-        Pageable other = (Pageable) obj;
-        return this.page == other.page && this.size == other.size;
+    public int hashCode() {
+        return Objects.hash(page, size);
     }
 }

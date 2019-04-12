@@ -126,7 +126,7 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
             initFetch().initWhere().initOrderBy();
             //noinspection unchecked
             TypedQuery<R> typedQuery = entityManager.createQuery(query.select(root));
-            setLimit(typedQuery, pageable.getOffset(), (long) pageable.getPageSize());
+            setLimit(typedQuery, pageable.getOffset(), pageable.getPageSize());
             setLock(typedQuery);
             setParameter(typedQuery);
             List<R> resultList = typedQuery.getResultList();
@@ -217,7 +217,7 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
 
         private StoredData<R> initFetch() {
             List<? extends FetchAttribute<T>> list = criteria.getFetchAttributes();
-            for ( FetchAttribute<T> attr : list) {
+            for (FetchAttribute<T> attr : list) {
                 Fetch fetch = null;
                 for (String stringPath : attr.getNames()) {
                     if (fetch == null) {
@@ -239,12 +239,13 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
 
         private Predicate toPredicate() {
             WhereClause<T> where = criteria.getWhereClause();
+            //noinspection unchecked
             return new SpecificationImpl(where).toPredicate(root, query, cb);
         }
 
-        public <X> Expression toExpression(com.github.alittlehuang.data.query.specification.Expression<X> expression, CriteriaBuilder cb, Root<X> root) {
+        public <X> javax.persistence.criteria.Expression toExpression(com.github.alittlehuang.data.query.specification.Expression<X> expression, CriteriaBuilder cb, Root<X> root) {
             com.github.alittlehuang.data.query.specification.Expression<X> subexpression = expression.getSubexpression();
-            Expression exp = ( subexpression != null )
+            javax.persistence.criteria.Expression exp = ( subexpression != null )
                     ? toExpression(subexpression, cb, root)
                     : toPath(root, expression);
 
@@ -254,7 +255,7 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
             Object[] args = expression.getArgs();
             args = args == null ? com.github.alittlehuang.data.query.specification.Expression.EMPTY_ARGS : args;
 
-            Expression result = exp;
+            javax.persistence.criteria.Expression result = exp;
 
             switch ( type ) {
 
@@ -400,11 +401,11 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
                         //noinspection unchecked
                         result = cb.nullif(exp, args[0]);
                     } else {
-                        result = cb.nullif((Expression<?>) exp, getExpression(cb, root, args));
+                        result = cb.nullif((javax.persistence.criteria.Expression<?>) exp, getExpression(cb, root, args));
                     }
                     break;
                 case CUSTOMIZE: {
-                    Expression[] expressions = new Expression[args.length + 1];
+                    javax.persistence.criteria.Expression[] expressions = new javax.persistence.criteria.Expression[args.length + 1];
                     int index = 0;
                     expressions[index++] = exp;
                     for ( Object arg : args ) {
@@ -418,7 +419,7 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
             return result;
         }
 
-        private Expression getExpression(CriteriaBuilder cb, Root<?> root, Object[] args) {
+        private javax.persistence.criteria.Expression getExpression(CriteriaBuilder cb, Root<?> root, Object[] args) {
             //noinspection unchecked
             return toExpression((com.github.alittlehuang.data.query.specification.Expression) args[0], cb, root);
         }

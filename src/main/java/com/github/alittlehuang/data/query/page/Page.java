@@ -20,12 +20,12 @@ public interface Page<T> {
     static <T> Page<T> empty(Pageable pageable) {
         return new Page<T>() {
             @Override
-            public int getNumber() {
+            public long getNumber() {
                 return pageable.getPageNumber();
             }
 
             @Override
-            public int getSize() {
+            public long getSize() {
                 return pageable.getPageSize();
             }
 
@@ -36,9 +36,9 @@ public interface Page<T> {
         };
     }
 
-    int getNumber();
+    long getNumber();
 
-    int getSize();
+    long getSize();
 
     long getTotalElements();
 

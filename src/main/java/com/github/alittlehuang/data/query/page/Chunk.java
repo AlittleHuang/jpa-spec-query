@@ -35,12 +35,12 @@ abstract class Chunk<T> implements Serializable, Page<T> {
     }
 
     @Override
-    public int getNumber() {
+    public long getNumber() {
         return pageable.getPageNumber();
     }
 
     @Override
-    public int getSize() {
+    public long getSize() {
         return pageable.getPageSize();
     }
 
