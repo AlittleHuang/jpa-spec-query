@@ -8,7 +8,7 @@
         <dependency>
           <groupId>com.github.alittlehuang</groupId>
           <artifactId>jpa-spec-query</artifactId>
-          <version>1.0.9</version>
+          <version>1.1.0</version>
         </dependency>
 
         <dependency>
@@ -176,56 +176,38 @@ public class User {
 #### Use EntityManager
 
 ```java
-// com.github.test.Test
-public class Test {
+public class Demo {
 
     public static void main(String[] args) {
 
         ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
         EntityManager entityManager = appCtx.getBean(EntityManager.class);
 
-        TypeRepostory<User> repostory = new TypeRepostory<>(User.class, entityManager);
+        TypeRepository<User> repository = new TypeRepository<>(User.class, entityManager);
 
         //select by id
-        User selectById = repostory.query()
+        User selectById = repository.query()
                 .andEqual(User::getId, 1)
                 .getSingleResult();
 
         // fetch:
         // select user inner join company
-        User fetch = repostory.query()
+        User fetch = repository.query()
                 .andEqual(User::getId, 1)
                 .addFetchs(User::getCompany)
                 .getSingleResult();
 
-        // System.out.println(selectById.getCompany());//no Session
-        System.out.println(fetch.getCompany());//OK
-
         // select by name and age
-        User luna = repostory.query()
+        User luna = repository.query()
                 .andEqual(User::getName, "Luna")
                 .andEqual(User::getAge, 18)
                 .getSingleResult();
 
 
         // select user by company name
-        List<User> list = repostory.query()
+        List<User> list = repository.query()
                 .andEqual(Path.of(User::getCompany).to(Company::getName), "Microsoft")
                 .getResultList();
     }
 }
-```
-
-#### Use JpaSpecificationExecutor
-
-
-```java
-// UserRepository
-
-SpecBuilder<User> spec = new SpecBuilder<User>()
-        .andEqual(User::getName, "Luna")
-        .andEqual(User::getAge, 18);
-
-List<User> all = userRepostory.findAll(spec);
-
 ```
