@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
 
 import static javax.persistence.criteria.CriteriaBuilder.Trimspec;
 
+/**
+ * @author ALittleHuang
+ */
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuilder<T> {
     private static final JoinType DEFAULT_JOIN_TYPE = JoinType.LEFT;

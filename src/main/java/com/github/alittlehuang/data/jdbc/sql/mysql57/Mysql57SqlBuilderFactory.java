@@ -6,6 +6,9 @@ import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
 import com.github.alittlehuang.data.query.page.Pageable;
 import com.github.alittlehuang.data.query.specification.Criteria;
 
+/**
+ * @author ALittleHuang
+ */
 public class Mysql57SqlBuilderFactory implements SqlBuilderFactory {
 
     private JdbcQueryStoredConfig config;
