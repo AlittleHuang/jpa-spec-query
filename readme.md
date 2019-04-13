@@ -1,5 +1,43 @@
 # Quick start
 
+### pom.xml
+
+```xml
+        ......
+        
+        <dependency>
+          <groupId>com.github.alittlehuang</groupId>
+          <artifactId>jpa-spec-query</artifactId>
+          <version>1.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>${hibernate.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        
+        ......
+```
+
 ### database
 
 ```sql
@@ -43,6 +81,7 @@ CREATE TABLE `user`  (
 INSERT INTO `user` VALUES (1, 18, 1, 'Luna');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
 ```
 
 ### applicationContext.xml
@@ -137,56 +176,38 @@ public class User {
 #### Use EntityManager
 
 ```java
-// com.github.test.Test
-public class Test {
+public class Demo {
 
     public static void main(String[] args) {
 
         ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
         EntityManager entityManager = appCtx.getBean(EntityManager.class);
 
-        TypeRepostory<User> repostory = new TypeRepostory<>(User.class, entityManager);
+        TypeRepository<User> repository = new TypeRepository<>(User.class, entityManager);
 
         //select by id
-        User selectById = repostory.query()
+        User selectById = repository.query()
                 .andEqual(User::getId, 1)
                 .getSingleResult();
 
         // fetch:
         // select user inner join company
-        User fetch = repostory.query()
+        User fetch = repository.query()
                 .andEqual(User::getId, 1)
                 .addFetchs(User::getCompany)
                 .getSingleResult();
 
-        // System.out.println(selectById.getCompany());//no Session
-        System.out.println(fetch.getCompany());//OK
-
         // select by name and age
-        User luna = repostory.query()
+        User luna = repository.query()
                 .andEqual(User::getName, "Luna")
                 .andEqual(User::getAge, 18)
                 .getSingleResult();
 
 
         // select user by company name
-        List<User> list = repostory.query()
+        List<User> list = repository.query()
                 .andEqual(Path.of(User::getCompany).to(Company::getName), "Microsoft")
                 .getResultList();
     }
 }
-```
-
-#### Use JpaSpecificationExecutor
-
-
-```java
-// com.github.test.UserRepostory
-
-SpecBuilder<User> spec = new SpecBuilder<User>()
-        .andEqual(User::getName, "Luna")
-        .andEqual(User::getAge, 18);
-
-List<User> all = userRepostory.findAll(spec);
-
 ```
