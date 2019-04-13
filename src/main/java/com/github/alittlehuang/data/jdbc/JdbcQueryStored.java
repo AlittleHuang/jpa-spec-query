@@ -52,7 +52,7 @@ public class JdbcQueryStored<T> extends AbstractQueryStored<T> {
 
     private List<T> toList(ResultSet resultSet, List<SelectedAttribute> selectedAttributes) throws SQLException {
         List<T> results = new ArrayList<>();
-        boolean fistRow = true;
+        boolean firstRow = true;
         while ( resultSet.next() ) {
             T entity;
             try {
@@ -100,7 +100,7 @@ public class JdbcQueryStored<T> extends AbstractQueryStored<T> {
                             else if ( targetType == Time.class )
                                 val = resultSet.getTime(index);
                             else { // ClassCastException ?
-                                if ( fistRow && logger.isWarnEnabled() ) {
+                                if ( firstRow && logger.isWarnEnabled() ) {
                                     Class<?> entityType = attribute.getEntityType();
                                     EntityInformation<?, ?> information = EntityInformation.getInstance(entityType);
                                     Field field = attribute.getField();
@@ -117,7 +117,7 @@ public class JdbcQueryStored<T> extends AbstractQueryStored<T> {
                     attribute.setValue(entityAttr, val);
                 }
             }
-            fistRow = false;
+            firstRow = false;
         }
         return results;
     }

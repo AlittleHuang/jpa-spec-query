@@ -15,6 +15,9 @@
  */
 package com.github.alittlehuang.data.query.page;
 
+import java.util.Collections;
+import java.util.List;
+
 public interface Page<T> {
 
     static <T> Page<T> empty(Pageable pageable) {
@@ -33,6 +36,11 @@ public interface Page<T> {
             public long getTotalElements() {
                 return 0;
             }
+
+            @Override
+            public List<T> getContent() {
+                return Collections.emptyList();
+            }
         };
     }
 
@@ -41,5 +49,7 @@ public interface Page<T> {
     long getSize();
 
     long getTotalElements();
+
+    List<T> getContent();
 
 }

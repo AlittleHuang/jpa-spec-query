@@ -5,6 +5,7 @@ import com.github.alittlehuang.data.query.page.Page;
 import com.github.alittlehuang.data.util.Assert;
 
 import java.util.List;
+import java.util.function.Function;
 
 
 public interface QueryStored<T> {
@@ -28,6 +29,14 @@ public interface QueryStored<T> {
     Page<T> getPage(long page, long size);
 
     Page<T> getPage();
+
+    default <P> P getPage(long page, long size, Function<Page<T>, P> function) {
+        return function.apply(getPage(page, size));
+    }
+
+    default <P> P getPage(Function<Page<T>, P> function) {
+        return function.apply(getPage());
+    }
 
     long count();
 

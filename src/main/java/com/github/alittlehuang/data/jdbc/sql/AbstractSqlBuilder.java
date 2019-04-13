@@ -362,10 +362,10 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
             //noinspection unchecked
             appendExpression((Expression<T>) parameter);
         } else if ( parameter instanceof Iterable ) {
-            boolean fist = true;
+            boolean first = true;
             for ( Object arg : ( (Iterable<?>) parameter ) ) {
-                if ( fist ) {
-                    fist = false;
+                if ( first ) {
+                    first = false;
                 } else {
                     sql.append(',');
                 }
@@ -587,11 +587,12 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         if ( items.size() == 1 ) {
             appendNonCompoundWhereClause(items.get(0));
         } else if ( !items.isEmpty() ) {
-            boolean fist = true;
+            boolean first = true;
             Predicate.BooleanOperator pre = null;
             for ( WhereClause<T> item : items ) {
-                if ( fist ) {
-                    fist = false;
+
+                if ( first ) {
+                    first = item.isCompound();
                 } else {
                     Predicate.BooleanOperator operator = item.getBooleanOperator();
                     if ( pre == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {

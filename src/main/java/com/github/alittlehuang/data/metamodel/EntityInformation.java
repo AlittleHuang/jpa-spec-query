@@ -9,6 +9,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -113,7 +114,8 @@ public class EntityInformation<T, ID> {
 
         for (Field field : writeMap.keySet()) {
             Attribute attribute = new Attribute(field, readerMap.get(field), writeMap.get(field), javaType);
-            if (attribute.getAnnotation(Transient.class) == null) {
+            if ( attribute.getAnnotation(Transient.class) == null
+                    && !Modifier.isStatic(field.getModifiers()) ) {
                 attributes.add(attribute);
             }
         }
