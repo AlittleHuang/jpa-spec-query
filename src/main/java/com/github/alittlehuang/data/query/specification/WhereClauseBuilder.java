@@ -2,6 +2,9 @@ package com.github.alittlehuang.data.query.specification;
 
 import java.util.Collection;
 
+/**
+ * @author ALittleHuang
+ */
 public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>> {
 
     /**

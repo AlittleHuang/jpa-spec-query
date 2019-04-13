@@ -56,6 +56,7 @@ public class PageImpl<T> extends Chunk<T> implements Page<T> {
         return total;
     }
 
+    @Override
     public boolean hasNext() {
         return getNumber() + 1 < getTotalPages();
     }

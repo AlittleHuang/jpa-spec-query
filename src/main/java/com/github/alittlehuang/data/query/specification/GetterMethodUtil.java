@@ -1,7 +1,6 @@
 package com.github.alittlehuang.data.query.specification;
 
 
-import com.github.alittlehuang.data.query.specification.Expressions;
 import com.github.alittlehuang.data.util.Assert;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
@@ -14,6 +13,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * @author ALittleHuang
+ */
 public class GetterMethodUtil {
 
     private final static Map<Class, Method> map = new HashMap<>();

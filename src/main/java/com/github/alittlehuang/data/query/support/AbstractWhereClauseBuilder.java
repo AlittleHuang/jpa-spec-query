@@ -83,6 +83,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         return add(expression, value, booleanOperator, false, conditionalOperator);
     }
 
+    @Override
     public THIS and() {
         AbstractWhereClauseBuilder<T, THIS> sub = sub(null);
         getCompoundItems().add(sub);
@@ -114,6 +115,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         return sub;
     }
 
+    @Override
     public THIS or() {
         AbstractWhereClauseBuilder<T, THIS> sub = sub(null);
         sub.booleanOperator = OR;

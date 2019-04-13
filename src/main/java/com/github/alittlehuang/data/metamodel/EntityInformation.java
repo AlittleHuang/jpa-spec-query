@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * @author ALittleHuang
+ */
 public class EntityInformation<T, ID> {
 
     private static final Map<Class<?>, EntityInformation<?, ?>> MAP = new ConcurrentHashMap<>();

@@ -3,6 +3,9 @@ package com.github.alittlehuang.data.query.specification;
 import javax.persistence.LockModeType;
 import java.util.List;
 
+/**
+ * @author ALittleHuang
+ */
 public interface Criteria<T> {
 
     WhereClause<T> getWhereClause();

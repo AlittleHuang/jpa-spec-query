@@ -18,6 +18,9 @@ package com.github.alittlehuang.data.query.page;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author ALittleHuang
+ */
 public interface Page<T> {
 
     static <T> Page<T> empty(Pageable pageable) {

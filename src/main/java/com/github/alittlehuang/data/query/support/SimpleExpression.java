@@ -3,6 +3,9 @@ package com.github.alittlehuang.data.query.support;
 import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.specification.Expressions;
 
+/**
+ * @author ALittleHuang
+ */
 public class SimpleExpression<T, R> implements Expressions<T, R> {
 
     private Expression<T> expressions;

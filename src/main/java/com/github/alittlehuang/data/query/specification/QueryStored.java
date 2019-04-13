@@ -7,7 +7,9 @@ import com.github.alittlehuang.data.util.Assert;
 import java.util.List;
 import java.util.function.Function;
 
-
+/**
+ * @author ALittleHuang
+ */
 public interface QueryStored<T> {
 
     List<T> getResultList();

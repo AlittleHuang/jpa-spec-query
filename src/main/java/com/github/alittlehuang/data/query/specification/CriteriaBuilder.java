@@ -3,6 +3,9 @@ package com.github.alittlehuang.data.query.specification;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
 
+/**
+ * @author ALittleHuang
+ */
 public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> extends WhereClauseBuilder<T, THIS> {
 
     THIS addSelect(String... paths);

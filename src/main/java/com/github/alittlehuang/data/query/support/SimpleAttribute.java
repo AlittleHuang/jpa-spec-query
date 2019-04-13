@@ -4,6 +4,9 @@ import com.github.alittlehuang.data.query.specification.AttributePath;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+/**
+ * @author ALittleHuang
+ */
 @Getter
 @EqualsAndHashCode
 public class SimpleAttribute<T> implements AttributePath {

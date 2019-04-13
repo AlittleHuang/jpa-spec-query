@@ -7,6 +7,9 @@ import com.github.alittlehuang.data.query.specification.QueryStored;
 
 import java.util.List;
 
+/**
+ * @author ALittleHuang
+ */
 public abstract class AbstractQuery<T> extends AbstractCriteriaBuilder<T, Query<T>> implements Query<T> {
 
     protected AbstractQueryStored<T> stored;

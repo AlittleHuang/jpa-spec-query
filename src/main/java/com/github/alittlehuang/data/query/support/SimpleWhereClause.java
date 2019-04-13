@@ -10,19 +10,22 @@ import java.util.List;
 
 import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 
+/**
+ * @author ALittleHuang
+ */
 public class SimpleWhereClause<T> implements WhereClause<T> {
 
     protected final Expression<T> expression;
 
     protected boolean compound;
 
-    protected Object parameter;//参数
+    protected Object parameter;
 
     protected Predicate.BooleanOperator booleanOperator = AND;
 
-    protected ConditionalOperator conditionalOperator;//条件运算符
+    protected ConditionalOperator conditionalOperator;
 
-    protected boolean negate = false;//取反
+    protected boolean negate = false;
 
     protected final List<WhereClause<T>> compoundItems;
 

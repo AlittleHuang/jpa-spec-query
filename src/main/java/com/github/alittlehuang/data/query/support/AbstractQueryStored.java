@@ -4,6 +4,9 @@ import com.github.alittlehuang.data.query.page.Page;
 import com.github.alittlehuang.data.query.specification.Criteria;
 import com.github.alittlehuang.data.query.specification.QueryStored;
 
+/**
+ * @author ALittleHuang
+ */
 public abstract class AbstractQueryStored<T> implements QueryStored<T> {
     protected static final int DEFAULT_PAGE_SIZE = 10;
 

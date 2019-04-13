@@ -52,6 +52,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
         return Collections.singletonList(this);
     }
 
+    @Override
     default String[] getNames() {
         return GetterMethodUtil.getAttrNames(null, this);
     }

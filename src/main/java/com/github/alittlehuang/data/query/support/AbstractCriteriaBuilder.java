@@ -5,6 +5,9 @@ import com.github.alittlehuang.data.query.specification.*;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
 
+/**
+ * @author ALittleHuang
+ */
 public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>>
         extends AbstractWhereClauseBuilder<T, THIS>
         implements CriteriaBuilder<T, THIS> {

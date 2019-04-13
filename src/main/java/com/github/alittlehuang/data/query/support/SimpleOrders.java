@@ -7,6 +7,9 @@ import com.github.alittlehuang.data.query.specification.Orders;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author ALittleHuang
+ */
 public class SimpleOrders<T> implements Orders<T> {
 
     @Getter

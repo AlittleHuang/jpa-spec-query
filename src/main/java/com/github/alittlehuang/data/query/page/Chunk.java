@@ -66,6 +66,7 @@ abstract class Chunk<T> implements Serializable, Page<T> {
         return !content.isEmpty();
     }
 
+    @Override
     public List<T> getContent() {
         return Collections.unmodifiableList(content);
     }
@@ -86,33 +87,5 @@ abstract class Chunk<T> implements Serializable, Page<T> {
         return this.getContent().stream().map(converter).collect(Collectors.toList());
     }
 
-    @Override
-    public boolean equals(Object obj) {
 
-        if ( this == obj ) {
-            return true;
-        }
-
-        if ( !( obj instanceof Chunk<?> ) ) {
-            return false;
-        }
-
-        Chunk<?> that = (Chunk<?>) obj;
-
-        boolean contentEqual = this.content.equals(that.content);
-        boolean pageableEqual = this.pageable.equals(that.pageable);
-
-        return contentEqual && pageableEqual;
-    }
-
-    @Override
-    public int hashCode() {
-
-        int result = 17;
-
-        result += 31 * pageable.hashCode();
-        result += 31 * content.hashCode();
-
-        return result;
-    }
 }

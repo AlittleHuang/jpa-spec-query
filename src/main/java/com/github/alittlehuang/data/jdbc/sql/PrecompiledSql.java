@@ -2,6 +2,9 @@ package com.github.alittlehuang.data.jdbc.sql;
 
 import java.util.List;
 
+/**
+ * @author ALittleHuang
+ */
 public class PrecompiledSql {
 
     private String sql;

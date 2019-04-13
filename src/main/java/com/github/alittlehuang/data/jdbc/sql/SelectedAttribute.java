@@ -2,6 +2,9 @@ package com.github.alittlehuang.data.jdbc.sql;
 
 import com.github.alittlehuang.data.metamodel.Attribute;
 
+/**
+ * @author ALittleHuang
+ */
 public class SelectedAttribute {
 
     private Attribute attribute;

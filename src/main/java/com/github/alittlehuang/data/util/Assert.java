@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * @author ALittleHuang
+ */
 @SuppressWarnings( {"Duplicates", "unused"} )
 public abstract class Assert {
     public Assert() {

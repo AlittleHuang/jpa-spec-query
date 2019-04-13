@@ -3,6 +3,9 @@ package com.github.alittlehuang.data.jpa.util;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Root;
 
+/**
+ * @author ALittleHuang
+ */
 public class JpaHelper {
 
     public static <T> Path<?> getPath(Root<T> root, String[] attributeNames) {

@@ -72,9 +72,8 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     @Override
     public PrecompiledSql count() {
         sql = new StringBuilder();
-        sql.append("SELECT\n  COUNT(1) AS count_").append(rootEntityInfo.getTableName()).append("_\n");
+        sql.append("SELECT\n  COUNT(1) AS count_").append(rootEntityInfo.getTableName()).append("_");
         appendFrom(rootEntityInfo);
-        sql.append("\n  ");
         int index = sql.length();
         appendWhereClause();
         insertJoin(index);
@@ -130,7 +129,9 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
 
     protected void appendGroupings() {
         List<? extends Expression<T>> groupings = criteria.getGroupings();
-        if ( groupings == null || groupings.isEmpty() ) return;
+        if ( groupings == null || groupings.isEmpty() ) {
+            return;
+        }
         sql.append("\nGROUP BY\n  ");
         boolean first = true;
         for ( Expression<T> grouping : groupings ) {
@@ -163,9 +164,12 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
 
     protected void appendWhereClause() {
         WhereClause<T> whereClause = criteria.getWhereClause();
-        if ( whereClause != null && ( !whereClause.isCompound() || !whereClause.getCompoundItems().isEmpty() ) ) {
-            sql.append("\nWHERE\n  ");
-            appendWhereClause(whereClause);
+        if ( whereClause != null ) {
+            boolean notEmpty = !whereClause.isCompound() || !whereClause.getCompoundItems().isEmpty();
+            if ( notEmpty ) {
+                sql.append("\nWHERE\n  ");
+                appendWhereClause(whereClause);
+            }
         }
     }
 
@@ -347,6 +351,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
             case IS_NULL:
                 sql.append(negate ? " IS NOT NULL" : " IS NULL");
                 break;
+            default:
         }
 
     }
@@ -420,31 +425,19 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 appendSingleParameterFunction(expression, "ABS");
                 break;
             case SUM: {
-                appendAttribute(expression.getSubexpression());
-                sql.append("+");
-                Object arg = args[0];
-                appendSqlParameter(arg);
+                numberOperation(expression, "+", args[0]);
                 break;
             }
             case PROD: {
-                appendAttribute(expression.getSubexpression());
-                sql.append("*");
-                Object arg = args[0];
-                appendFunArgs(arg);
+                numberOperation(expression, "*", args[0]);
                 break;
             }
             case DIFF: {
-                appendAttribute(expression.getSubexpression());
-                sql.append("-");
-                Object arg = args[0];
-                appendFunArgs(arg);
+                numberOperation(expression, "-", args[0]);
                 break;
             }
             case QUOT: {
-                appendAttribute(expression.getSubexpression());
-                sql.append("/");
-                Object arg = args[0];
-                appendFunArgs(arg);
+                numberOperation(expression, "/", args[0]);
                 break;
             }
             case MOD:
@@ -462,18 +455,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 appendMultiParameterFunction(expression, "SUBSTRING");
                 break;
             case TRIM:
-                if ( args == null || args.length == 0 ) {
-                    appendSingleParameterFunction(expression, "TRIM");
-                } else {
-                    Trimspec p0 = (Trimspec) args[0];
-                    char p1 = ' ';
-                    if ( args.length == 2 ) {
-                        p1 = (char) args[1];
-                    }
-                    sql.append("TRIM(").append(p0).append(" '").append(p1).append("' FROM ");
-                    appendExpression(expression.getSubexpression());
-                    sql.append(")");
-                }
+                trim(expression, args);
                 break;
             case LOWER:
                 appendSingleParameterFunction(expression, "LOWER");
@@ -485,11 +467,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 appendSingleParameterFunction(expression, "UPPER");
                 break;
             case LOCATE:
-                sql.append("LOCATE").append("(");
-                appendFunArg(args);
-                sql.append(",");
-                appendAttribute(expression.getSubexpression());
-                sql.append(")");
+                locate(expression, args);
                 break;
             case COALESCE:
                 appendMultiParameterFunction(expression, "COALESCE");
@@ -498,15 +476,49 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 appendMultiParameterFunction(expression, "NULLIF");
                 break;
             case CUSTOMIZE:
-                String functionName = expression.getFunctionName();
-                if ( expression.getArgs() == null || expression.getArgs().length == 0 ) {
-                    appendSingleParameterFunction(expression, functionName);
-                } else {
-                    appendMultiParameterFunction(expression, functionName);
-                }
+                customize(expression);
                 break;
+            default:
         }
 
+    }
+
+    private void numberOperation(Expression<T> expression, String operator, Object arg) {
+        appendAttribute(expression.getSubexpression());
+        sql.append(operator);
+        appendFunArgs(arg);
+    }
+
+    private void customize(Expression<T> expression) {
+        String functionName = expression.getFunctionName();
+        if ( expression.getArgs() == null || expression.getArgs().length == 0 ) {
+            appendSingleParameterFunction(expression, functionName);
+        } else {
+            appendMultiParameterFunction(expression, functionName);
+        }
+    }
+
+    private void locate(Expression<T> expression, Object[] args) {
+        sql.append("LOCATE").append("(");
+        appendFunArg(args);
+        sql.append(",");
+        appendAttribute(expression.getSubexpression());
+        sql.append(")");
+    }
+
+    private void trim(Expression<T> expression, Object[] args) {
+        if ( args == null || args.length == 0 ) {
+            appendSingleParameterFunction(expression, "TRIM");
+        } else {
+            Trimspec p0 = (Trimspec) args[0];
+            char p1 = ' ';
+            if ( args.length > 1 ) {
+                p1 = (char) args[1];
+            }
+            sql.append("TRIM(").append(p0).append(" '").append(p1).append("' FROM ");
+            appendExpression(expression.getSubexpression());
+            sql.append(")");
+        }
     }
 
     protected void appendMultiParameterFunction(Expression<T> expression, String funStr) {
@@ -586,7 +598,12 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
 
         List<? extends WhereClause<T>> items = whereClause.getCompoundItems();
         if ( items.size() == 1 ) {
-            appendNonCompoundWhereClause(items.get(0));
+            WhereClause<T> sub = items.get(0);
+            if ( sub.isCompound() ) {
+                appendCompoundWhereClause(sub);
+            } else {
+                appendNonCompoundWhereClause(sub);
+            }
         } else if ( !items.isEmpty() ) {
             Predicate.BooleanOperator pre = null;
             for ( WhereClause<T> item : items ) {
@@ -614,7 +631,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     }
 
     public <X> EntityInformation<X, ?> getEntityInformation(Class<X> clazz) {
-        EntityInformation<X, ?> info = config.getEntityInformationFactory().getEntityInfor(clazz);
+        EntityInformation<X, ?> info = config.getEntityInformationFactory().getEntityInfo(clazz);
         Assert.notNull(info, "the type " + clazz + " is not an entity type");
         return info;
     }

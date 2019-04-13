@@ -2,6 +2,9 @@ package com.github.alittlehuang.data.query.support;
 
 import com.github.alittlehuang.data.query.specification.Expression;
 
+/**
+ * @author ALittleHuang
+ */
 public class QueryImpl<T> extends AbstractQuery<T> {
 
     public QueryImpl(AbstractQueryStored<T> stored) {

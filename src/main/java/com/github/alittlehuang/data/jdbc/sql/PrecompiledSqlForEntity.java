@@ -2,6 +2,9 @@ package com.github.alittlehuang.data.jdbc.sql;
 
 import java.util.List;
 
+/**
+ * @author ALittleHuang
+ */
 public class PrecompiledSqlForEntity<T> extends PrecompiledSql {
 
     private List<SelectedAttribute> selectedAttributes;

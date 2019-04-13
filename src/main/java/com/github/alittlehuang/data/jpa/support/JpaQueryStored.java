@@ -250,172 +250,223 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
                     : toPath(root, expression);
 
             com.github.alittlehuang.data.query.specification.Expression.Function type = expression.getFunction();
-            if ( type == null ) type = com.github.alittlehuang.data.query.specification.Expression.Function.NONE;
+            if ( type == null ) {
+                type = com.github.alittlehuang.data.query.specification.Expression.Function.NONE;
+            }
 
             Object[] args = expression.getArgs();
             args = args == null ? com.github.alittlehuang.data.query.specification.Expression.EMPTY_ARGS : args;
 
             javax.persistence.criteria.Expression result = exp;
 
+//            int doubleArgs = 2;
             switch ( type ) {
-
                 case NONE:
                     break;
                 case ABS:
                     //noinspection unchecked
                     result = cb.abs(exp);
                     break;
-
-
                 case SUM:
-                    if ( isFirstArgNotAttrExpression(args) ) {
-                        //noinspection unchecked
-                        result = cb.sum(exp, (Number) args[0]);
-                    } else
-                        //noinspection unchecked
-                        result = cb.sum(exp, getExpression(cb, root, args));
+                    result = sum(cb, root, exp, args);
                     break;
-
-
                 case PROD:
-                    if ( isFirstArgNotAttrExpression(args) ) {
-                        //noinspection unchecked
-                        result = cb.prod(exp, (Number) args[0]);
-                    } else
-                        //noinspection unchecked
-                        result = cb.prod(exp, getExpression(cb, root, args));
+                    result = prod(cb, root, exp, args);
                     break;
-
-
                 case DIFF:
-                    if ( isFirstArgNotAttrExpression(args) ) {
-                        //noinspection unchecked
-                        result = cb.diff(exp, (Number) args[0]);
-                    } else
-                        //noinspection unchecked
-                        result = cb.diff(exp, getExpression(cb, root, args));
+                    result = diff(cb, root, exp, args);
                     break;
-
-
                 case QUOT:
-                    if ( isFirstArgNotAttrExpression(args) ) {
-                        //noinspection unchecked
-                        result = cb.quot(exp, (Number) args[0]);
-                    } else
-                        //noinspection unchecked
-                        result = cb.quot(exp, getExpression(cb, root, args));
+                    result = quot(cb, root, exp, args);
                     break;
-
-
                 case MOD:
-                    if ( isFirstArgNotAttrExpression(args) ) {
-                        //noinspection unchecked
-                        result = cb.mod(exp, (Integer) args[0]);
-                    } else
-                        //noinspection unchecked
-                        result = cb.mod(exp, getExpression(cb, root, args));
+                    result = mod(cb, root, exp, args);
                     break;
-
-
                 case SQRT:
                     //noinspection unchecked
                     result = cb.sqrt(exp);
                     break;
-
-
                 case CONCAT:
-                    if ( isFirstArgNotAttrExpression(args) ) {
-                        //noinspection unchecked
-                        result = cb.concat(exp, (String) args[0]);
-                    } else
-                        //noinspection unchecked
-                        result = cb.concat(exp, getExpression(cb, root, args));
+                    result = concat(cb, root, exp, args);
                     break;
-
-
                 case SUBSTRING:
-                    if ( args.length == 2 ) {
-                        //noinspection unchecked
-                        result = cb.substring(exp, (Integer) args[0], (Integer) args[1]);
-                    } else if ( args.length == 1 ) {
-                        //noinspection unchecked
-                        result = cb.substring(exp, (Integer) args[0]);
-                    }
+                    result = substring(cb, exp, args);
                     break;
-
-
                 case TRIM:
-                    if ( args == null || args.length == 0 ) {
-                        //noinspection unchecked
-                        result = cb.trim(exp);
-                    } else if ( args.length == 1 ) {
-                        //noinspection unchecked
-                        result = cb.trim((CriteriaBuilder.Trimspec) args[0], exp);
-                    } else if ( args.length == 2 ) {
-                        //noinspection unchecked
-                        result = cb.trim((CriteriaBuilder.Trimspec) args[0], (char) args[1], exp);
-                    }
+                    result = trim(cb, exp, args);
                     break;
-
-
                 case LOWER:
                     //noinspection unchecked
                     result = cb.lower(exp);
                     break;
-
-
                 case UPPER:
                     //noinspection unchecked
                     result = cb.upper(exp);
                     break;
-
-
                 case LENGTH:
                     //noinspection unchecked
                     result = cb.length(exp);
                     break;
-
-
                 case LOCATE:
-                    if ( args[0] instanceof AttributePath ) {
-                        //noinspection unchecked
-                        result = cb.locate(exp, getExpression(cb, root, args));
-                    } else {
-                        //noinspection unchecked
-                        result = cb.locate(exp, (String) args[0]);
-                    }
+                    result = locate(cb, root, exp, args);
                     break;
-
-
                 case COALESCE:
-                    if ( args[0] instanceof AttributePath ) {
-                        result = cb.coalesce(exp, getExpression(cb, root, args));
-                    } else {
-                        result = cb.coalesce(exp, args[0]);
-                    }
+                    result = coalesce(cb, root, exp, args);
                     break;
-
-
                 case NULLIF:
-                    if ( isFirstArgNotAttrExpression(args) ) {
-                        //noinspection unchecked
-                        result = cb.nullif(exp, args[0]);
-                    } else {
-                        result = cb.nullif((javax.persistence.criteria.Expression<?>) exp, getExpression(cb, root, args));
-                    }
+                    result = nullif(cb, root, exp, args);
                     break;
-                case CUSTOMIZE: {
-                    javax.persistence.criteria.Expression[] expressions = new javax.persistence.criteria.Expression[args.length + 1];
-                    int index = 0;
-                    expressions[index++] = exp;
-                    for ( Object arg : args ) {
-                        ParameterExpression<?> parameter = cb.parameter(arg.getClass());
-                        expressions[index++] = parameter;
-                        param.put(parameter, arg);
-                    }
-                    result = cb.function(expression.getFunctionName(), Object.class, expressions);
-                }
+                case CUSTOMIZE:
+                    result = customize(expression, cb, exp, args);
+                    break;
+                default:
             }
+            return result;
+        }
+
+        private <X> Expression sum(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( isFirstArgNotAttrExpression(args) ) {
+                //noinspection unchecked
+                result = cb.sum(exp, (Number) args[0]);
+            } else {
+                //noinspection unchecked
+                result = cb.sum(exp, getExpression(cb, root, args));
+            }
+            return result;
+        }
+
+        private <X> Expression prod(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( isFirstArgNotAttrExpression(args) ) {
+                //noinspection unchecked
+                result = cb.prod(exp, (Number) args[0]);
+            } else {
+                //noinspection unchecked
+                result = cb.prod(exp, getExpression(cb, root, args));
+            }
+            return result;
+        }
+
+        private <X> Expression diff(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( isFirstArgNotAttrExpression(args) ) {
+                //noinspection unchecked
+                result = cb.diff(exp, (Number) args[0]);
+            } else {
+                //noinspection unchecked
+                result = cb.diff(exp, getExpression(cb, root, args));
+            }
+            return result;
+        }
+
+        private <X> Expression quot(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( isFirstArgNotAttrExpression(args) ) {
+                //noinspection unchecked
+                result = cb.quot(exp, (Number) args[0]);
+            } else {
+                //noinspection unchecked
+                result = cb.quot(exp, getExpression(cb, root, args));
+            }
+            return result;
+        }
+
+        private <X> Expression mod(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( isFirstArgNotAttrExpression(args) ) {
+                //noinspection unchecked
+                result = cb.mod(exp, (Integer) args[0]);
+            } else {
+                //noinspection unchecked
+                result = cb.mod(exp, getExpression(cb, root, args));
+            }
+            return result;
+        }
+
+        private <X> Expression concat(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( isFirstArgNotAttrExpression(args) ) {
+                //noinspection unchecked
+                result = cb.concat(exp, (String) args[0]);
+            } else {
+                //noinspection unchecked
+                result = cb.concat(exp, getExpression(cb, root, args));
+            }
+            return result;
+        }
+
+        private Expression substring(CriteriaBuilder cb, Expression exp, Object[] args) {
+            Expression result;
+            if ( args.length > 1 ) {
+                //noinspection unchecked
+                result = cb.substring(exp, (Integer) args[0], (Integer) args[1]);
+            } else {
+                //noinspection unchecked
+                result = cb.substring(exp, (Integer) args[0]);
+            }
+            return result;
+        }
+
+        private Expression trim(CriteriaBuilder cb, Expression exp, Object[] args) {
+            Expression result;
+            if ( args == null || args.length == 0 ) {
+                //noinspection unchecked
+                result = cb.trim(exp);
+            } else if ( args.length == 1 ) {
+                //noinspection unchecked
+                result = cb.trim((CriteriaBuilder.Trimspec) args[0], exp);
+            } else {
+                //noinspection unchecked
+                result = cb.trim((CriteriaBuilder.Trimspec) args[0], (char) args[1], exp);
+            }
+            return result;
+        }
+
+        private <X> Expression locate(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( args[0] instanceof AttributePath ) {
+                //noinspection unchecked
+                result = cb.locate(exp, getExpression(cb, root, args));
+            } else {
+                //noinspection unchecked
+                result = cb.locate(exp, (String) args[0]);
+            }
+            return result;
+        }
+
+        private <X> Expression coalesce(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( args[0] instanceof AttributePath ) {
+                result = cb.coalesce(exp, getExpression(cb, root, args));
+            } else {
+                result = cb.coalesce(exp, args[0]);
+            }
+            return result;
+        }
+
+        private <X> Expression nullif(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+            Expression result;
+            if ( isFirstArgNotAttrExpression(args) ) {
+                //noinspection unchecked
+                result = cb.nullif(exp, args[0]);
+            } else {
+                result = cb.nullif((Expression<?>) exp, getExpression(cb, root, args));
+            }
+            return result;
+        }
+
+        private <X> Expression customize(com.github.alittlehuang.data.query.specification.Expression<X> expression, CriteriaBuilder cb, Expression exp, Object[] args) {
+            Expression result;
+            Expression[] expressions = new Expression[args.length + 1];
+            int index = 0;
+            expressions[index++] = exp;
+            for ( Object arg : args ) {
+                ParameterExpression<?> parameter = cb.parameter(arg.getClass());
+                expressions[index++] = parameter;
+                param.put(parameter, arg);
+            }
+            result = cb.function(expression.getFunctionName(), Object.class, expressions);
             return result;
         }
 
@@ -432,14 +483,13 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
             return JpaHelper.getPath(root, attribute.getNames());
         }
 
-        public class SpecificationImpl/* implements Specification<T>*/ {
+        public class SpecificationImpl {
             private final WhereClause<T> whereClause;
 
             public SpecificationImpl(WhereClause<T> whereClause) {
                 this.whereClause = whereClause;
             }
 
-            //@Override
             public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
                 return new PredicateBuilder(root, query, criteriaBuilder, whereClause).toPredicate();
             }
@@ -485,6 +535,7 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
                                     case OR:
                                         this.predicate = cb.or(this.predicate, predicateItem);
                                         break;
+                                    default:
                                 }
                             }
                         }
@@ -545,7 +596,8 @@ public class JpaQueryStored<T> extends AbstractQueryStored<T> {
                             Iterator<?> iterator = values.iterator();
 
                             if ( !iterator.hasNext() ) {
-                                predicate = cb.equal(path, path).not();//will get empty result
+                                //will get empty result
+                                predicate = cb.equal(path, path).not();
                                 break;
                             }
                             CriteriaBuilder.In<Object> in = cb.in(path);

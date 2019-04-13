@@ -2,6 +2,9 @@ package com.github.alittlehuang.data.util;
 
 import java.util.Arrays;
 
+/**
+ * @author ALittleHuang
+ */
 public class JointKey {
 
     private final Object[] values;

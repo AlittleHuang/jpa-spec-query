@@ -6,6 +6,9 @@ import com.github.alittlehuang.data.jpa.support.JpaQueryStored;
 
 import javax.persistence.EntityManager;
 
+/**
+ * @author ALittleHuang
+ */
 public class TypeRepository<T> {
 
     protected final Class<T> entityType;

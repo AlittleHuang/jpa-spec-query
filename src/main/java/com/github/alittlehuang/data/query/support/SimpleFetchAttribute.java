@@ -8,6 +8,9 @@ import lombok.experimental.Delegate;
 
 import javax.persistence.criteria.JoinType;
 
+/**
+ * @author ALittleHuang
+ */
 public class SimpleFetchAttribute<T> implements FetchAttribute<T> {
 
     @lombok.Getter

@@ -3,6 +3,9 @@ package com.github.alittlehuang.data.log;
 
 import lombok.experimental.Delegate;
 
+/**
+ * @author ALittleHuang
+ */
 public class LoggerFactory {
 
     private static final Logger DISABLE_LOGGER = new Logger() {

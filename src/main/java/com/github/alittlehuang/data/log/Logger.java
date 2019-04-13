@@ -3,6 +3,9 @@ package com.github.alittlehuang.data.log;
 import org.slf4j.Marker;
 
 
+/**
+ * @author ALittleHuang
+ */
 public interface Logger {
 
     String ROOT_LOGGER_NAME = "ROOT";

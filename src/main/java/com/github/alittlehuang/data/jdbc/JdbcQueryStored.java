@@ -77,29 +77,29 @@ public class JdbcQueryStored<T> extends AbstractQueryStored<T> {
                             //noinspection unchecked
                             val = function.apply(val);
                         } else {
-                            if ( targetType == Byte.class )
+                            if ( targetType == Byte.class ) {
                                 val = resultSet.getByte(index);
-                            else if ( targetType == Short.class )
+                            } else if ( targetType == Short.class ) {
                                 val = resultSet.getShort(index);
-                            else if ( targetType == Integer.class )
+                            } else if ( targetType == Integer.class ) {
                                 val = resultSet.getInt(index);
-                            else if ( targetType == Float.class )
+                            } else if ( targetType == Float.class ) {
                                 val = resultSet.getFloat(index);
-                            else if ( targetType == Long.class )
+                            } else if ( targetType == Long.class ) {
                                 val = resultSet.getLong(index);
-                            else if ( targetType == Double.class )
+                            } else if ( targetType == Double.class ) {
                                 val = resultSet.getDouble(index);
-                            else if ( targetType == BigDecimal.class )
+                            } else if ( targetType == BigDecimal.class ) {
                                 val = resultSet.getBigDecimal(index);
-                            else if ( targetType == Boolean.class )
+                            } else if ( targetType == Boolean.class ) {
                                 val = resultSet.getBoolean(index);
-                            else if ( targetType == Date.class )
+                            } else if ( targetType == Date.class ) {
                                 val = resultSet.getDate(index);
-                            else if ( targetType == String.class )
+                            } else if ( targetType == String.class ) {
                                 val = resultSet.getString(index);
-                            else if ( targetType == Time.class )
+                            } else if ( targetType == Time.class ) {
                                 val = resultSet.getTime(index);
-                            else { // ClassCastException ?
+                            } else { // ClassCastException ?
                                 if ( firstRow && logger.isWarnEnabled() ) {
                                     Class<?> entityType = attribute.getEntityType();
                                     EntityInformation<?, ?> information = EntityInformation.getInstance(entityType);

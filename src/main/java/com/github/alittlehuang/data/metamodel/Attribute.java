@@ -6,7 +6,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * @author ALittleHuang
+ */
 public class Attribute {
+
+    public static final String FIX = "`";
 
     private final Field field;
     private final Method getter;
@@ -94,7 +99,7 @@ public class Attribute {
         } else {
             columnName = field.getName().replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
         }
-        if ( columnName.startsWith("`") && columnName.endsWith("`") ) {
+        if ( columnName.startsWith(FIX) && columnName.endsWith(FIX) ) {
             columnName = columnName.substring(1, columnName.length() - 1);
         }
         return columnName;

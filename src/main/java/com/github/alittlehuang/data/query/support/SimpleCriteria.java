@@ -7,6 +7,9 @@ import javax.persistence.LockModeType;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author ALittleHuang
+ */
 public class SimpleCriteria<T> implements Criteria<T> {
 
     protected final SimpleWhereClause<T> whereClause;
