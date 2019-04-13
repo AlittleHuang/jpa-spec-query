@@ -579,6 +579,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         appendColumnName(attr);
     }
 
+    boolean firstWhereClause = true;
     protected void appendCompoundWhereClause(WhereClause<T> whereClause) {
 
         int appendIndex = sql.length();
@@ -587,12 +588,10 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         if ( items.size() == 1 ) {
             appendNonCompoundWhereClause(items.get(0));
         } else if ( !items.isEmpty() ) {
-            boolean first = true;
             Predicate.BooleanOperator pre = null;
             for ( WhereClause<T> item : items ) {
-
-                if ( first ) {
-                    first = item.isCompound();
+                if ( firstWhereClause ) {
+                    firstWhereClause = item.isCompound();
                 } else {
                     Predicate.BooleanOperator operator = item.getBooleanOperator();
                     if ( pre == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {
