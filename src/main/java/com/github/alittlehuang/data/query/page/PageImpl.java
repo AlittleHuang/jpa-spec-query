@@ -65,6 +65,7 @@ public class PageImpl<T> extends Chunk<T> implements Page<T> {
         return new PageImpl<>(getConvertedContent(converter), getPageable(), total);
     }
 
+    @Override
     public String toString() {
 
         String contentType = "UNKNOWN";
@@ -77,6 +78,7 @@ public class PageImpl<T> extends Chunk<T> implements Page<T> {
         return String.format("Page %s of %d containing %s instances", getNumber() + 1, getTotalPages(), contentType);
     }
 
+    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {
@@ -92,6 +94,7 @@ public class PageImpl<T> extends Chunk<T> implements Page<T> {
         return this.total == that.total && super.equals(obj);
     }
 
+    @Override
     public int hashCode() {
 
         int result = 17;

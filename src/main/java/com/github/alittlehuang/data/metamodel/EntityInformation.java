@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class EntityInformation<T, ID> {
 
     private static final Map<Class<?>, EntityInformation<?, ?>> MAP = new ConcurrentHashMap<>();
+    public static final String FIX = "`";
 
     private Class<T> javaType;
     private final Attribute idAttribute;
@@ -98,7 +99,9 @@ public class EntityInformation<T, ID> {
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             for (PropertyDescriptor descriptor : propertyDescriptors) {
                 Field field = getDeclaredField(javaType, descriptor.getName());
-                if (field == null) continue;
+                if (field == null) {
+                    continue;
+                }
                 readerMap.put(field, descriptor.getReadMethod());
                 writeMap.put(field, descriptor.getWriteMethod());
             }
@@ -144,7 +147,7 @@ public class EntityInformation<T, ID> {
             return table.name();
         }
         String tableName = javaType.getSimpleName().replaceAll("([a-z])([A-Z])", "$1_$2").toLowerCase();
-        if ( tableName.startsWith("`") && tableName.endsWith("`") ) {
+        if ( tableName.startsWith(FIX) && tableName.endsWith(FIX) ) {
             tableName = tableName.substring(1, tableName.length() - 1);
         }
         return tableName;

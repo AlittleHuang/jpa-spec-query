@@ -69,8 +69,12 @@ public class Pageable implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if ( this == o ) return true;
-        if ( o == null || getClass() != o.getClass() ) return false;
+        if ( this == o ) {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() ) {
+            return false;
+        }
         Pageable pageable = (Pageable) o;
         return page == pageable.page &&
                 size == pageable.size;

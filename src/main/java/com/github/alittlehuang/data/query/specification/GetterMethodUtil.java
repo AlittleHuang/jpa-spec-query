@@ -18,7 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class GetterMethodUtil {
 
-    private final static Map<Class, Method> map = new HashMap<>();
+    private final static Map<Class, Method> CLASS_METHOD_MAP = new HashMap<>();
+    public static final char CHAR_A = 'A';
+    public static final char CHAR_Z = 'Z';
 
     static <T> String[] getAttrNames(Class<? extends T> type, Expressions<T, ?> getters) {
         Class cls = type == null ? Object.class : type;
@@ -37,17 +39,17 @@ public class GetterMethodUtil {
     private static <T> Method getMethod(Class<T> type, Expressions<T, ?> getters, boolean cast) {
         Class key = getters.getClass();
         Method method = null;
-        if ( !map.containsKey(key) ) {
-            synchronized ( map ) {
-                method = map.get(key);
+        if ( !CLASS_METHOD_MAP.containsKey(key) ) {
+            synchronized ( CLASS_METHOD_MAP ) {
+                method = CLASS_METHOD_MAP.get(key);
                 if ( method == null ) {
                     method = Proxy.getMethod(type, getters, cast);
-                    map.put(key, method);
+                    CLASS_METHOD_MAP.put(key, method);
                 }
             }
         }
         if ( method == null ) {
-            method = map.get(key);
+            method = CLASS_METHOD_MAP.get(key);
             Objects.requireNonNull(method,"The function is not getter of " + type.getName());
         }
         return method;
@@ -56,12 +58,11 @@ public class GetterMethodUtil {
     public static String toAttrName(String getterName) {
         boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
         Assert.state(check, "the function is not getters");
-        //noinspection ConstantConditions
         StringBuilder builder = new StringBuilder(getterName.substring(3));
         if ( builder.length() == 1 ) {
             return builder.toString().toLowerCase();
         }
-        if ( builder.charAt(1) >= 'A' && builder.charAt(1) <= 'Z' ) {
+        if ( builder.charAt(1) >= CHAR_A && builder.charAt(1) <= CHAR_Z ) {
             return builder.toString();
         }
         builder.setCharAt(0, Character.toLowerCase(builder.charAt(0)));
@@ -78,9 +79,10 @@ public class GetterMethodUtil {
             try {
                 getters.apply(target);
             } catch ( Exception e ) {
-                if ( e.getClass() == MethodInfo.class )
+                if ( e.getClass() == MethodInfoException.class ) {
                     //noinspection ConstantConditions
-                    return ( (MethodInfo) e ).getMethod();
+                    return ( (MethodInfoException) e ).getMethod();
+                }
                 if ( cast && e.getClass() == ClassCastException.class ) {
                     String message = e.getMessage();
                     int i = message.lastIndexOf(' ');
@@ -109,14 +111,14 @@ public class GetterMethodUtil {
         @Override
         public Object intercept(Object o, Method method, Object[] objects, MethodProxy methodProxy)
                 throws Throwable {
-            throw new MethodInfo(method);
+            throw new MethodInfoException(method);
         }
 
-        private static class MethodInfo extends Exception {
+        private static class MethodInfoException extends Exception {
             @lombok.Getter
             final Method method;
 
-            public MethodInfo(Method method) {
+            public MethodInfoException(Method method) {
                 this.method = method;
             }
         }
