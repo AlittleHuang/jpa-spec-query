@@ -608,17 +608,17 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 appendNonCompoundWhereClause(sub);
             }
         } else if ( !items.isEmpty() ) {
-            Predicate.BooleanOperator pre = null;
+            Predicate.BooleanOperator preOperator = null;
             for ( WhereClause<T> item : items ) {
                 if ( firstWhereClause ) {
                     firstWhereClause = item.isCompound();
                 } else {
                     Predicate.BooleanOperator operator = item.getBooleanOperator();
-                    if ( pre == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {
+                    if ( preOperator == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {
                         sql.insert(appendIndex, "(").append(")");
                     }
                     sql.append(operator == Predicate.BooleanOperator.OR ? "\n  OR  " : "\n  AND ");
-                    pre = operator;
+                    preOperator = operator;
                 }
                 boolean compound = item.isCompound() && item.getCompoundItems().size() > 1;
                 if ( compound ) {
