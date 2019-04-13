@@ -29,6 +29,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     private List<SelectedAttribute> selectedAttributes;
     private Map<JointKey, JoinAttr> joinAttrs;
     private Pageable pageable;
+    boolean firstWhereClause = true;
 
     StringBuilder sql;
 
@@ -355,7 +356,9 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 sql.append(negate ? " IS NOT NULL" : " IS NULL");
                 break;
             default:
+                break;
         }
+        firstWhereClause = false;
 
     }
 
@@ -594,7 +597,6 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         appendColumnName(attr);
     }
 
-    boolean firstWhereClause = true;
     protected void appendCompoundWhereClause(WhereClause<T> whereClause) {
 
         int appendIndex = sql.length();
@@ -610,9 +612,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         } else if ( !items.isEmpty() ) {
             Predicate.BooleanOperator preOperator = null;
             for ( WhereClause<T> item : items ) {
-                if ( firstWhereClause ) {
-                    firstWhereClause = item.isCompound();
-                } else {
+                if ( !firstWhereClause ) {
                     Predicate.BooleanOperator operator = item.getBooleanOperator();
                     if ( preOperator == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {
                         sql.insert(appendIndex, "(").append(")");
