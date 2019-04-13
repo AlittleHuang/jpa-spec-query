@@ -1,31 +1,32 @@
 package com.github.alittlehuang.data.query.support;
 
-import com.github.alittlehuang.data.query.page.Page;
+import com.github.alittlehuang.data.query.specification.BaseQuery;
+import com.github.alittlehuang.data.query.specification.BaseQueryStored;
 import com.github.alittlehuang.data.query.specification.Expression;
-import com.github.alittlehuang.data.query.specification.Query;
-import com.github.alittlehuang.data.query.specification.QueryStored;
 
 import java.util.List;
 
 /**
  * @author ALittleHuang
  */
-public abstract class AbstractQuery<T> extends AbstractCriteriaBuilder<T, Query<T>> implements Query<T> {
+public abstract class AbstractQuery<T, P, THIS extends BaseQuery<T, P, THIS>>
+        extends AbstractCriteriaBuilder<T, THIS>
+        implements BaseQuery<T, P, THIS> {
 
-    protected AbstractQueryStored<T> stored;
+    protected AbstractQueryStored<T, P> stored;
 
-    protected QueryStored<T> getStored() {
+    protected BaseQueryStored<T, P> getStored() {
         return stored;
     }
 
-    public AbstractQuery(AbstractQueryStored<T> stored) {
+    public AbstractQuery(AbstractQueryStored<T, P> stored) {
         super(stored.getJavaType());
         stored.criteria = getCriteria();
         this.stored = stored;
     }
 
     protected AbstractQuery(Expression<T> expression, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
-                            AbstractQueryStored<T> stored) {
+                            AbstractQueryStored<T, P> stored) {
         super(expression, root, criteria);
         stored.criteria = criteria;
         this.stored = stored;
@@ -52,12 +53,12 @@ public abstract class AbstractQuery<T> extends AbstractCriteriaBuilder<T, Query<
     }
 
     @Override
-    public Page<T> getPage(long page, long size) {
+    public P getPage(long page, long size) {
         return getStored().getPage(page, size);
     }
 
     @Override
-    public Page<T> getPage() {
+    public P getPage() {
         return getStored().getPage();
     }
 
