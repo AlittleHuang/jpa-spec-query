@@ -252,7 +252,7 @@ public abstract class AbstractJdbcQueryStored<T, P> extends AbstractQueryStored<
 
     private void logSql(String sql, List<Object> args) {
         if ( logger.isDebugEnabled() ) {
-            logger.debug("prepared sql:\n\n" + sql + "\n".replaceAll("\n", "\n  "));
+            logger.debug(( "prepared sql:\n\n" + sql + "\n" ).replaceAll("\n", "\n  "));
             if ( args != null && !args.isEmpty() ) {
                 logger.debug("args: " + args.toString());
             }
