@@ -29,7 +29,6 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     private List<SelectedAttribute> selectedAttributes;
     private Map<JointKey, JoinAttr> joinAttrs;
     private Pageable pageable;
-    boolean firstWhereClause = true;
 
     StringBuilder sql;
 
@@ -358,7 +357,6 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
             default:
                 break;
         }
-        firstWhereClause = false;
 
     }
 
@@ -611,25 +609,45 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
             }
         } else if ( !items.isEmpty() ) {
             Predicate.BooleanOperator preOperator = null;
+            boolean firstWhereClause = true;
             for ( WhereClause<T> item : items ) {
-                if ( !firstWhereClause ) {
+                if ( isEmpty(item) ) {
+                    continue;
+                } else if ( !firstWhereClause ) {
                     Predicate.BooleanOperator operator = item.getBooleanOperator();
                     if ( preOperator == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {
                         sql.insert(appendIndex, "(").append(")");
                     }
                     sql.append(operator == Predicate.BooleanOperator.OR ? "\n  OR  " : "\n  AND ");
                     preOperator = operator;
+                } else {
+                    firstWhereClause = false;
                 }
                 boolean compound = item.isCompound() && item.getCompoundItems().size() > 1;
                 if ( compound ) {
                     sql.append("(");
                 }
                 appendWhereClause(item);
-
                 if ( compound ) {
                     sql.append(")");
                 }
             }
+        }
+    }
+
+    private boolean isEmpty(WhereClause<?> whereClause) {
+        if ( whereClause.isCompound() ) {
+            List<? extends WhereClause<?>> compoundItems = whereClause.getCompoundItems();
+            if ( compoundItems != null ) {
+                for ( WhereClause<?> item : compoundItems ) {
+                    if ( !isEmpty(item) ) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } else {
+            return whereClause.getExpression() == null;
         }
     }
 

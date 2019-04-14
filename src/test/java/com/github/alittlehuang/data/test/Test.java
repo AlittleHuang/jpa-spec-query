@@ -2,10 +2,13 @@ package com.github.alittlehuang.data.test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import com.github.alittlehuang.data.jdbc.JdbcQueryStored;
+import com.github.alittlehuang.data.jdbc.JdbcQueryStoredConfig;
 import com.github.alittlehuang.data.jpa.repostory.TypeRepository;
 import com.github.alittlehuang.data.query.specification.AggregateFunctions;
 import com.github.alittlehuang.data.query.specification.Expressions;
 import com.github.alittlehuang.data.query.specification.Query;
+import com.github.alittlehuang.data.query.support.QueryImpl;
 import com.github.alittlehuang.test.entity.User;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -14,17 +17,21 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.sql.DataSource;
 
 public class Test {
 
     static TypeRepository<User> repository;
     static ApplicationContext appCtx;
+    static DataSource dataSource;
     static {
         ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
         LoggerContext context = (LoggerContext) iLoggerFactory;
         context.getLogger("ROOT").setLevel(Level.ERROR);
         context.getLogger("org.hibernate.SQL").setLevel(Level.DEBUG);
+        context.getLogger("com.github.alittlehuang").setLevel(Level.DEBUG);
         ApplicationContext appCtx = new ClassPathXmlApplicationContext("config/applicationContext.xml");
+        dataSource = appCtx.getBean(DataSource.class);
         Test.appCtx = appCtx;
         EntityManager entityManager = appCtx.getBean(EntityManager.class);
         repository = new TypeRepository<>(User.class, entityManager);
@@ -32,7 +39,7 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        repository.query()
+        getQuery()
                 .notEq(Expressions.function("LOG10", User::getId),1)
                 .notEq(Expressions.function("LOG", User::getId),2)
                 .getPage();
@@ -45,7 +52,7 @@ public class Test {
 //        transactional.required(Test::testLock);
 //        System.out.println(transactional.getClass());
         Expressions<User, Integer> getPassword = Expressions.abs(User::getId);
-        repository.query().addSelect(getPassword).addGroupings(getPassword)
+        getQuery().addSelect(getPassword).addGroupings(getPassword)
                 .addOrdersAsc(User::getId)
                 .setMaxResult(10)
                 .getObjectList();
@@ -53,21 +60,28 @@ public class Test {
 
     public static void test() {
 
-        repository.query()
+        getQuery()
                 .eq(Expressions.abs(User::getId), 1)
                 .eq(Expressions.sum(User::getId, 1.1), 1)
+                .and()
                 .eq(Expressions.sum(User::getId, User::getId), 1)
                 .eq(Expressions.diff(User::getId, 1.1), 1)
+                .or()
                 .eq(Expressions.diff(User::getId, User::getId), 1)
                 .eq(Expressions.prod(User::getId, 1.1), 1)
                 .eq(Expressions.prod(User::getId, User::getId), 1)
                 .eq(Expressions.quot(User::getId, 1.1), 1)
+                .and()
+                .or()
+                .and()
                 .eq(Expressions.quot(User::getId, User::getId), 1)
                 .eq(Expressions.mod(User::getId, 1), 1)
+                .or()
                 .eq(Expressions.mod(User::getId, User::getId), 1)
                 .eq(Expressions.sqrt(User::getId), 1)
+                .or()
                 .eq(Expressions.concat(User::getPassword, User::getUsername), "99")
-                .eq(Expressions.concat(User::getPassword, "User::getUsername"), "99")
+                .eq(Expressions.concat(User::getPassword, "pwd"), "99")
                 .eq(Expressions.substring(User::getPassword, 1), "99")
                 .eq(Expressions.substring(User::getPassword, 1, 2), "99")
                 .eq(Expressions.trim(User::getPassword), "99")
@@ -86,6 +100,9 @@ public class Test {
                 .eq(Expressions.nullif(User::getPassword, User::getPassword), "2")
                 .eq(Expressions.nullifVal(User::getPassword, "33"), "2")
 
+                .and(getQuery().eq(User::getId,996).getWhereClause())
+                .and(getQuery().getWhereClause())
+                .and(getQuery().getWhereClause())
 
                 .addOrdersDesc(Expressions.trimLeading(User::getUsername, 'x'))
                 .addSelect(Expressions.sqrt(User::getId))
@@ -97,7 +114,7 @@ public class Test {
 
     public static void test1() {
 
-        repository.query()
+        getQuery()
                 .eq(User::getId, 1)
                 .andEq(User::getId, 1)
                 .notEq(User::getId, 1)
@@ -165,7 +182,7 @@ public class Test {
 
     public static void test0() {
 
-        repository.query()
+        getQuery()
                 .andLe("id", 1)
                 .isNull(User::getUsername, true)
                 .isNull(User::getUsername, false)
@@ -186,7 +203,7 @@ public class Test {
 
     public static void test2() {
 
-        repository.query()
+        getQuery()
                 .eq("id", 1)
                 .andEq("id", 1)
                 .notEq("id", 1)
@@ -234,7 +251,7 @@ public class Test {
     }
 
     static void testAbstractCriteriaBuilder() {
-        repository.query()
+        getQuery()
                 .addSelect("id")
                 .addSelect(User::getPassword)
                 .addSelect(User::getId, AggregateFunctions.SUM)
@@ -266,12 +283,18 @@ public class Test {
     }
 
     private static void testLock(){
-        Query<User> userQuery = repository.query().setLockModeType(LockModeType.OPTIMISTIC);
+        Query<User> userQuery = getQuery().setLockModeType(LockModeType.OPTIMISTIC);
         userQuery.getResultList();
-        repository.query().setLockModeType(LockModeType.OPTIMISTIC_FORCE_INCREMENT).getResultList();
-        repository.query().setLockModeType(LockModeType.PESSIMISTIC_READ).getResultList();//lock in share mode
-        repository.query().setLockModeType(LockModeType.PESSIMISTIC_WRITE).getResultList();//for update
-        repository.query().setLockModeType(LockModeType.PESSIMISTIC_FORCE_INCREMENT).getResultList();//for update
+        getQuery().setLockModeType(LockModeType.OPTIMISTIC_FORCE_INCREMENT).getResultList();
+        getQuery().setLockModeType(LockModeType.PESSIMISTIC_READ).getResultList();//lock in share mode
+        getQuery().setLockModeType(LockModeType.PESSIMISTIC_WRITE).getResultList();//for update
+        getQuery().setLockModeType(LockModeType.PESSIMISTIC_FORCE_INCREMENT).getResultList();//for update
+    }
+
+    private static Query<User> getQuery() {
+        JdbcQueryStored<User> stored = new JdbcQueryStored<>(new JdbcQueryStoredConfig(dataSource), User.class);
+        return new QueryImpl<>(stored);
+//        return repository.query();
     }
 
 }
