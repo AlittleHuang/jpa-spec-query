@@ -11,6 +11,8 @@ import com.github.alittlehuang.data.util.JointKey;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -19,7 +21,6 @@ import static javax.persistence.criteria.CriteriaBuilder.Trimspec;
 /**
  * @author ALittleHuang
  */
-@SuppressWarnings("WeakerAccess")
 public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuilder<T> {
     private static final JoinType DEFAULT_JOIN_TYPE = JoinType.LEFT;
     private JdbcQueryStoredConfig config;
@@ -385,19 +386,19 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         }
     }
 
-    private static Set<Class<?>> basic = new HashSet<>(Arrays.asList(
-//            java.lang.Boolean.class,
-//            java.lang.Character.class,
-            java.lang.Byte.class,
-            java.lang.Short.class,
-            java.lang.Integer.class,
-            java.lang.Long.class,
-            java.lang.Float.class,
-            java.lang.Double.class
+    private static Set<Class<?>> BASIC_NUMBER_CLASS = new HashSet<>(Arrays.asList(
+            BigInteger.class,
+            BigDecimal.class,
+            Byte.class,
+            Short.class,
+            Integer.class,
+            Long.class,
+            Float.class,
+            Double.class
     ));
     
     protected void appendSimpleParam(Object arg) {
-        if (arg != null && basic.contains(arg.getClass())) {
+        if (arg != null && BASIC_NUMBER_CLASS.contains(arg.getClass())) {
             sql.append(arg);
         } else {
             sql.append("?");
