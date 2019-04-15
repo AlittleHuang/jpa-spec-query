@@ -244,7 +244,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
             for ( FetchAttribute<T> fetch : fetchList ) {
                 String[] names = fetch.getNames();
                 boolean hasCollections = false;
-                Class upEntityType = rootEntityInfo.getJavaType();
+                Class<?> upEntityType = rootEntityInfo.getJavaType();
                 for ( String name : names ) {
                     EntityInformation information = getEntityInformation(upEntityType);
                     Attribute attribute = information.getAttribute(name);
