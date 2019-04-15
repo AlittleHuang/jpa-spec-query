@@ -243,24 +243,38 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         if ( fetchList != null && !fetchList.isEmpty() ) {
             for ( FetchAttribute<T> fetch : fetchList ) {
                 String[] names = fetch.getNames();
-                String[] tmp = new String[names.length + 1];
-                System.arraycopy(names, 0, tmp, 0, names.length);
-
-                Attribute attr = rootEntityInfo.getAttribute(names[0]);
-                EntityInformation<?, ?> attrInfo = getEntityInformation(attr.getFieldType());
-                SelectedAttribute select = new SelectedAttribute(attr, null);
-                if ( names.length > 1 ) {
-                    for (int i = 1; i < names.length; i++ ) {
-                        attr = attrInfo.getAttribute(names[i]);
-                        attrInfo = getEntityInformation(attr.getFieldType());
-                        select = new SelectedAttribute(attr, select);
+                boolean hasCollections = false;
+                Class upEntityType = rootEntityInfo.getJavaType();
+                for ( String name : names ) {
+                    EntityInformation information = getEntityInformation(upEntityType);
+                    Attribute attribute = information.getAttribute(name);
+                    if ( attribute.isCollection() ) {
+                        hasCollections = true;
+                        break;
                     }
+                    upEntityType = attribute.getJavaType();
                 }
-                for ( Attribute attribute : attrInfo.getBasicAttributes() ) {
-                    sql.append(",\n  ");
-                    tmp[names.length] = attribute.getFieldName();
-                    appendAttribute(tmp, fetch.getJoinType());
-                    selectedAttributes.add(new SelectedAttribute(attribute, select));
+
+                if ( !hasCollections ) {
+                    String[] tmp = new String[names.length + 1];
+                    System.arraycopy(names, 0, tmp, 0, names.length);
+
+                    Attribute attr = rootEntityInfo.getAttribute(names[0]);
+                    EntityInformation<?, ?> attrInfo = getEntityInformation(attr.getJavaType());
+                    SelectedAttribute select = new SelectedAttribute(attr, null);
+                    if ( names.length > 1 ) {
+                        for ( int i = 1; i < names.length; i++ ) {
+                            attr = attrInfo.getAttribute(names[i]);
+                            attrInfo = getEntityInformation(attr.getJavaType());
+                            select = new SelectedAttribute(attr, select);
+                        }
+                    }
+                    for ( Attribute attribute : attrInfo.getBasicAttributes() ) {
+                        sql.append(",\n  ");
+                        tmp[names.length] = attribute.getFieldName();
+                        appendAttribute(tmp, fetch.getJoinType());
+                        selectedAttributes.add(new SelectedAttribute(attribute, select));
+                    }
                 }
             }
         }
@@ -336,17 +350,11 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 appendComparisonOperatorExpression(item, negate ? ">" : "<=");
                 break;
             case BETWEEN: {
-                Iterator<?> iterator = ( (Iterable<?>) item.getParameter() ).iterator();
-                sql.append(negate ? " NOT BETWEEN " : " BETWEEN ");
-                appendSimpleParam(iterator.next());
-                sql.append(" AND ");
-                appendSimpleParam(iterator.next());
+                appendBetweenExpression(item, negate);
                 break;
             }
             case IN: {
-                sql.append(negate ? " NOT IN(" : " IN(");
-                appendSqlParameter(item.getParameter());
-                sql.append(")");
+                appendInExpression(item, negate);
                 break;
             }
             case LIKE:
@@ -359,6 +367,20 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 break;
         }
 
+    }
+
+    private void appendInExpression(WhereClause<T> item, boolean negate) {
+        sql.append(negate ? " NOT IN(" : " IN(");
+        appendSqlParameter(item.getParameter());
+        sql.append(")");
+    }
+
+    private void appendBetweenExpression(WhereClause<T> item, boolean negate) {
+        Iterator<?> iterator = ( (Iterable<?>) item.getParameter() ).iterator();
+        sql.append(negate ? " NOT BETWEEN " : " BETWEEN ");
+        appendSimpleParam(iterator.next());
+        sql.append(" AND ");
+        appendSimpleParam(iterator.next());
     }
 
     protected void appendComparisonOperatorExpression(WhereClause<T> item, String operator) {
@@ -582,7 +604,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                     joinAttr.joinType = DEFAULT_JOIN_TYPE;
                 }
 
-                EntityInformation attrInfo = getEntityInformation(attr.getFieldType());
+                EntityInformation attrInfo = getEntityInformation(attr.getJavaType());
                 attr = attrInfo.getAttribute(names[i]);
                 if ( !attr.isEntityType() ) {
                     joinAttr.appendAlias(sql);
@@ -637,19 +659,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     }
 
     private boolean isEmpty(WhereClause<?> whereClause) {
-        if ( whereClause.isCompound() ) {
-            List<? extends WhereClause<?>> compoundItems = whereClause.getCompoundItems();
-            if ( compoundItems != null ) {
-                for ( WhereClause<?> item : compoundItems ) {
-                    if ( !isEmpty(item) ) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        } else {
-            return whereClause.getExpression() == null;
-        }
+        return WhereClause.isEmpty(whereClause);
     }
 
     public <X> EntityInformation<X, ?> getEntityInformation(Class<X> clazz) {
@@ -669,13 +679,13 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         public JoinAttr(JoinAttr parent, Attribute attribute) {
             this.parent = parent;
             this.attribute = attribute;
-            this.attrInfo = getEntityInformation(attribute.getFieldType());
+            this.attrInfo = getEntityInformation(attribute.getJavaType());
         }
 
         void appendAlias(StringBuilder sql) {
             sql.append(attrInfo.getTableName())
                     .append(index)
-                    .append("_");
+                    .append("_JN_");
         }
     }
 }

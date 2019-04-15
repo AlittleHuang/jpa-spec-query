@@ -2,13 +2,10 @@ package com.github.alittlehuang.data.test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
-import com.github.alittlehuang.data.jdbc.JdbcQueryStored;
-import com.github.alittlehuang.data.jdbc.JdbcQueryStoredConfig;
 import com.github.alittlehuang.data.jpa.repostory.TypeRepository;
 import com.github.alittlehuang.data.query.specification.AggregateFunctions;
 import com.github.alittlehuang.data.query.specification.Expressions;
 import com.github.alittlehuang.data.query.specification.Query;
-import com.github.alittlehuang.data.query.support.QueryImpl;
 import com.github.alittlehuang.test.entity.User;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -17,7 +14,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
+import javax.persistence.criteria.JoinType;
 import javax.sql.DataSource;
+import java.util.List;
 
 public class Test {
 
@@ -56,6 +55,9 @@ public class Test {
                 .addOrdersAsc(User::getId)
                 .setMaxResult(10)
                 .getObjectList();
+
+        List<User> resultList = getQuery().fetch(User::getChildren).getResultList();
+        System.out.println(resultList);
     }
 
     public static void test() {
@@ -101,11 +103,13 @@ public class Test {
                 .eq(Expressions.nullifVal(User::getPassword, "33"), "2")
 
                 .and(getQuery().eq(User::getId,996).getWhereClause())
+                .or(getQuery().eq(User::getId, 996).getWhereClause())
                 .and(getQuery().getWhereClause())
                 .and(getQuery().getWhereClause())
 
                 .addOrdersDesc(Expressions.trimLeading(User::getUsername, 'x'))
                 .addSelect(Expressions.sqrt(User::getId))
+                .addSelect(User::getId)
                 .setMaxResult(1)
                 .getSingleObject();
 
@@ -120,6 +124,7 @@ public class Test {
                 .notEq(User::getId, 1)
                 .andNotEq(User::getId, 1)
                 .notEqual(User::getId, User::getId)
+                .orNotGreaterThanOrEqual(User::getId, User::getId)
                 .andNotEqual(User::getId, User::getId)
                 .equal(User::getId, User::getId)
                 .andEqual(User::getId, User::getId)
@@ -165,6 +170,10 @@ public class Test {
                 .orLessThan(User::getId, User::getId)
                 .orGe(User::getId, 1)
                 .orGreaterThanOrEqual(User::getId, User::getId)
+                .andGreaterThanOrEqual(User::getId, User::getId)
+                .orNotLessThanOrEqual(User::getId, User::getId)
+                .orNotGreaterThan(User::getId, User::getId)
+                .orNotLessThan(User::getId, User::getId)
                 .orLe(User::getId, 1)
                 .orLessThanOrEqual(User::getId, User::getId)
                 .orBetween(User::getId, 1, 2)
@@ -274,11 +283,15 @@ public class Test {
                 .getObjectList();
 
 
-//        repository.query()
-//                .fetch("company2")
-//                .fetch(User::getCompany)
-//                .fetch(User::getCompany3, JoinType.INNER)
-//                .setPageable(2, 5).getResultList();
+        getQuery()
+                .fetch(User::getPuser)
+                .fetch("puser.puser", JoinType.INNER)
+                .setPageable(2, 5).getResultList();
+
+        getQuery()
+                .fetch(User::getPuser, JoinType.INNER)
+                .fetch("puser.puser", "puser")
+                .setPageable(2, 5).getResultList();
 
     }
 
@@ -292,9 +305,9 @@ public class Test {
     }
 
     private static Query<User> getQuery() {
-        JdbcQueryStored<User> stored = new JdbcQueryStored<>(new JdbcQueryStoredConfig(dataSource), User.class);
-        return new QueryImpl<>(stored);
-//        return repository.query();
+//        JdbcQueryStored<User> stored = new JdbcQueryStored<>(new JdbcQueryStoredConfig(dataSource), User.class);
+//        return new QueryImpl<>(stored);
+        return repository.query();
     }
 
 }

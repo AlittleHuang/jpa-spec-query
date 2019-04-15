@@ -524,6 +524,9 @@ public abstract class AbstractJpaQueryStored<T, P> extends AbstractQueryStored<T
                     List<? extends WhereClause<T>> subItems = item.getCompoundItems();
                     if ( subItems != null ) {
                         for ( WhereClause<T> item : subItems ) {
+                            if(WhereClause.isEmpty(item)){
+                                continue;
+                            }
                             Predicate predicateItem = new PredicateBuilder(root, query, cb, item).toPredicate();
                             if ( this.predicate == null ) {
                                 this.predicate = predicateItem;

@@ -44,7 +44,7 @@ public class EntityInformation<T, ID> {
         List<Attribute> manyToManyAttributes = new ArrayList<>();
         List<Attribute> oneToOneAttributes = new ArrayList<>();
         for ( Attribute attribute : this.allAttributes ) {
-            Entity entity = attribute.getFieldType().getAnnotation(Entity.class);
+            Entity entity = attribute.getJavaType().getAnnotation(Entity.class);
             if ( entity == null ) {
                 basicAttributes.add(attribute);
             } else if ( attribute.getManyToOne() != null ) {
