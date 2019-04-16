@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 用户
@@ -46,4 +47,12 @@ public class User implements Serializable {
         this.password = password;
         this.secondpwd = secondpwd;
     }
+
+    @ManyToOne( fetch = FetchType.LAZY )
+    @JoinColumn( name = "pid" )
+    private User puser;
+
+    @OneToMany
+    @JoinColumn( name = "pid" )
+    private List<User> children;
 }

@@ -22,5 +22,20 @@ public interface WhereClause<T> {
 
     boolean isNegate();
 
+    static boolean isEmpty(WhereClause<?> whereClause) {
+        if ( whereClause.isCompound() ) {
+            List<? extends WhereClause<?>> compoundItems = whereClause.getCompoundItems();
+            if ( compoundItems != null ) {
+                for ( WhereClause<?> item : compoundItems ) {
+                    if ( !isEmpty(item) ) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } else {
+            return whereClause.getExpression() == null;
+        }
+    }
 
 }

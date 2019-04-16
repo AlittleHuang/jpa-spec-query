@@ -48,6 +48,8 @@ public abstract class AbstractJdbcQueryStored<T, P> extends AbstractQueryStored<
         return config.getSqlBuilderFactory().createSqlBuild(getCriteria());
     }
 
+    private Map<JointKey,Object> entityMap = new HashMap<>();
+
     private List<T> toList(ResultSet resultSet, List<SelectedAttribute> selectedAttributes) throws SQLException {
         List<T> results = new ArrayList<>();
         boolean firstRow = true;
@@ -65,7 +67,7 @@ public abstract class AbstractJdbcQueryStored<T, P> extends AbstractQueryStored<
             for ( SelectedAttribute selectedAttribute : selectedAttributes ) {
                 Object val = resultSet.getObject(++index);
                 Attribute attribute = selectedAttribute.getAttribute();
-                Class targetType = attribute.getFieldType();
+                Class targetType = attribute.getJavaType();
                 if ( val != null ) {
                     if ( !targetType.isInstance(val) ) {
                         Class valType = val.getClass();
@@ -130,7 +132,7 @@ public abstract class AbstractJdbcQueryStored<T, P> extends AbstractQueryStored<
         try {
             Object parentInstance = getInstance(map, selected.getParent());
             Attribute attribute = selected.getAttribute();
-            Object val = attribute.getFieldType().newInstance();
+            Object val = attribute.getJavaType().newInstance();
             attribute.setValue(parentInstance, val);
             map.put(key, val);
             return val;
@@ -252,8 +254,10 @@ public abstract class AbstractJdbcQueryStored<T, P> extends AbstractQueryStored<
 
     private void logSql(String sql, List<Object> args) {
         if ( logger.isDebugEnabled() ) {
-            logger.debug("prepared sql:\n\n" + sql + "\n".replaceAll("\n", "\n  "));
-            if ( args != null && !args.isEmpty() ) {
+            boolean hasArgs = args != null && !args.isEmpty();
+            String info = ( hasArgs ? "prepared sql:\n\n" : "sql:\n\n" ) + sql + "\n";
+            logger.debug(info.replaceAll("\n", "\n  "));
+            if ( hasArgs ) {
                 logger.debug("args: " + args.toString());
             }
         }

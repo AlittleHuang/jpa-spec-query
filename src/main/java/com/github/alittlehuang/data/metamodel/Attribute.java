@@ -2,9 +2,7 @@ package com.github.alittlehuang.data.metamodel;
 
 import javax.persistence.*;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 
 /**
  * @author ALittleHuang
@@ -25,6 +23,8 @@ public class Attribute {
     private final ManyToMany manyToMany;
     private final OneToOne oneToOne;
     private final String columnName;
+    private final Class<?> javaType;
+    private final boolean collection;
 
     public Attribute(Field field, Method getter, Method setter, Class<?> entityType) {
         this.field = field;
@@ -39,6 +39,8 @@ public class Attribute {
         this.manyToMany = getAnnotation(ManyToMany.class);
         this.oneToOne = getAnnotation(OneToOne.class);
         this.columnName = initColumnName();
+        this.collection = Iterable.class.isAssignableFrom(field.getType());
+        this.javaType = initJavaType();
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
@@ -109,9 +111,28 @@ public class Attribute {
         return field.getName();
     }
 
-    public Class<Object> getFieldType() {
-        //noinspection unchecked
-        return (Class<Object>) field.getType();
+    public Class<?> initJavaType() {
+        Class<?> javaType = null;
+        Class<?> fieldType = field.getType();
+        if ( collection ) {
+            Type genericType = field.getGenericType();
+            if ( genericType instanceof ParameterizedType ) {
+                ParameterizedType parameterizedType = (ParameterizedType) genericType;
+                Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+                if ( actualTypeArguments.length == 1 ) {
+                    Type actualTypeArgument = actualTypeArguments[0];
+                    if ( actualTypeArgument instanceof Class ) {
+                        javaType = (Class<?>) actualTypeArgument;
+                    }
+                }
+            }
+        } else {
+            javaType = fieldType;
+        }
+        if ( javaType == null ) {
+            throw new RuntimeException("field " + field + " unspecified type in " + entityType);
+        }
+        return javaType;
     }
 
     public Class<?> getEntityType() {
@@ -151,10 +172,18 @@ public class Attribute {
     }
 
     public boolean isEntityType() {
-        return getFieldType().getAnnotation(Entity.class) != null;
+        return getJavaType().getAnnotation(Entity.class) != null;
     }
 
     public String getColumnName() {
         return columnName;
+    }
+
+    public boolean isCollection() {
+        return collection;
+    }
+
+    public Class<?> getJavaType() {
+        return javaType;
     }
 }

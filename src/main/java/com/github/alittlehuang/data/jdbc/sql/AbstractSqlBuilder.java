@@ -11,6 +11,8 @@ import com.github.alittlehuang.data.util.JointKey;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -19,7 +21,6 @@ import static javax.persistence.criteria.CriteriaBuilder.Trimspec;
 /**
  * @author ALittleHuang
  */
-@SuppressWarnings("WeakerAccess")
 public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuilder<T> {
     private static final JoinType DEFAULT_JOIN_TYPE = JoinType.LEFT;
     private JdbcQueryStoredConfig config;
@@ -29,7 +30,6 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     private List<SelectedAttribute> selectedAttributes;
     private Map<JointKey, JoinAttr> joinAttrs;
     private Pageable pageable;
-    boolean firstWhereClause = true;
 
     StringBuilder sql;
 
@@ -243,24 +243,38 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         if ( fetchList != null && !fetchList.isEmpty() ) {
             for ( FetchAttribute<T> fetch : fetchList ) {
                 String[] names = fetch.getNames();
-                String[] tmp = new String[names.length + 1];
-                System.arraycopy(names, 0, tmp, 0, names.length);
-
-                Attribute attr = rootEntityInfo.getAttribute(names[0]);
-                EntityInformation<?, ?> attrInfo = getEntityInformation(attr.getFieldType());
-                SelectedAttribute select = new SelectedAttribute(attr, null);
-                if ( names.length > 1 ) {
-                    for (int i = 1; i < names.length; i++ ) {
-                        attr = attrInfo.getAttribute(names[i]);
-                        attrInfo = getEntityInformation(attr.getFieldType());
-                        select = new SelectedAttribute(attr, select);
+                boolean hasCollections = false;
+                Class<?> upEntityType = rootEntityInfo.getJavaType();
+                for ( String name : names ) {
+                    EntityInformation information = getEntityInformation(upEntityType);
+                    Attribute attribute = information.getAttribute(name);
+                    if ( attribute.isCollection() ) {
+                        hasCollections = true;
+                        break;
                     }
+                    upEntityType = attribute.getJavaType();
                 }
-                for ( Attribute attribute : attrInfo.getBasicAttributes() ) {
-                    sql.append(",\n  ");
-                    tmp[names.length] = attribute.getFieldName();
-                    appendAttribute(tmp, fetch.getJoinType());
-                    selectedAttributes.add(new SelectedAttribute(attribute, select));
+
+                if ( !hasCollections ) {
+                    String[] tmp = new String[names.length + 1];
+                    System.arraycopy(names, 0, tmp, 0, names.length);
+
+                    Attribute attr = rootEntityInfo.getAttribute(names[0]);
+                    EntityInformation<?, ?> attrInfo = getEntityInformation(attr.getJavaType());
+                    SelectedAttribute select = new SelectedAttribute(attr, null);
+                    if ( names.length > 1 ) {
+                        for ( int i = 1; i < names.length; i++ ) {
+                            attr = attrInfo.getAttribute(names[i]);
+                            attrInfo = getEntityInformation(attr.getJavaType());
+                            select = new SelectedAttribute(attr, select);
+                        }
+                    }
+                    for ( Attribute attribute : attrInfo.getBasicAttributes() ) {
+                        sql.append(",\n  ");
+                        tmp[names.length] = attribute.getFieldName();
+                        appendAttribute(tmp, fetch.getJoinType());
+                        selectedAttributes.add(new SelectedAttribute(attribute, select));
+                    }
                 }
             }
         }
@@ -336,17 +350,11 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                 appendComparisonOperatorExpression(item, negate ? ">" : "<=");
                 break;
             case BETWEEN: {
-                Iterator<?> iterator = ( (Iterable<?>) item.getParameter() ).iterator();
-                sql.append(negate ? " NOT BETWEEN " : " BETWEEN ");
-                appendSimpleParam(iterator.next());
-                sql.append(" AND ");
-                appendSimpleParam(iterator.next());
+                appendBetweenExpression(item, negate);
                 break;
             }
             case IN: {
-                sql.append(negate ? " NOT IN(" : " IN(");
-                appendSqlParameter(item.getParameter());
-                sql.append(")");
+                appendInExpression(item, negate);
                 break;
             }
             case LIKE:
@@ -358,8 +366,21 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
             default:
                 break;
         }
-        firstWhereClause = false;
 
+    }
+
+    private void appendInExpression(WhereClause<T> item, boolean negate) {
+        sql.append(negate ? " NOT IN(" : " IN(");
+        appendSqlParameter(item.getParameter());
+        sql.append(")");
+    }
+
+    private void appendBetweenExpression(WhereClause<T> item, boolean negate) {
+        Iterator<?> iterator = ( (Iterable<?>) item.getParameter() ).iterator();
+        sql.append(negate ? " NOT BETWEEN " : " BETWEEN ");
+        appendSimpleParam(iterator.next());
+        sql.append(" AND ");
+        appendSimpleParam(iterator.next());
     }
 
     protected void appendComparisonOperatorExpression(WhereClause<T> item, String operator) {
@@ -387,19 +408,19 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         }
     }
 
-    private static Set<Class<?>> basic = new HashSet<>(Arrays.asList(
-//            java.lang.Boolean.class,
-//            java.lang.Character.class,
-            java.lang.Byte.class,
-            java.lang.Short.class,
-            java.lang.Integer.class,
-            java.lang.Long.class,
-            java.lang.Float.class,
-            java.lang.Double.class
+    private static Set<Class<?>> BASIC_NUMBER_CLASS = new HashSet<>(Arrays.asList(
+            BigInteger.class,
+            BigDecimal.class,
+            Byte.class,
+            Short.class,
+            Integer.class,
+            Long.class,
+            Float.class,
+            Double.class
     ));
     
     protected void appendSimpleParam(Object arg) {
-        if (arg != null && basic.contains(arg.getClass())) {
+        if (arg != null && BASIC_NUMBER_CLASS.contains(arg.getClass())) {
             sql.append(arg);
         } else {
             sql.append("?");
@@ -583,7 +604,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                     joinAttr.joinType = DEFAULT_JOIN_TYPE;
                 }
 
-                EntityInformation attrInfo = getEntityInformation(attr.getFieldType());
+                EntityInformation attrInfo = getEntityInformation(attr.getJavaType());
                 attr = attrInfo.getAttribute(names[i]);
                 if ( !attr.isEntityType() ) {
                     joinAttr.appendAlias(sql);
@@ -611,26 +632,34 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
             }
         } else if ( !items.isEmpty() ) {
             Predicate.BooleanOperator preOperator = null;
+            boolean firstWhereClause = true;
             for ( WhereClause<T> item : items ) {
-                if ( !firstWhereClause ) {
+                if ( isEmpty(item) ) {
+                    continue;
+                } else if ( !firstWhereClause ) {
                     Predicate.BooleanOperator operator = item.getBooleanOperator();
                     if ( preOperator == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {
                         sql.insert(appendIndex, "(").append(")");
                     }
                     sql.append(operator == Predicate.BooleanOperator.OR ? "\n  OR  " : "\n  AND ");
                     preOperator = operator;
+                } else {
+                    firstWhereClause = false;
                 }
                 boolean compound = item.isCompound() && item.getCompoundItems().size() > 1;
                 if ( compound ) {
                     sql.append("(");
                 }
                 appendWhereClause(item);
-
                 if ( compound ) {
                     sql.append(")");
                 }
             }
         }
+    }
+
+    private boolean isEmpty(WhereClause<?> whereClause) {
+        return WhereClause.isEmpty(whereClause);
     }
 
     public <X> EntityInformation<X, ?> getEntityInformation(Class<X> clazz) {
@@ -650,13 +679,13 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         public JoinAttr(JoinAttr parent, Attribute attribute) {
             this.parent = parent;
             this.attribute = attribute;
-            this.attrInfo = getEntityInformation(attribute.getFieldType());
+            this.attrInfo = getEntityInformation(attribute.getJavaType());
         }
 
         void appendAlias(StringBuilder sql) {
             sql.append(attrInfo.getTableName())
                     .append(index)
-                    .append("_");
+                    .append("_JN_");
         }
     }
 }
