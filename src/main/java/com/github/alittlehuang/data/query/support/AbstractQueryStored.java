@@ -1,9 +1,8 @@
 package com.github.alittlehuang.data.query.support;
 
+import com.github.alittlehuang.data.query.page.PageFactory;
 import com.github.alittlehuang.data.query.specification.BaseQueryStored;
 import com.github.alittlehuang.data.query.specification.Criteria;
-
-import java.util.List;
 
 /**
  * @author ALittleHuang
@@ -13,6 +12,11 @@ public abstract class AbstractQueryStored<T, P> implements BaseQueryStored<T, P>
 
     protected Criteria<T> criteria;
     protected Class<T> type;
+    private final PageFactory<T, P> pageFactory;
+
+    public AbstractQueryStored(PageFactory<T, P> pageFactory) {
+        this.pageFactory = pageFactory;
+    }
 
     void setCriteria(Criteria<T> criteria) {
         this.criteria = criteria;
@@ -38,5 +42,7 @@ public abstract class AbstractQueryStored<T, P> implements BaseQueryStored<T, P>
         return getPage(( offset / maxResults ), maxResults);
     }
 
-    protected abstract P toPage(Number page, Number size, List<T> content, Number totalElement);
+    protected PageFactory<T, P> getPageFactory() {
+        return pageFactory;
+    }
 }

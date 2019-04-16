@@ -1,5 +1,6 @@
 package com.github.alittlehuang.data.jpa.repostory;
 
+import com.github.alittlehuang.data.query.page.PageFactory;
 import com.github.alittlehuang.data.query.specification.Query;
 import com.github.alittlehuang.data.query.support.QueryImpl;
 import com.github.alittlehuang.data.jpa.support.JpaQueryStored;
@@ -20,7 +21,7 @@ public class TypeRepository<T> {
     }
 
     public Query<T> query() {
-        return new QueryImpl<>(new JpaQueryStored<>(entityManager,entityType));
+        return new QueryImpl<>(new JpaQueryStored<>(entityManager, entityType, PageFactory.getDefault()));
     }
 
     public T persist(T entity) {
