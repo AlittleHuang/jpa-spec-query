@@ -4,7 +4,7 @@ import com.github.alittlehuang.data.util.Assert;
 
 import java.util.List;
 
-public interface BaseQueryStored<T, PAGE> {
+public interface BaseQueryStored<T, PAGE> {//自定义
 
     List<T> getResultList();
 

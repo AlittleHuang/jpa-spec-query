@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author ALittleHuang
  */
-public class AbstractQuery<T, P, THIS extends BaseQuery<T, P, THIS>>
+public abstract class AbstractQuery<T, P, THIS extends BaseQuery<T, P, THIS>>
         extends AbstractCriteriaBuilder<T, THIS>
         implements BaseQuery<T, P, THIS> {
 
@@ -23,12 +23,6 @@ public class AbstractQuery<T, P, THIS extends BaseQuery<T, P, THIS>>
         super(stored.getJavaType());
         stored.criteria = getCriteria();
         this.stored = stored;
-    }
-
-    @Override
-    protected THIS createSubItem(Expression<T> expression) {
-        //noinspection unchecked
-        return (THIS) new AbstractQuery<T, P, THIS>(expression, getWhereClause(), getCriteria(), stored);
     }
 
     protected AbstractQuery(Expression<T> expression, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
@@ -82,5 +76,4 @@ public class AbstractQuery<T, P, THIS extends BaseQuery<T, P, THIS>>
     public Class<T> getJavaType() {
         return getStored().getJavaType();
     }
-
 }

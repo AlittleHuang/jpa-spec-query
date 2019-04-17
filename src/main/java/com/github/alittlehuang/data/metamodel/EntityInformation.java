@@ -23,7 +23,7 @@ public class EntityInformation<T, ID> {
     private static final Map<Class<?>, EntityInformation<?, ?>> MAP = new ConcurrentHashMap<>();
     public static final String FIX = "`";
 
-    private Class<T> javaType;
+    private final Class<T> javaType;
     private final Attribute idAttribute;
     private final List<Attribute> allAttributes;
     private final List<Attribute> basicAttributes;
@@ -31,10 +31,21 @@ public class EntityInformation<T, ID> {
     private final List<Attribute> oneToManyAttributes;
     private final List<Attribute> manyToManyAttributes;
     private final List<Attribute> oneToOneAttributes;
+    /**
+     * k->field name, v->attribute
+     */
     private final Map<String, Attribute> nameMap;
+    /**
+     * k->column name, v->attribute
+     */
+    private final Map<String, Attribute> columnNameMap;
+
+    private final Map<Method, Attribute> getterMap;
+
     private final String tableName;
 
     private EntityInformation(Class<T> javaType) {
+        this.javaType = javaType;
         this.allAttributes = initAttributes(javaType);
         this.idAttribute = initIdAttribute();
         this.tableName = initTableName();
@@ -57,17 +68,25 @@ public class EntityInformation<T, ID> {
                 oneToOneAttributes.add(attribute);
             }
         }
+
         this.basicAttributes = Collections.unmodifiableList(basicAttributes);
         this.manyToOneAttributes = Collections.unmodifiableList(manyToOneAttributes);
         this.oneToManyAttributes = Collections.unmodifiableList(oneToManyAttributes);
         this.manyToManyAttributes = Collections.unmodifiableList(manyToManyAttributes);
         this.oneToOneAttributes = Collections.unmodifiableList(oneToOneAttributes);
 
-        nameMap = allAttributes.stream().collect(Collectors.toMap(Attribute::getFieldName, Function.identity()));
+        nameMap = Collections.unmodifiableMap(
+                allAttributes.stream().collect(Collectors.toMap(Attribute::getFieldName, Function.identity())));
+        columnNameMap = Collections.unmodifiableMap(
+                allAttributes.stream().collect(Collectors.toMap(Attribute::getColumnName, Function.identity())));
+        getterMap = Collections.unmodifiableMap(allAttributes
+                .stream().filter(it -> it.getGetter() != null)
+                .collect(Collectors.toMap(Attribute::getGetter, Function.identity()))
+        );
     }
 
     public static <X, Y> EntityInformation<X, Y> getInstance(Class<X> clazz) {
-        Objects.requireNonNull(clazz.getAnnotation(Entity.class), "the class must be a entity");
+        Objects.requireNonNull(clazz.getAnnotation(Entity.class), "the class must be an entity");
         //noinspection unchecked
         return (EntityInformation<X, Y>) MAP.computeIfAbsent(clazz, EntityInformation::new);
     }
@@ -90,7 +109,6 @@ public class EntityInformation<T, ID> {
 
     private List<Attribute> initAttributes(Class<T> javaType) {
         List<Attribute> attributes = new ArrayList<>();
-        this.javaType = javaType;
         Field[] fields = javaType.getDeclaredFields();
         Map<Field, Method> readerMap = new HashMap<>();
         Map<Field, Method> writeMap = new HashMap<>();
@@ -167,6 +185,14 @@ public class EntityInformation<T, ID> {
 
     public Attribute getAttribute(String name) {
         return nameMap.get(name);
+    }
+
+    public Attribute getAttributeByGetter(Method method) {
+        return getterMap.get(method);
+    }
+
+    public Attribute getAttributeByColumnName(String name) {
+        return columnNameMap.get(name);
     }
 
     public List<Attribute> getBasicAttributes() {

@@ -26,7 +26,7 @@ public class Attribute {
     private final Class<?> javaType;
     private final boolean collection;
 
-    public Attribute(Field field, Method getter, Method setter, Class<?> entityType) {
+    Attribute(Field field, Method getter, Method setter, Class<?> entityType) {
         this.field = field;
         this.getter = getter;
         this.setter = setter;
@@ -186,4 +186,13 @@ public class Attribute {
     public Class<?> getJavaType() {
         return javaType;
     }
+
+    public Method getSetter() {
+        return setter;
+    }
+
+    public Method getGetter() {
+        return getter;
+    }
+
 }
