@@ -2,10 +2,16 @@ package com.github.alittlehuang.data.test;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import com.github.alittlehuang.data.jdbc.JdbcQueryStored;
+import com.github.alittlehuang.data.jdbc.JdbcQueryStoredConfig;
+import com.github.alittlehuang.data.jdbc.JdbcUpdateStored;
 import com.github.alittlehuang.data.jpa.repostory.TypeRepository;
+import com.github.alittlehuang.data.query.page.Page;
+import com.github.alittlehuang.data.query.page.PageFactory;
 import com.github.alittlehuang.data.query.specification.AggregateFunctions;
 import com.github.alittlehuang.data.query.specification.Expressions;
 import com.github.alittlehuang.data.query.specification.Query;
+import com.github.alittlehuang.data.query.support.QueryImpl;
 import com.github.alittlehuang.test.entity.User;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
@@ -38,6 +44,18 @@ public class Test {
     }
 
     public static void main(String[] args) {
+        User user = new User();
+        JdbcUpdateStored<User> updateStored = new JdbcUpdateStored<>(dataSource, User.class);
+        System.out.println(updateStored.insert(user));
+        user.setUsername("good");
+        user.setPassword("666");
+        user.setSecondpwd("888");
+        updateStored.update(user);
+        User result = getQuery().eq(User::getId, user.getId()).getSingleResult();
+        System.out.println(result);
+    }
+
+    private static void testQuery() {
         getQuery()
                 .notEq(Expressions.function("LOG10", User::getId),1)
                 .notEq(Expressions.function("LOG", User::getId),2)
@@ -305,9 +323,9 @@ public class Test {
     }
 
     private static Query<User> getQuery() {
-//        JdbcQueryStored<User> stored = new JdbcQueryStored<>(new JdbcQueryStoredConfig(dataSource), User.class);
-//        return new QueryImpl<>(stored);
-        return repository.query();
+        JdbcQueryStored<User, Page<User>> stored = new JdbcQueryStored<>(new JdbcQueryStoredConfig(dataSource), User.class, PageFactory.getDefault());
+        return new QueryImpl<>(stored);
+//        return repository.query();
     }
 
 }

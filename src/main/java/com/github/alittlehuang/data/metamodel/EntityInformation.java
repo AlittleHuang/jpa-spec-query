@@ -27,6 +27,8 @@ public class EntityInformation<T, ID> {
     private final Attribute idAttribute;
     private final List<Attribute> allAttributes;
     private final List<Attribute> basicAttributes;
+    private final List<Attribute> basicUpdatableAttributes;
+    private final List<Attribute> basicInsertableAttributes;
     private final List<Attribute> manyToOneAttributes;
     private final List<Attribute> oneToManyAttributes;
     private final List<Attribute> manyToManyAttributes;
@@ -70,6 +72,12 @@ public class EntityInformation<T, ID> {
         }
 
         this.basicAttributes = Collections.unmodifiableList(basicAttributes);
+        this.basicUpdatableAttributes = Collections.unmodifiableList(
+                this.basicAttributes.stream().filter(it -> it.getColumn() == null || it.getColumn().updatable()).collect(Collectors.toList())
+        );
+        this.basicInsertableAttributes = Collections.unmodifiableList(
+                this.basicAttributes.stream().filter(it -> it.getColumn() == null || it.getColumn().insertable()).collect(Collectors.toList())
+        );
         this.manyToOneAttributes = Collections.unmodifiableList(manyToOneAttributes);
         this.oneToManyAttributes = Collections.unmodifiableList(oneToManyAttributes);
         this.manyToManyAttributes = Collections.unmodifiableList(manyToManyAttributes);
@@ -215,4 +223,10 @@ public class EntityInformation<T, ID> {
         return manyToOneAttributes;
     }
 
+    public List<Attribute> getBasicUpdatableAttributes() {
+        return basicUpdatableAttributes;
+    }
+    public List<Attribute> getBasicInsertableAttributes() {
+        return basicInsertableAttributes;
+    }
 }

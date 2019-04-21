@@ -55,4 +55,14 @@ public class User implements Serializable {
     @OneToMany
     @JoinColumn( name = "pid" )
     private List<User> children;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", secondpwd='" + secondpwd + '\'' +
+                '}';
+    }
 }
