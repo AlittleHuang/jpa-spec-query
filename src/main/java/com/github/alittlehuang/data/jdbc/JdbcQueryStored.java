@@ -73,8 +73,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
                 Class<?> targetType = attribute.getJavaType();
                 if ( val != null ) {
                     if ( !targetType.isInstance(val) ) {
-                        Class valType = val.getClass();
-                        //noinspection unchecked
+                        Class<?> valType = val.getClass();
                         Function function = config.getTypeConverter(valType, targetType);
                         if ( function != null ) {
                             //noinspection unchecked
@@ -83,7 +82,9 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
                             Object value = ResultSetUtil.getValue(resultSet, index, targetType);
                             if ( value != null ) {
                                 val = value;
-                            } else { // ClassCastException ?
+                            }
+                            // type mismatch
+                            else {
                                 if ( firstRow && logger.isWarnEnabled() ) {
                                     Class<?> entityType = attribute.getEntityType();
                                     EntityInformation<?, ?> information = EntityInformation.getInstance(entityType);
