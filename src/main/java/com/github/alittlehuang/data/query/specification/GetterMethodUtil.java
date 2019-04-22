@@ -36,6 +36,11 @@ public class GetterMethodUtil {
         return strings;
     }
 
+    private static Method getMethod(Expressions<?, ?> getters) {
+        //noinspection unchecked
+        return getMethod(Object.class, (Expressions<Object, ?>) getters, true);
+    }
+
     private static <T> Method getMethod(Class<T> type, Expressions<T, ?> getters, boolean cast) {
         Class key = getters.getClass();
         Method method = null;
