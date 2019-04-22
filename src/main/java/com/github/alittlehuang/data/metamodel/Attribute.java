@@ -7,14 +7,14 @@ import java.lang.reflect.*;
 /**
  * @author ALittleHuang
  */
-public class Attribute {
+public class Attribute<X, Y> {
 
     public static final String FIX = "`";
 
     private final Field field;
     private final Method getter;
     private final Method setter;
-    private final Class<?> entityType;
+    private final Class<X> entityType;
     private final ManyToOne manyToOne;
     private final OneToMany oneToMany;
     private final JoinColumn joinColumn;
@@ -23,10 +23,10 @@ public class Attribute {
     private final ManyToMany manyToMany;
     private final OneToOne oneToOne;
     private final String columnName;
-    private final Class<?> javaType;
+    private final Class<Y> javaType;
     private final boolean collection;
 
-    Attribute(Field field, Method getter, Method setter, Class<?> entityType) {
+    Attribute(Field field, Method getter, Method setter, Class<X> entityType) {
         this.field = field;
         this.getter = getter;
         this.setter = setter;
@@ -111,9 +111,9 @@ public class Attribute {
         return field.getName();
     }
 
-    public Class<?> initJavaType() {
-        Class<?> javaType = null;
-        Class<?> fieldType = field.getType();
+    public Class<Y> initJavaType() {
+        Class javaType = null;
+        Class fieldType = field.getType();
         if ( collection ) {
             Type genericType = field.getGenericType();
             if ( genericType instanceof ParameterizedType ) {
@@ -122,7 +122,7 @@ public class Attribute {
                 if ( actualTypeArguments.length == 1 ) {
                     Type actualTypeArgument = actualTypeArguments[0];
                     if ( actualTypeArgument instanceof Class ) {
-                        javaType = (Class<?>) actualTypeArgument;
+                        javaType = (Class) actualTypeArgument;
                     }
                 }
             }
@@ -132,6 +132,7 @@ public class Attribute {
         if ( javaType == null ) {
             throw new RuntimeException("field " + field + " unspecified type in " + entityType);
         }
+        //noinspection unchecked
         return javaType;
     }
 
@@ -183,7 +184,7 @@ public class Attribute {
         return collection;
     }
 
-    public Class<?> getJavaType() {
+    public Class<Y> getJavaType() {
         return javaType;
     }
 

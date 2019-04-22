@@ -47,6 +47,12 @@ public class Test {
 
     public static void main(String[] args) {
 
+        testQuery();
+        testUpdate();
+
+    }
+
+    private static void testUpdate() {
         JdbcUpdateStored<User> updateStored = new JdbcUpdateStored<>(dataSource, User.class);
         List<User> list = new ArrayList<>();
         for ( int i = 0; i < 5; i++ ) {
@@ -54,8 +60,8 @@ public class Test {
             User user = new User();
             String iStr = String.valueOf(i);
             user.setUsername(String.valueOf(Math.random()));
-            user.setPassword(iStr);
-            user.setSecondpwd(iStr);
+            user.setPassword("P:" + iStr);
+            user.setSecondpwd("SP:" + iStr);
             list.add(user);
 
         }
@@ -65,9 +71,9 @@ public class Test {
 
         for ( User user : list ) {
             String iStr = String.valueOf(user.getId());
-            user.setUsername(iStr);
-            user.setPassword(iStr);
-            user.setSecondpwd(iStr);
+            user.setUsername("U:" + iStr);
+            user.setPassword("P:" + iStr);
+            user.setSecondpwd("SP:" + iStr);
         }
         updateStored.update(list);
 
@@ -75,7 +81,6 @@ public class Test {
                 .getResultList();
 
         System.out.println(resultList);
-
     }
 
     private static void testQuery() {

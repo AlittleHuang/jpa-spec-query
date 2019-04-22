@@ -8,12 +8,15 @@ import com.github.alittlehuang.data.util.Assert;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings( "Duplicates" )
 public class JdbcUpdateStored<T> implements UpdateStored<T> {
 
     public static final int[] EMPTY_INTS = new int[0];
@@ -70,7 +73,7 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
 
             ResultSet resultSet = new UpdateSlqBuilder(entities, entityType).insertSql().getGeneratedKeys(connection);
             while ( resultSet.next() ) {
-                Attribute idAttribute = EntityInformation.getInstance(entityType).getIdAttribute();
+                Attribute<T,?> idAttribute = EntityInformation.getInstance(entityType).getIdAttribute();
                 Object object = ResultSetUtil.getValue(resultSet, 1, idAttribute.getJavaType());
                 idAttribute.setValue(iterator.next(), object);
             }
@@ -108,7 +111,7 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
                 data.idValue = idValue;
                 dataList.add(data);
             }
-            List<Attribute> list = ef.getBasicUpdatableAttributes();
+            List<? extends Attribute<?, ?>> list = ef.getBasicUpdatableAttributes();
             Assert.notEmpty(list, "basic updatable attributes must not be empty");
 
             sql.append("UPDATE `").append(ef.getTableName()).append("` SET ");
@@ -134,7 +137,7 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
             sql = new StringBuilder();
             EntityInformation<?, Object> ef = EntityInformation.getInstance(type);
 
-            List<Attribute> list = ef.getBasicInsertableAttributes();
+            List<? extends Attribute<?, ?>> list = ef.getBasicInsertableAttributes();
             Assert.notEmpty(list, "basic insertable attributes must not be empty");
 
             ArrayList<Data> dataList = new ArrayList<>();

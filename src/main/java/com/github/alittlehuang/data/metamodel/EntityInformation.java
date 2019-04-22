@@ -1,5 +1,7 @@
 package com.github.alittlehuang.data.metamodel;
 
+import lombok.Getter;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -23,16 +25,26 @@ public class EntityInformation<T, ID> {
     private static final Map<Class<?>, EntityInformation<?, ?>> MAP = new ConcurrentHashMap<>();
     public static final String FIX = "`";
 
+    @Getter
     private final Class<T> javaType;
-    private final Attribute idAttribute;
-    private final List<Attribute> allAttributes;
-    private final List<Attribute> basicAttributes;
-    private final List<Attribute> basicUpdatableAttributes;
-    private final List<Attribute> basicInsertableAttributes;
-    private final List<Attribute> manyToOneAttributes;
-    private final List<Attribute> oneToManyAttributes;
-    private final List<Attribute> manyToManyAttributes;
-    private final List<Attribute> oneToOneAttributes;
+    @Getter
+    private final Attribute<T, ID> idAttribute;
+    @Getter
+    private final List<Attribute<T, ?>> allAttributes;
+    @Getter
+    private final List<Attribute<T, ?>> basicAttributes;
+    @Getter
+    private final List<Attribute<T, ?>> basicUpdatableAttributes;
+    @Getter
+    private final List<Attribute<T, ?>> basicInsertableAttributes;
+    @Getter
+    private final List<Attribute<T, ?>> manyToOneAttributes;
+    @Getter
+    private final List<Attribute<T, ?>> oneToManyAttributes;
+    @Getter
+    private final List<Attribute<T, ?>> manyToManyAttributes;
+    @Getter
+    private final List<Attribute<T, ?>> oneToOneAttributes;
     /**
      * k->field name, v->attribute
      */
@@ -44,6 +56,7 @@ public class EntityInformation<T, ID> {
 
     private final Map<Method, Attribute> getterMap;
 
+    @Getter
     private final String tableName;
 
     private EntityInformation(Class<T> javaType) {
@@ -51,12 +64,12 @@ public class EntityInformation<T, ID> {
         this.allAttributes = initAttributes(javaType);
         this.idAttribute = initIdAttribute();
         this.tableName = initTableName();
-        List<Attribute> basicAttributes = new ArrayList<>();
-        List<Attribute> manyToOneAttributes = new ArrayList<>();
-        List<Attribute> oneToManyAttributes = new ArrayList<>();
-        List<Attribute> manyToManyAttributes = new ArrayList<>();
-        List<Attribute> oneToOneAttributes = new ArrayList<>();
-        for ( Attribute attribute : this.allAttributes ) {
+        List<Attribute<T, ?>> basicAttributes = new ArrayList<>();
+        List<Attribute<T, ?>> manyToOneAttributes = new ArrayList<>();
+        List<Attribute<T, ?>> oneToManyAttributes = new ArrayList<>();
+        List<Attribute<T, ?>> manyToManyAttributes = new ArrayList<>();
+        List<Attribute<T, ?>> oneToOneAttributes = new ArrayList<>();
+        for ( Attribute<T, ?> attribute : this.allAttributes ) {
             Entity entity = attribute.getJavaType().getAnnotation(Entity.class);
             if ( entity == null ) {
                 basicAttributes.add(attribute);
@@ -99,24 +112,8 @@ public class EntityInformation<T, ID> {
         return (EntityInformation<X, Y>) MAP.computeIfAbsent(clazz, EntityInformation::new);
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
-    public List<? extends Attribute> getAllAttributes() {
-        return allAttributes;
-    }
-
-    public Class<T> getJavaType() {
-        return javaType;
-    }
-
-    public Attribute getIdAttribute() {
-        return idAttribute;
-    }
-
-    private List<Attribute> initAttributes(Class<T> javaType) {
-        List<Attribute> attributes = new ArrayList<>();
+    private List<Attribute<T, ?>> initAttributes(Class<T> javaType) {
+        List<Attribute<T,?>> attributes = new ArrayList<>();
         Field[] fields = javaType.getDeclaredFields();
         Map<Field, Method> readerMap = new HashMap<>();
         Map<Field, Method> writeMap = new HashMap<>();
@@ -145,7 +142,7 @@ public class EntityInformation<T, ID> {
         }
 
         for (Field field : writeMap.keySet()) {
-            Attribute attribute = new Attribute(field, readerMap.get(field), writeMap.get(field), javaType);
+            Attribute<T,?> attribute = new Attribute<>(field, readerMap.get(field), writeMap.get(field), javaType);
             if ( attribute.getAnnotation(Transient.class) == null
                     && !Modifier.isStatic(field.getModifiers()) ) {
                 attributes.add(attribute);
@@ -154,13 +151,14 @@ public class EntityInformation<T, ID> {
         return Collections.unmodifiableList(attributes);
     }
 
-    private Attribute initIdAttribute() {
-        for ( Attribute attribute : allAttributes ) {
+    private Attribute<T, ID> initIdAttribute() {
+        for ( Attribute<T, ?> attribute : allAttributes ) {
             if (attribute.getAnnotation(Id.class) != null) {
-                return attribute;
+                //noinspection unchecked
+                return (Attribute<T, ID>) attribute;
             }
         }
-        return null;
+        throw new RuntimeException("entity " + javaType + " has no id attribute");
     }
 
     private String initTableName() {
@@ -201,32 +199,5 @@ public class EntityInformation<T, ID> {
 
     public Attribute getAttributeByColumnName(String name) {
         return columnNameMap.get(name);
-    }
-
-    public List<Attribute> getBasicAttributes() {
-        return basicAttributes;
-    }
-
-    public List<Attribute> getOneToManyAttributes() {
-        return oneToManyAttributes;
-    }
-
-    public List<Attribute> getOneToOneAttributes() {
-        return oneToOneAttributes;
-    }
-
-    public List<Attribute> getManyToManyAttributes() {
-        return manyToManyAttributes;
-    }
-
-    public List<Attribute> getManyToOneAttributes() {
-        return manyToOneAttributes;
-    }
-
-    public List<Attribute> getBasicUpdatableAttributes() {
-        return basicUpdatableAttributes;
-    }
-    public List<Attribute> getBasicInsertableAttributes() {
-        return basicInsertableAttributes;
     }
 }
