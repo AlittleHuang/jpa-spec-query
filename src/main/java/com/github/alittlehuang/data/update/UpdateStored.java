@@ -18,4 +18,8 @@ public interface UpdateStored<T> {
      */
     T insert(T entity);
 
+    int[] update(Iterable<T> entities);
+
+    <X extends Iterable<T>> X insert(X entities);
+
 }

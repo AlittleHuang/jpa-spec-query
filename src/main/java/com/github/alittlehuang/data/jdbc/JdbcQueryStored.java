@@ -85,6 +85,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
                             }
                             // type mismatch
                             else {
+
                                 if ( firstRow && logger.isWarnEnabled() ) {
                                     Class<?> entityType = attribute.getEntityType();
                                     EntityInformation<?, ?> information = EntityInformation.getInstance(entityType);

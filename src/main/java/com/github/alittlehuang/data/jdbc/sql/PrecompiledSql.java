@@ -12,10 +12,10 @@ import java.util.List;
 public class PrecompiledSql {
     private static Logger logger = LoggerFactory.getLogger(PrecompiledSql.class);
 
-    private String sql;
-    private List<Object> args;
+    protected String sql;
+    protected List<?> args;
 
-    public PrecompiledSql(String sql, List<Object> args) {
+    public PrecompiledSql(String sql, List<?> args) {
         this.sql = sql;
         this.args = args;
     }
@@ -24,7 +24,7 @@ public class PrecompiledSql {
         return sql;
     }
 
-    public List<Object> getArgs(){
+    public List<?> getArgs() {
         return args;
     }
 
@@ -51,24 +51,31 @@ public class PrecompiledSql {
     }
 
     private void setParam(PreparedStatement preparedStatement, String sql) throws SQLException {
+        List<?> args = getArgs();
+        setParam(preparedStatement, sql, args);
+    }
+
+    protected void setParam(PreparedStatement preparedStatement, String sql, List<?> args) throws SQLException {
         int i = 0;
-        List<Object> args = getArgs();
         for ( Object arg : args ) {
             preparedStatement.setObject(++i, arg);
         }
-
         logSql(sql, args);
     }
 
-    private void logSql(String sql, List<Object> args) {
+    protected void logSql(String sql, List<?> args) {
         if ( logger.isDebugEnabled() ) {
             boolean hasArgs = args != null && !args.isEmpty();
-            String info = ( hasArgs ? "prepared sql:\n\n" : "sql:\n\n" ) + sql + "\n";
-            logger.debug(info.replaceAll("\n", "\n  "));
+            StringBuilder info = new StringBuilder(( hasArgs ? "prepared sql:\n\n" : "sql:\n\n" ) + sql + "\n");
             if ( hasArgs ) {
-                logger.debug("args: " + args.toString());
+                info.append("\nargs: ").append(args.toString()).append('\n');
             }
+            logger.debug(info.toString().replaceAll("\n", "\n  "));
         }
+    }
+
+    protected void logSql() {
+        logSql(sql, getArgs());
     }
 
     @Override

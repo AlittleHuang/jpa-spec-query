@@ -13,7 +13,6 @@ public class LoggerFactory {
 
     private static final boolean SLF4J_ENABLED = logEnabled("org.slf4j.LoggerFactory");
     private static final boolean LOG4J2_ENABLED = logEnabled("org.apache.logging.log4j.LogManager");
-    private static final boolean LOG4J_ENABLED = logEnabled("org.apache.log4j.Logger");
 
     private static boolean logEnabled(String className) {
         boolean logEnabled;
@@ -35,10 +34,6 @@ public class LoggerFactory {
             return new Log4j2(org.apache.logging.log4j.LogManager.getLogger(clazz));
         }
 
-        if ( LOG4J_ENABLED ) {
-            return new Log4j(org.apache.log4j.LogManager.getLogger(clazz));
-        }
-
         return DISABLE_LOGGER;
     }
 
@@ -47,15 +42,6 @@ public class LoggerFactory {
         private final org.slf4j.Logger logger;
 
         Slf4j(org.slf4j.Logger logger) {
-            this.logger = logger;
-        }
-    }
-
-    private static class Log4j implements Logger {
-        @Delegate
-        private final org.apache.log4j.Logger logger;
-
-        Log4j(org.apache.log4j.Logger logger) {
             this.logger = logger;
         }
     }

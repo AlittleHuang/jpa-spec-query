@@ -22,7 +22,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Test {
 
@@ -44,15 +46,36 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        User user = new User();
+
         JdbcUpdateStored<User> updateStored = new JdbcUpdateStored<>(dataSource, User.class);
-        System.out.println(updateStored.insert(user));
-        user.setUsername("good");
-        user.setPassword("666");
-        user.setSecondpwd("888");
-        updateStored.update(user);
-        User result = getQuery().eq(User::getId, user.getId()).getSingleResult();
-        System.out.println(result);
+        List<User> list = new ArrayList<>();
+        for ( int i = 0; i < 5; i++ ) {
+
+            User user = new User();
+            String iStr = String.valueOf(i);
+            user.setUsername(String.valueOf(Math.random()));
+            user.setPassword(iStr);
+            user.setSecondpwd(iStr);
+            list.add(user);
+
+        }
+        System.out.println(list);
+        List<User> insert = updateStored.insert(list);
+        System.out.println(insert);
+
+        for ( User user : list ) {
+            String iStr = String.valueOf(user.getId());
+            user.setUsername(iStr);
+            user.setPassword(iStr);
+            user.setSecondpwd(iStr);
+        }
+        updateStored.update(list);
+
+        List<User> resultList = getQuery().andIn(User::getId, list.stream().map(User::getId).collect(Collectors.toList()))
+                .getResultList();
+
+        System.out.println(resultList);
+
     }
 
     private static void testQuery() {
