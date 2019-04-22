@@ -19,17 +19,13 @@ import java.util.stream.Collectors;
 @SuppressWarnings( "Duplicates" )
 public class JdbcUpdateStored<T> implements UpdateStored<T> {
 
-    public static final int[] EMPTY_INTS = new int[0];
+    private static final int[] EMPTY_INTS = new int[0];
     private final DataSource dataSource;
     private final Class<T> entityType;
 
     public JdbcUpdateStored(DataSource dataSource, Class<T> entityType) {
         this.dataSource = dataSource;
         this.entityType = entityType;
-    }
-
-    public DataSource getDataSource() {
-        return dataSource;
     }
 
     @Override
@@ -67,7 +63,6 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
         if ( !iterator.hasNext() ) {
             return entities;
         }
-        UpdateSlqBuilder updateSlqBuilder = new UpdateSlqBuilder(entities, entityType);
 
         try ( Connection connection = dataSource.getConnection() ) {
 
@@ -79,20 +74,19 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
             }
 
         } catch ( SQLException e ) {
-
             throw new RuntimeException(e);
         }
         return entities;
     }
 
-    static class UpdateSlqBuilder {
+    private class UpdateSlqBuilder {
         StringBuilder sql;
         private List<List<?>> args;
 
         final Iterable<?> entities;
         final Class<?> type;
 
-        public UpdateSlqBuilder(Iterable<?> entities, Class<?> type) {
+        UpdateSlqBuilder(Iterable<?> entities, Class<?> type) {
             this.entities = entities;
             this.type = type;
         }

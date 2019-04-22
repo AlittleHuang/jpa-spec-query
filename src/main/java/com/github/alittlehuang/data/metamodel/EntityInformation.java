@@ -1,11 +1,9 @@
 package com.github.alittlehuang.data.metamodel;
 
+import com.github.alittlehuang.data.util.Assert;
 import lombok.Getter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -29,6 +27,8 @@ public class EntityInformation<T, ID> {
     private final Class<T> javaType;
     @Getter
     private final Attribute<T, ID> idAttribute;
+    @Getter
+    private final Attribute<T, ? extends Number> versionAttribute;
     @Getter
     private final List<Attribute<T, ?>> allAttributes;
     @Getter
@@ -63,6 +63,7 @@ public class EntityInformation<T, ID> {
         this.javaType = javaType;
         this.allAttributes = initAttributes(javaType);
         this.idAttribute = initIdAttribute();
+        this.versionAttribute = initVersionAttribute();
         this.tableName = initTableName();
         List<Attribute<T, ?>> basicAttributes = new ArrayList<>();
         List<Attribute<T, ?>> manyToOneAttributes = new ArrayList<>();
@@ -156,6 +157,19 @@ public class EntityInformation<T, ID> {
             if (attribute.getAnnotation(Id.class) != null) {
                 //noinspection unchecked
                 return (Attribute<T, ID>) attribute;
+            }
+        }
+        throw new RuntimeException("entity " + javaType + " has no id attribute");
+    }
+
+    private Attribute<T, ? extends Number> initVersionAttribute() {
+        for (Attribute<T, ?> attribute : allAttributes) {
+            if (attribute.getAnnotation(Version.class) != null) {
+                Class<?> type = attribute.getJavaType();
+                Assert.state(type == Integer.class || type == Long.class,
+                        "version attribute type must be integer or long");
+                //noinspection unchecked
+                return (Attribute<T, ? extends Number>) attribute;
             }
         }
         throw new RuntimeException("entity " + javaType + " has no id attribute");
