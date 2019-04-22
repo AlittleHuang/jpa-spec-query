@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class EntityInformation<T, ID> {
 
     private static final Map<Class<?>, EntityInformation<?, ?>> MAP = new ConcurrentHashMap<>();
-    public static final String FIX = "`";
+    private static final String FIX = "`";
 
     @Getter
     private final Class<T> javaType;
