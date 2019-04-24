@@ -22,7 +22,7 @@ import java.util.function.Function;
 /**
  * @author ALittleHuang
  */
-public class JdbcStoredConfig implements JdbcSqlActuator {//sql执行器
+public class JdbcStoredConfig implements JdbcSqlActuator {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcStoredConfig.class);
     private static final boolean RELY_ON_SPRING_JDBC;
