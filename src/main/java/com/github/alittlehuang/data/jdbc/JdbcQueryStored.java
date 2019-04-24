@@ -86,9 +86,9 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
                                     EntityInformation<?, ?> information = EntityInformationImpl.getInstance(entityType);
                                     Field field = attribute.getField();
 
-                                    logger.warn("the type " + information.getTableName() + "." + attribute.getColumnName() +
-                                            " in the database does not match " + field.getDeclaringClass().getTypeName() + "."
-                                            + field.getName());
+                                    logger.warn(String.format("the type %s.%s in the database does not match %s.%s",
+                                            information.getTableName(), attribute.getColumnName(),
+                                            field.getDeclaringClass().getTypeName(), field.getName()));
                                 }
 
                             }
