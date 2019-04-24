@@ -22,37 +22,18 @@ import java.util.function.Function;
 /**
  * @author ALittleHuang
  */
-public class JdbcStoredConfig implements JdbcSqlActuator {
+public class JdbcStoredConfig extends JdbcSqlActuatorImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcStoredConfig.class);
-    private static final boolean RELY_ON_SPRING_JDBC;
-
-    private DataSource dataSource;
     private SqlBuilderFactory sqlBuilderFactory;
     private Map<JointKey, Function> typeConverterSet = new ConcurrentHashMap<>();
     private EntityInformationFactory entityInformationFactory;
-    private JdbcTemplate jdbcTemplate;
-
-    static {
-        boolean result = false;
-        try {
-            Class.forName("org.springframework.jdbc.datasource.DataSourceUtils");
-            result = true;
-        } catch ( ClassNotFoundException e ) {
-            logger.info(e.getMessage());
-        }
-        RELY_ON_SPRING_JDBC = result;
-    }
 
     public JdbcStoredConfig() {
-
     }
 
     public JdbcStoredConfig(DataSource dataSource) {
-        this.dataSource = dataSource;
-        if ( RELY_ON_SPRING_JDBC ) {
-            this.jdbcTemplate = new JdbcTemplate(dataSource);
-        }
+        super(dataSource);
     }
 
     public <X, Y> Function<X, Y> getTypeConverter(Class<X> srcType, Class<Y> targetType) {
@@ -64,13 +45,6 @@ public class JdbcStoredConfig implements JdbcSqlActuator {
         typeConverterSet.put(new JointKey(srcType, targetType), converter);
     }
 
-    public DataSource getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     public SqlBuilderFactory getSqlBuilderFactory() {
         if (sqlBuilderFactory == null) {
@@ -94,62 +68,5 @@ public class JdbcStoredConfig implements JdbcSqlActuator {
         this.entityInformationFactory = entityInformationFactory;
     }
 
-    private Connection getConnection() {
-        DataSource dataSource = getDataSource();
-        if ( RELY_ON_SPRING_JDBC ) {
-            return DataSourceUtils.getConnection(dataSource);
-        }
-        try {
-            return dataSource.getConnection();
-        } catch ( SQLException e ) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public <R> R execute(ConnectionCallback<R> action) {
-        return execute(action, false);
-    }
-
-    public <R> R execute(ConnectionCallback<R> action, boolean commit) {
-        if ( jdbcTemplate != null ) {
-            return jdbcTemplate.execute(action::doInConnection);
-        }
-        try ( Connection connection = getConnection() ) {
-            R result = action.doInConnection(connection);
-            if ( commit ) {
-                connection.commit();
-            }
-            return result;
-        } catch ( SQLException e ) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public <R> R update(ConnectionCallback<R> action) {
-        return execute(action, true);
-    }
-
-    @Override
-    public <R> R query(PreparedStatementCreator psc, ResultSetExtractor<R> rse) {
-        return execute(con -> {
-            try (
-                    PreparedStatement statement = psc.createPreparedStatement(con);
-                    ResultSet resultSet = statement.executeQuery()
-            ) {
-                R result = rse.extractData(resultSet);
-                statement.close();
-                return result;
-            }
-        });
-    }
-
-    @Override
-    public <R> R insert(ConnectionCallback<ResultSet> psc, ResultSetExtractor<R> rse) {
-        return execute(con -> {
-            ResultSet resultSet = psc.doInConnection(con);
-            return rse.extractData(resultSet);
-        }, true);
-    }
 
 }
