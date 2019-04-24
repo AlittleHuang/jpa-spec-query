@@ -16,11 +16,11 @@ public interface SqlBuilderFactory {
 
         PrecompiledSqlForEntity<T> listEntityResult();
 
-        PrecompiledSql listObjectResult();
+        QueryPrecompiledSql listObjectResult();
 
-        PrecompiledSql count();
+        QueryPrecompiledSql count();
 
-        PrecompiledSql exists();
+        QueryPrecompiledSql exists();
 
     }
 

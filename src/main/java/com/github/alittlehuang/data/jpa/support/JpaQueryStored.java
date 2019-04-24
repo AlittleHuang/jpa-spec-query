@@ -2,6 +2,7 @@ package com.github.alittlehuang.data.jpa.support;
 
 import com.github.alittlehuang.data.jpa.util.JpaHelper;
 import com.github.alittlehuang.data.metamodel.EntityInformation;
+import com.github.alittlehuang.data.metamodel.support.EntityInformationImpl;
 import com.github.alittlehuang.data.query.page.PageFactory;
 import com.github.alittlehuang.data.query.page.Pageable;
 import com.github.alittlehuang.data.query.specification.Selection;
@@ -148,7 +149,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
 
         public boolean exists() {
             initWhere().initGroupBy();
-            EntityInformation<T, ?> information = EntityInformation.getInstance(type);
+            EntityInformation<T, ?> information = EntityInformationImpl.getInstance(type);
             //noinspection unchecked
             query.select(root.get(information.getIdAttribute().getFieldName()));
             TypedQuery<R> query = entityManager.createQuery(this.query);

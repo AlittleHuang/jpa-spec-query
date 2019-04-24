@@ -13,12 +13,12 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
     @SuppressWarnings( "UnusedReturnValue" )
     R apply(T t);
 
-    static <T, R> Expressions<T, R> of(Expressions<? extends T, ? super R> expression) {
+    static <T, R> Expressions<T, R> of(Expressions<? extends T, ? extends R> expression) {
         //noinspection unchecked
         return (Expressions<T, R>) expression;
     }
 
-    default <V> Expressions<T, V> to(Expressions<? extends R, ? super V> expression) {
+    default <V> Expressions<T, V> to(Expressions<? extends R, ? extends V> expression) {
         Expressions<T, R> previous = this;
         return new Expressions<T, V>() {
             List<Expressions<?, ?>> list = new ArrayList<>();
@@ -39,7 +39,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
             }
 
             @Override
-            public <X> Expressions<T, X> to(Expressions<? extends V, ? super X> expression) {
+            public <X> Expressions<T, X> to(Expressions<? extends V, ? extends X> expression) {
                 list.add(expression);
                 //noinspection unchecked
                 return (Expressions<T, X>) this;

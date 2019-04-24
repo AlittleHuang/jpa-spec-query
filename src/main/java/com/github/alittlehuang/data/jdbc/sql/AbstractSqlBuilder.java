@@ -1,6 +1,6 @@
 package com.github.alittlehuang.data.jdbc.sql;
 
-import com.github.alittlehuang.data.jdbc.JdbcQueryStoredConfig;
+import com.github.alittlehuang.data.jdbc.JdbcStoredConfig;
 import com.github.alittlehuang.data.metamodel.Attribute;
 import com.github.alittlehuang.data.metamodel.EntityInformation;
 import com.github.alittlehuang.data.query.page.Pageable;
@@ -23,7 +23,7 @@ import static javax.persistence.criteria.CriteriaBuilder.Trimspec;
  */
 public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuilder<T> {
     private static final JoinType DEFAULT_JOIN_TYPE = JoinType.LEFT;
-    private JdbcQueryStoredConfig config;
+    private JdbcStoredConfig config;
     private Criteria<T> criteria;
     private EntityInformation<T, ?> rootEntityInfo;
     private List<Object> args = new ArrayList<>();
@@ -33,13 +33,13 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
 
     StringBuilder sql;
 
-    public AbstractSqlBuilder(JdbcQueryStoredConfig config, Criteria<T> criteria) {
+    public AbstractSqlBuilder(JdbcStoredConfig config, Criteria<T> criteria) {
         this.config = config;
         this.criteria = criteria;
         rootEntityInfo = getEntityInformation(criteria.getJavaType());
     }
 
-    public AbstractSqlBuilder(JdbcQueryStoredConfig config, Criteria<T> criteria, Pageable pageable) {
+    public AbstractSqlBuilder(JdbcStoredConfig config, Criteria<T> criteria, Pageable pageable) {
         this.config = config;
         this.criteria = criteria;
         rootEntityInfo = getEntityInformation(criteria.getJavaType());
@@ -60,7 +60,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     }
 
     @Override
-    public PrecompiledSql listObjectResult() {
+    public QueryPrecompiledSql listObjectResult() {
         sql = new StringBuilder();
         appendSelections();
         int index = sql.length();
@@ -70,22 +70,22 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         insertJoin(index);
         appendLimit();
         appendLockMode();
-        return new PrecompiledSql(sql.toString(), args);
+        return new QueryPrecompiledSql(sql.toString(), args);
     }
 
     @Override
-    public PrecompiledSql count() {
+    public QueryPrecompiledSql count() {
         sql = new StringBuilder();
         sql.append("SELECT\n  COUNT(1) AS count_").append(rootEntityInfo.getTableName()).append("_");
         appendFrom(rootEntityInfo);
         int index = sql.length();
         appendWhereClause();
         insertJoin(index);
-        return new PrecompiledSql(sql.toString(), args);
+        return new QueryPrecompiledSql(sql.toString(), args);
     }
 
     @Override
-    public PrecompiledSql exists() {
+    public QueryPrecompiledSql exists() {
         sql = new StringBuilder();
         sql.append("SELECT\n  ");
         appendRootTableAlias();
@@ -96,7 +96,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         appendWhereClause();
         insertJoin(index);
         sql.append("\nLIMIT 1");
-        return new PrecompiledSql(sql.toString(), args);
+        return new QueryPrecompiledSql(sql.toString(), args);
     }
 
     protected void appendLimit() {

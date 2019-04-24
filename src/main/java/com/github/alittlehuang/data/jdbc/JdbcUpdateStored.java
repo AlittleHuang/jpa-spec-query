@@ -1,15 +1,13 @@
 package com.github.alittlehuang.data.jdbc;
 
-import com.github.alittlehuang.data.jdbc.sql.PrecompiledSqlBatch;
+import com.github.alittlehuang.data.jdbc.sql.BatchInsertPrecompiledSql;
+import com.github.alittlehuang.data.jdbc.sql.BatchUpdatePrecompiledSql;
 import com.github.alittlehuang.data.metamodel.Attribute;
 import com.github.alittlehuang.data.metamodel.EntityInformation;
+import com.github.alittlehuang.data.metamodel.support.EntityInformationImpl;
 import com.github.alittlehuang.data.update.UpdateStored;
 import com.github.alittlehuang.data.util.Assert;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -19,12 +17,12 @@ import java.util.stream.Collectors;
 @SuppressWarnings( "Duplicates" )
 public class JdbcUpdateStored<T> implements UpdateStored<T> {
 
-    private static final int[] EMPTY_INTS = new int[0];
-    private final DataSource dataSource;
+    private static final int[] EMPTY_INT_ARRAY = new int[0];
+    private final JdbcSqlActuator sqlActuator;
     private final Class<T> entityType;
 
-    public JdbcUpdateStored(DataSource dataSource, Class<T> entityType) {
-        this.dataSource = dataSource;
+    public JdbcUpdateStored(JdbcSqlActuator sqlActuator, Class<T> entityType) {
+        this.sqlActuator = sqlActuator;
         this.entityType = entityType;
     }
 
@@ -44,15 +42,10 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
         Assert.notNull(entities, "entity must not be null");
         Iterator<T> iterator = entities.iterator();
         if ( !iterator.hasNext() ) {
-            return EMPTY_INTS;
+            return EMPTY_INT_ARRAY;
         }
         UpdateSlqBuilder updateSlqBuilder = new UpdateSlqBuilder(entities, entityType);
-
-        try ( Connection connection = dataSource.getConnection() ) {
-            return updateSlqBuilder.updateSql().updateBatch(connection);
-        } catch ( SQLException e ) {
-            throw new RuntimeException(e);
-        }
+        return sqlActuator.update(updateSlqBuilder.updateSql());
     }
 
     @Override
@@ -64,40 +57,38 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
             return entities;
         }
 
-        try ( Connection connection = dataSource.getConnection() ) {
+        BatchInsertPrecompiledSql precompiledSql = new UpdateSlqBuilder(entities, entityType).insertSql();
 
-            ResultSet resultSet = new UpdateSlqBuilder(entities, entityType).insertSql().getGeneratedKeys(connection);
+        return sqlActuator.insert(precompiledSql, resultSet -> {
             while ( resultSet.next() ) {
-                Attribute<T,?> idAttribute = EntityInformation.getInstance(entityType).getIdAttribute();
-                Object object = ResultSetUtil.getValue(resultSet, 1, idAttribute.getJavaType());
+                Attribute<T, Object> idAttribute = EntityInformationImpl.getInstance(entityType).getIdAttribute();
+                Object object = JdbcUtil.getValue(resultSet, 1, idAttribute.getJavaType());
                 idAttribute.setValue(iterator.next(), object);
             }
+            return entities;
+        });
 
-        } catch ( SQLException e ) {
-            throw new RuntimeException(e);
-        }
-        return entities;
     }
 
     private class UpdateSlqBuilder {
         StringBuilder sql;
         private List<List<?>> args;
 
-        final Iterable<?> entities;
-        final Class<?> type;
+        final Iterable<T> entities;
+        final Class<T> type;
 
-        UpdateSlqBuilder(Iterable<?> entities, Class<?> type) {
+        UpdateSlqBuilder(Iterable<T> entities, Class<T> type) {
             this.entities = entities;
             this.type = type;
         }
 
-        private PrecompiledSqlBatch updateSql() {
+        private BatchUpdatePrecompiledSql updateSql() {
             sql = new StringBuilder();
-            EntityInformation<?, Object> ef = EntityInformation.getInstance(type);
+            EntityInformation<T, Object> ef = EntityInformationImpl.getInstance(type);
 
-            Attribute idAttribute = ef.getIdAttribute();
+            Attribute<T, ?> idAttribute = ef.getIdAttribute();
             ArrayList<Data> dataList = new ArrayList<>();
-            for ( Object entity : entities ) {
+            for ( T entity : entities ) {
                 Object idValue = idAttribute.getValue(entity);
                 Assert.notNull(idValue, "id attribute value must not be null");
                 Data data = new Data();
@@ -105,12 +96,12 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
                 data.idValue = idValue;
                 dataList.add(data);
             }
-            List<? extends Attribute<?, ?>> list = ef.getBasicUpdatableAttributes();
+            List<? extends Attribute<T, ?>> list = ef.getBasicUpdatableAttributes();
             Assert.notEmpty(list, "basic updatable attributes must not be empty");
 
             sql.append("UPDATE `").append(ef.getTableName()).append("` SET ");
             boolean first = true;
-            for ( Attribute attribute : list ) {
+            for ( Attribute<T, ?> attribute : list ) {
                 if ( first ) {
                     first = false;
                 } else {
@@ -124,20 +115,20 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
                 data.arg.add(data.idValue);
             }
             args = dataList.stream().map(it -> it.arg).collect(Collectors.toList());
-            return new PrecompiledSqlBatch(sql.toString(), args);
+            return new BatchUpdatePrecompiledSql(sql.toString(), args);
         }
 
-        private PrecompiledSqlBatch insertSql() {
+        private BatchInsertPrecompiledSql insertSql() {
             sql = new StringBuilder();
-            EntityInformation<?, Object> ef = EntityInformation.getInstance(type);
-
-            List<? extends Attribute<?, ?>> list = ef.getBasicInsertableAttributes();
+            EntityInformation<T, Object> ef = EntityInformationImpl.getInstance(type);
+            List<? extends Attribute<T, ?>> list = ef.getBasicInsertableAttributes();
             Assert.notEmpty(list, "basic insertable attributes must not be empty");
 
             ArrayList<Data> dataList = new ArrayList<>();
-            for ( Object entity : entities ) {
+            for ( T entity : entities ) {
                 Data data = new Data();
                 data.entity = entity;
+                checkVersion(ef, entity);
                 dataList.add(data);
             }
 
@@ -153,7 +144,7 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
             }
             sql.append(") VALUES (");
             first = true;
-            for ( Attribute attribute : list ) {
+            for ( Attribute<T, ?> attribute : list ) {
                 if ( first ) {
                     first = false;
                 } else {
@@ -164,17 +155,30 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
             }
             sql.append(")");
             args = dataList.stream().map(it -> it.arg).collect(Collectors.toList());
-            return new PrecompiledSqlBatch(sql.toString(), args);
+            return new BatchInsertPrecompiledSql(sql.toString(), args);
         }
 
-        private void setParams(ArrayList<Data> dataList, Attribute attribute) {
+        private void checkVersion(EntityInformation<T, Object> ef, T entity) {
+            Attribute<T, ? extends Number> versionAttribute = ef.getVersionAttribute();
+            if ( versionAttribute != null && versionAttribute.getValue(entity) == null ) {
+                //noinspection unchecked
+                Attribute<T, Number> attribute = (Attribute<T, Number>) versionAttribute;
+                if ( versionAttribute.getJavaType() == Integer.class ) {
+                    attribute.setValue(entity, 0);
+                } else {
+                    attribute.setValue(entity, 0L);
+                }
+            }
+        }
+
+        private void setParams(ArrayList<Data> dataList, Attribute<T, ?> attribute) {
             for ( Data data : dataList ) {
                 data.arg.add(attribute.getValue(data.entity));
             }
         }
 
         class Data {
-            Object entity;
+            T entity;
             Object idValue;
             List<Object> arg = new ArrayList<>();
         }

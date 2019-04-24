@@ -42,6 +42,9 @@ public class User implements Serializable {
      */
     private String secondpwd;
 
+    @Version
+    private Long optlock;
+
     public User(String username, String password, String secondpwd) {
         this.username = username;
         this.password = password;

@@ -1,6 +1,6 @@
 package com.github.alittlehuang.data.jdbc.sql.mysql57;
 
-import com.github.alittlehuang.data.jdbc.JdbcQueryStoredConfig;
+import com.github.alittlehuang.data.jdbc.JdbcStoredConfig;
 import com.github.alittlehuang.data.jdbc.sql.AbstractSqlBuilder;
 import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
 import com.github.alittlehuang.data.query.page.Pageable;
@@ -11,9 +11,9 @@ import com.github.alittlehuang.data.query.specification.Criteria;
  */
 public class Mysql57SqlBuilderFactory implements SqlBuilderFactory {
 
-    private JdbcQueryStoredConfig config;
+    private JdbcStoredConfig config;
 
-    public Mysql57SqlBuilderFactory(JdbcQueryStoredConfig config) {
+    public Mysql57SqlBuilderFactory(JdbcStoredConfig config) {
         this.config = config;
     }
 
