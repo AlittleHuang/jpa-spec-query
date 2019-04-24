@@ -45,7 +45,25 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
             return EMPTY_INT_ARRAY;
         }
         UpdateSlqBuilder updateSlqBuilder = new UpdateSlqBuilder(entities, entityType);
-        return sqlActuator.update(updateSlqBuilder.updateSql());
+        EntityInformation<T, Object> ef = EntityInformationImpl.getInstance(entityType);
+        int[] result = sqlActuator.update(updateSlqBuilder.updateSql());
+        if ( ef.hasVersion() ) {
+            for ( int i : result ) {
+                Assert.state(i == 1, "the entity has been updated in other transactions");
+            }
+            for ( T entity : entities ) {
+                Attribute<T, ? extends Number> versionAttribute = ef.getVersionAttribute();
+                Number value = versionAttribute.getValue(entity);
+                if ( value.getClass() == Long.class ) {
+                    value = value.longValue() + 1;
+                } else {
+                    value = value.intValue() + 1;
+                }
+                //noinspection unchecked
+                ( (Attribute<T, Number>) versionAttribute ).setValue(entity, value);
+            }
+        }
+        return result;
     }
 
     @Override
@@ -85,6 +103,8 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
         private BatchUpdatePrecompiledSql updateSql() {
             sql = new StringBuilder();
             EntityInformation<T, Object> ef = EntityInformationImpl.getInstance(type);
+            boolean hasVersion = ef.hasVersion();
+            Attribute<T, ? extends Number> versionAttribute = ef.getVersionAttribute();
 
             Attribute<T, ?> idAttribute = ef.getIdAttribute();
             ArrayList<Data> dataList = new ArrayList<>();
@@ -108,11 +128,19 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
                     sql.append(",");
                 }
                 sql.append("`").append(attribute.getColumnName()).append("`").append("=?");
-                setParams(dataList, attribute);
+                setParams(dataList, attribute, true);
             }
             sql.append(" WHERE ").append("`").append(idAttribute.getColumnName()).append("`").append("=?");
+            if ( hasVersion ) {
+                sql.append(" AND ").append(versionAttribute.getColumnName()).append("=?");
+            }
+
+            Iterator<T> iterator = entities.iterator();
             for ( Data data : dataList ) {
                 data.arg.add(data.idValue);
+                if ( hasVersion ) {
+                    data.arg.add(versionAttribute.getValue(iterator.next()));
+                }
             }
             args = dataList.stream().map(it -> it.arg).collect(Collectors.toList());
             return new BatchUpdatePrecompiledSql(sql.toString(), args);
@@ -172,8 +200,16 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
         }
 
         private void setParams(ArrayList<Data> dataList, Attribute<T, ?> attribute) {
+            setParams(dataList, attribute, false);
+        }
+
+        private void setParams(ArrayList<Data> dataList, Attribute<T, ?> attribute, boolean updateVersion) {
             for ( Data data : dataList ) {
-                data.arg.add(attribute.getValue(data.entity));
+                Object value = attribute.getValue(data.entity);
+                if ( updateVersion && attribute.getVersion() != null ) {
+                    value = ( (Number) value ).longValue() + 1;
+                }
+                data.arg.add(value);
             }
         }
 

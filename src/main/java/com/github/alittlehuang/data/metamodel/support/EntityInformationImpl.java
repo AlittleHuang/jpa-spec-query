@@ -49,8 +49,8 @@ public class EntityInformationImpl<T, ID> implements EntityInformation<T, ID> {
     private final List<Attribute<T, ?>> oneToOneAttributes;
     @Getter
     private final String tableName;
-    @Getter
-    private final boolean version;
+
+    private final boolean hasVersion;
     /**
      * k->field name, v->attribute
      */
@@ -68,7 +68,7 @@ public class EntityInformationImpl<T, ID> implements EntityInformation<T, ID> {
         this.allAttributes = initAttributes(javaType);
         this.idAttribute = initIdAttribute();
         this.versionAttribute = initVersionAttribute();
-        this.version = versionAttribute != null;
+        this.hasVersion = versionAttribute != null;
         this.tableName = initTableName();
         List<Attribute<T, ?>> basicAttributes = new ArrayList<>();
         List<Attribute<T, ?>> manyToOneAttributes = new ArrayList<>();
@@ -223,4 +223,8 @@ public class EntityInformationImpl<T, ID> implements EntityInformation<T, ID> {
         return columnNameMap.get(name);
     }
 
+    @Override
+    public boolean hasVersion() {
+        return hasVersion;
+    }
 }

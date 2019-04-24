@@ -20,7 +20,7 @@ public interface EntityInformation<T, ID> {
 
     Attribute<T, ? extends Number> getVersionAttribute();
 
-    boolean isVersion();
+    boolean hasVersion();
 
     List<Attribute<T, ?>> getAllAttributes();
 
