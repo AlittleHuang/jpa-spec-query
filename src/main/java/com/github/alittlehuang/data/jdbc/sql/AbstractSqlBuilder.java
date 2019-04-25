@@ -60,7 +60,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     }
 
     @Override
-    public QueryPrecompiledSql listObjectResult() {
+    public PrecompiledSql listObjectResult() {
         sql = new StringBuilder();
         appendSelections();
         int index = sql.length();
@@ -70,22 +70,22 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         insertJoin(index);
         appendLimit();
         appendLockMode();
-        return new QueryPrecompiledSql(sql.toString(), args);
+        return new PrecompiledSql(sql.toString(), args);
     }
 
     @Override
-    public QueryPrecompiledSql count() {
+    public PrecompiledSql count() {
         sql = new StringBuilder();
         sql.append("SELECT\n  COUNT(1) AS count_").append(rootEntityInfo.getTableName()).append("_");
         appendFrom(rootEntityInfo);
         int index = sql.length();
         appendWhereClause();
         insertJoin(index);
-        return new QueryPrecompiledSql(sql.toString(), args);
+        return new PrecompiledSql(sql.toString(), args);
     }
 
     @Override
-    public QueryPrecompiledSql exists() {
+    public PrecompiledSql exists() {
         sql = new StringBuilder();
         sql.append("SELECT\n  ");
         appendRootTableAlias();
@@ -96,7 +96,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         appendWhereClause();
         insertJoin(index);
         sql.append("\nLIMIT 1");
-        return new QueryPrecompiledSql(sql.toString(), args);
+        return new PrecompiledSql(sql.toString(), args);
     }
 
     protected void appendLimit() {
@@ -259,7 +259,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
                     String[] tmp = new String[names.length + 1];
                     System.arraycopy(names, 0, tmp, 0, names.length);
 
-                    Attribute attr = rootEntityInfo.getAttribute(names[0]);
+                    Attribute<?, ?> attr = rootEntityInfo.getAttribute(names[0]);
                     EntityInformation<?, ?> attrInfo = getEntityInformation(attr.getJavaType());
                     SelectedAttribute select = new SelectedAttribute(attr, null);
                     if ( names.length > 1 ) {
@@ -588,7 +588,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
     }
 
     protected void appendAttribute(String[] names, JoinType joinType) {
-        Attribute attr = rootEntityInfo.getAttribute(names[0]);
+        Attribute<?, ?> attr = rootEntityInfo.getAttribute(names[0]);
         if ( names.length > 1 ) {
             joinAttrs = joinAttrs == null ? new HashMap<>() : joinAttrs;
             JoinAttr joinAttr = null;
@@ -676,7 +676,7 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
         boolean appended = false;
         int index = joinAttrs.size();
 
-        public JoinAttr(JoinAttr parent, Attribute attribute) {
+        public JoinAttr(JoinAttr parent, Attribute<?, ?> attribute) {
             this.parent = parent;
             this.attribute = attribute;
             this.attrInfo = getEntityInformation(attribute.getJavaType());

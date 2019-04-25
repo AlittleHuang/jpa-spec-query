@@ -1,4 +1,4 @@
-package com.github.alittlehuang.data.jdbc;
+package com.github.alittlehuang.data.jdbc.operations;
 
 import java.sql.Connection;
 import java.sql.SQLException;

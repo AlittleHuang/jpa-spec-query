@@ -90,15 +90,14 @@ public abstract class JdbcUtil {
         }
     }
 
-    public static void setParam(PreparedStatement preparedStatement, String sql, List<?> args) throws SQLException {
+    public static void setParam(PreparedStatement preparedStatement, List<?> args) throws SQLException {
         int i = 0;
         for ( Object arg : args ) {
             preparedStatement.setObject(++i, arg);
         }
-        logSql(sql, args);
     }
 
-    private static void logSql(String sql, List<?> args) {
+    public static void logSql(String sql, List<?> args) {
         if ( logger.isDebugEnabled() ) {
             boolean hasArgs = args != null && !args.isEmpty();
             StringBuilder info = new StringBuilder(( hasArgs ? "prepared sql:\n\n" : "sql:\n\n" ) + sql + "\n");

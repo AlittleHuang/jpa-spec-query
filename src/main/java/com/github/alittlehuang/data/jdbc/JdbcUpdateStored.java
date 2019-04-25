@@ -1,5 +1,6 @@
 package com.github.alittlehuang.data.jdbc;
 
+import com.github.alittlehuang.data.jdbc.operations.JdbcOperations;
 import com.github.alittlehuang.data.jdbc.sql.BatchInsertPrecompiledSql;
 import com.github.alittlehuang.data.jdbc.sql.BatchUpdatePrecompiledSql;
 import com.github.alittlehuang.data.metamodel.Attribute;
@@ -18,10 +19,10 @@ import java.util.stream.Collectors;
 public class JdbcUpdateStored<T> implements UpdateStored<T> {
 
     private static final int[] EMPTY_INT_ARRAY = new int[0];
-    private final JdbcSqlActuator sqlActuator;
+    private final JdbcOperations sqlActuator;
     private final Class<T> entityType;
 
-    public JdbcUpdateStored(JdbcSqlActuator sqlActuator, Class<T> entityType) {
+    public JdbcUpdateStored(JdbcOperations sqlActuator, Class<T> entityType) {
         this.sqlActuator = sqlActuator;
         this.entityType = entityType;
     }
@@ -46,7 +47,7 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
         }
         UpdateSlqBuilder updateSlqBuilder = new UpdateSlqBuilder(entities, entityType);
         EntityInformation<T, Object> ef = EntityInformationImpl.getInstance(entityType);
-        int[] result = sqlActuator.update(updateSlqBuilder.updateSql());
+        int[] result = sqlActuator.updateBatch(updateSlqBuilder.updateSql());
         if ( ef.hasVersion() ) {
             for ( int i : result ) {
                 Assert.state(i == 1, "the entity has been updated in other transactions");
@@ -77,11 +78,12 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
 
         BatchInsertPrecompiledSql precompiledSql = new UpdateSlqBuilder(entities, entityType).insertSql();
 
-        return sqlActuator.insert(precompiledSql, resultSet -> {
+        return sqlActuator.insertBatch(precompiledSql, resultSet -> {
             while ( resultSet.next() ) {
                 Attribute<T, Object> idAttribute = EntityInformationImpl.getInstance(entityType).getIdAttribute();
                 Object object = JdbcUtil.getValue(resultSet, 1, idAttribute.getJavaType());
-                idAttribute.setValue(iterator.next(), object);
+                T next = iterator.next();
+                idAttribute.setValue(next, object);
             }
             return entities;
         });

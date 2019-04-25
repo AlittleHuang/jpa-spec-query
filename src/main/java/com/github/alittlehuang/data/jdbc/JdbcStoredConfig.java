@@ -1,5 +1,6 @@
 package com.github.alittlehuang.data.jdbc;
 
+import com.github.alittlehuang.data.jdbc.operations.JdbcOperationsImpl;
 import com.github.alittlehuang.data.jdbc.sql.EntityInformationFactory;
 import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
 import com.github.alittlehuang.data.jdbc.sql.mysql57.Mysql57SqlBuilderFactory;
@@ -7,14 +8,8 @@ import com.github.alittlehuang.data.log.Logger;
 import com.github.alittlehuang.data.log.LoggerFactory;
 import com.github.alittlehuang.data.metamodel.support.EntityInformationImpl;
 import com.github.alittlehuang.data.util.JointKey;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -22,7 +17,7 @@ import java.util.function.Function;
 /**
  * @author ALittleHuang
  */
-public class JdbcStoredConfig extends JdbcSqlActuatorImpl {
+public class JdbcStoredConfig extends JdbcOperationsImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcStoredConfig.class);
     private SqlBuilderFactory sqlBuilderFactory;

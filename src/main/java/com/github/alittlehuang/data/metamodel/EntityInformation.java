@@ -8,11 +8,11 @@ import java.util.List;
  */
 public interface EntityInformation<T, ID> {
 
-    Attribute getAttribute(String name);
+    Attribute<T, ?> getAttribute(String name);
 
-    Attribute getAttributeByGetter(Method method);
+    Attribute<T, ?> getAttributeByGetter(Method method);
 
-    Attribute getAttributeByColumnName(String name);
+    Attribute<T, ?> getAttributeByColumnName(String name);
 
     Class<T> getJavaType();
 

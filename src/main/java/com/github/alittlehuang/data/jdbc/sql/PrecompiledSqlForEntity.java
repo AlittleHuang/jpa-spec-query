@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * @author ALittleHuang
  */
-public class PrecompiledSqlForEntity<T> extends QueryPrecompiledSql {
+public class PrecompiledSqlForEntity<T> extends PrecompiledSql {
 
     private List<SelectedAttribute> selectedAttributes;
 

@@ -1,6 +1,9 @@
 package com.github.alittlehuang.data.jdbc;
 
+import com.github.alittlehuang.data.jdbc.operations.ResultSetExtractor;
+import com.github.alittlehuang.data.jdbc.sql.PrecompiledSql;
 import com.github.alittlehuang.data.jdbc.sql.PrecompiledSqlForEntity;
+
 import com.github.alittlehuang.data.jdbc.sql.SelectedAttribute;
 import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
 import com.github.alittlehuang.data.log.Logger;
@@ -37,7 +40,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
     @Override
     public List<T> getResultList() {
         PrecompiledSqlForEntity<T> precompiledSql = getSqlBuilder().listEntityResult();
-        return getConfig().query(precompiledSql, resultSet -> toList(resultSet, precompiledSql));
+        return query(precompiledSql, resultSet -> toList(resultSet, precompiledSql));
     }
 
 
@@ -138,7 +141,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return (List<X>) getResultList();
         }
 
-        return getConfig().query(getSqlBuilder().listObjectResult(), resultSet -> {
+        return query(getSqlBuilder().listObjectResult(), resultSet -> {
             List<Object> result = new ArrayList<>();
             int columnsCount = selections.size();
             while ( resultSet.next() ) {
@@ -171,7 +174,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
                 PrecompiledSqlForEntity<T> precompiledSql = config.getSqlBuilderFactory()
                         .createSqlBuild(getCriteria(), pageable)
                         .listEntityResult();
-            content = getConfig().query(precompiledSql, resultSet -> toList(resultSet, precompiledSql));
+            content = query(precompiledSql, resultSet -> toList(resultSet, precompiledSql));
         }
         return getPageFactory().get(page, size, content, count);
 
@@ -180,7 +183,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
     @Override
     public long count() {
 
-        return getConfig().query(getSqlBuilder().count(), resultSet -> {
+        return query(getSqlBuilder().count(), resultSet -> {
             if ( resultSet.next() ) {
                 return resultSet.getLong(1);
             } else {
@@ -192,13 +195,19 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
 
     @Override
     public boolean exists() {
-        return getConfig().query(getSqlBuilder().exists(), ResultSet::next);
+        return query(getSqlBuilder().exists(), ResultSet::next);
     }
 
 
     @Override
     public Class<T> getJavaType() {
         return entityType;
+    }
+
+    private <X> X query(PrecompiledSql psc, ResultSetExtractor<X> rse) {
+        X result = getConfig().query(psc, rse);
+        psc.logSql();
+        return result;
     }
 
 

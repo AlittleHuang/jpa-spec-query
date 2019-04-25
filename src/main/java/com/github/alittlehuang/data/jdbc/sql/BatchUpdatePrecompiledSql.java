@@ -1,11 +1,9 @@
 package com.github.alittlehuang.data.jdbc.sql;
 
-import com.github.alittlehuang.data.jdbc.ConnectionCallback;
 import com.github.alittlehuang.data.jdbc.JdbcUtil;
 import com.github.alittlehuang.data.log.Logger;
 import com.github.alittlehuang.data.log.LoggerFactory;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -13,9 +11,7 @@ import java.util.List;
 /**
  * @author ALittleHuang
  */
-public class BatchUpdatePrecompiledSql
-        extends AbstractPrecompiledSql
-        implements ConnectionCallback<int[]> {
+public class BatchUpdatePrecompiledSql extends PrecompiledSql {
     private static Logger logger = LoggerFactory.getLogger(BatchUpdatePrecompiledSql.class);
 
     public BatchUpdatePrecompiledSql(String sql, List<List<?>> args) {
@@ -28,15 +24,21 @@ public class BatchUpdatePrecompiledSql
         return (List<List<?>>) super.getArgs();
     }
 
+    @Override
+    public void logSql() {
+        List<List<?>> args = getArgs();
+        String sql = getSql();
+        for ( List<?> arg : args ) {
+            JdbcUtil.logSql(sql, arg);
+        }
+    }
 
     @Override
-    public int[] doInConnection(Connection con) throws SQLException {
-        PreparedStatement preparedStatement = con.prepareStatement(sql);
+    public void setValues(PreparedStatement ps) throws SQLException {
         List<List<?>> args = getArgs();
         for ( List<?> arg : args ) {
-            JdbcUtil.setParam(preparedStatement, sql, arg);
-            preparedStatement.addBatch();
+            JdbcUtil.setParam(ps, arg);
+            ps.addBatch();
         }
-        return preparedStatement.executeBatch();
     }
 }
