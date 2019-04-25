@@ -3,7 +3,6 @@ package com.github.alittlehuang.data.jdbc;
 import com.github.alittlehuang.data.jdbc.operations.ResultSetExtractor;
 import com.github.alittlehuang.data.jdbc.sql.PrecompiledSql;
 import com.github.alittlehuang.data.jdbc.sql.PrecompiledSqlForEntity;
-
 import com.github.alittlehuang.data.jdbc.sql.SelectedAttribute;
 import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
 import com.github.alittlehuang.data.log.Logger;
@@ -48,7 +47,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
         return config.getSqlBuilderFactory().createSqlBuild(getCriteria());
     }
 
-    private Map<JointKey,Object> entityMap = new HashMap<>();
+    private Map<JointKey, Object> entityMap = new HashMap<>();
 
     private List<T> toList(ResultSet resultSet, PrecompiledSqlForEntity<T> precompiledSql) throws SQLException {
         List<SelectedAttribute> selectedAttributes = precompiledSql.getSelections();
@@ -164,16 +163,15 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
     @Override
     public P getPage(long page, long size) {
 
-
         long count = count();
         Pageable pageable = new Pageable(page, size);
         List<T> content;
         if ( count == 0 ) {
             content = Collections.emptyList();
         } else {
-                PrecompiledSqlForEntity<T> precompiledSql = config.getSqlBuilderFactory()
-                        .createSqlBuild(getCriteria(), pageable)
-                        .listEntityResult();
+            PrecompiledSqlForEntity<T> precompiledSql = config.getSqlBuilderFactory()
+                    .createSqlBuild(getCriteria(), pageable)
+                    .listEntityResult();
             content = query(precompiledSql, resultSet -> toList(resultSet, precompiledSql));
         }
         return getPageFactory().get(page, size, content, count);
