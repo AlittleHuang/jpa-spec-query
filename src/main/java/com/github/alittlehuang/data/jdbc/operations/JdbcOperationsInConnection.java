@@ -20,9 +20,13 @@ public class JdbcOperationsInConnection extends AbstractJdbcOperations {
     }
 
     @Override
-    <R> R execute(ConnectionCallback<R> action, boolean commit) {
+    protected <R> R execute(ConnectionCallback<R> action, boolean commit) {
         try {
-            return action.doInConnection(connection);
+            R result = action.doInConnection(getConnection());
+            if ( commit ) {
+                connection.commit();
+            }
+            return result;
         } catch ( SQLException ex ) {
             throw new RuntimeException(ex);
         }

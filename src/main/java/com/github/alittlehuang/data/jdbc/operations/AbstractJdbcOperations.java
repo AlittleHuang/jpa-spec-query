@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 public abstract class AbstractJdbcOperations implements JdbcOperations {
     private static final Logger logger = LoggerFactory.getLogger(AbstractJdbcOperations.class);
 
-    abstract <R> R execute(ConnectionCallback<R> action, boolean commit);
+    protected abstract <R> R execute(ConnectionCallback<R> action, boolean commit);
 
     @Override
     public int[] updateBatch(JdbcOperationsCallback operations) {

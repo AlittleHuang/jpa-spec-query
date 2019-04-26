@@ -8,9 +8,11 @@ import java.util.Arrays;
 public class JointKey {
 
     private final Object[] values;
+    private final int hashCode;
 
-    public JointKey(Object... keys) {
-        values = keys;
+    public JointKey(Object... objects) {
+        values = objects;
+        hashCode = Arrays.deepHashCode(objects);
     }
 
     @Override
@@ -25,12 +27,12 @@ public class JointKey {
         JointKey jointKey = (JointKey) o;
 
         // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(values, jointKey.values);
+        return hashCode() == jointKey.hashCode() && Arrays.equals(values, jointKey.values);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(values);
+        return hashCode;
     }
 
 }
