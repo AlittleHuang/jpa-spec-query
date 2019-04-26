@@ -2,62 +2,14 @@ package com.github.alittlehuang.data.jdbc.operations;
 
 import com.github.alittlehuang.data.log.Logger;
 import com.github.alittlehuang.data.log.LoggerFactory;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
-public class JdbcOperationsImpl implements JdbcOperations {
-    private static final Logger logger = LoggerFactory.getLogger(JdbcOperationsImpl.class);
-    protected static final boolean RELY_ON_SPRING_JDBC = isRelyOnSpringJdbc();
+public abstract class AbstractJdbcOperations implements JdbcOperations {
+    private static final Logger logger = LoggerFactory.getLogger(AbstractJdbcOperations.class);
 
-    @Getter
-    @Setter
-    private DataSource dataSource;
-    private JdbcTemplate jdbcTemplate;
-
-    public JdbcOperationsImpl(DataSource dataSource) {
-        this.dataSource = dataSource;
-        if ( RELY_ON_SPRING_JDBC ) {
-            this.jdbcTemplate = new JdbcTemplate(dataSource);
-        }
-    }
-
-    public JdbcOperationsImpl() {
-    }
-
-    private Connection getConnection() {
-        DataSource dataSource = getDataSource();
-        if ( RELY_ON_SPRING_JDBC ) {
-            return DataSourceUtils.getConnection(dataSource);
-        }
-        try {
-            return dataSource.getConnection();
-        } catch ( SQLException e ) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private <R> R execute(ConnectionCallback<R> action, boolean commit) {
-        if ( jdbcTemplate != null ) {
-            return jdbcTemplate.execute(action::doInConnection);
-        }
-        try ( Connection connection = getConnection() ) {
-            R result = action.doInConnection(connection);
-            if ( commit && !connection.getAutoCommit() ) {
-                connection.commit();
-            }
-            return result;
-        } catch ( SQLException e ) {
-            throw new RuntimeException(e);
-        }
-    }
+    abstract <R> R execute(ConnectionCallback<R> action, boolean commit);
 
     @Override
     public int[] updateBatch(JdbcOperationsCallback operations) {

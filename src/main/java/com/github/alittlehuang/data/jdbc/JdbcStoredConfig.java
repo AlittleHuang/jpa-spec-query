@@ -1,6 +1,6 @@
 package com.github.alittlehuang.data.jdbc;
 
-import com.github.alittlehuang.data.jdbc.operations.JdbcOperationsImpl;
+import com.github.alittlehuang.data.jdbc.operations.JdbcOperationsInSpring;
 import com.github.alittlehuang.data.jdbc.sql.EntityInformationFactory;
 import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
 import com.github.alittlehuang.data.jdbc.sql.mysql57.Mysql57SqlBuilderFactory;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 /**
  * @author ALittleHuang
  */
-public class JdbcStoredConfig extends JdbcOperationsImpl {
+public class JdbcStoredConfig extends JdbcOperationsInSpring {
 
     private static final Logger logger = LoggerFactory.getLogger(JdbcStoredConfig.class);
     private SqlBuilderFactory sqlBuilderFactory;

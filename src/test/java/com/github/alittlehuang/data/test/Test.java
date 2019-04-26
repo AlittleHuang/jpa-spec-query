@@ -5,6 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import com.github.alittlehuang.data.jdbc.JdbcQueryStored;
 import com.github.alittlehuang.data.jdbc.JdbcStoredConfig;
 import com.github.alittlehuang.data.jdbc.JdbcUpdateStored;
+import com.github.alittlehuang.data.jdbc.operations.JdbcOperationsInSpring;
 import com.github.alittlehuang.data.jpa.repostory.TypeRepository;
 import com.github.alittlehuang.data.query.page.Page;
 import com.github.alittlehuang.data.query.page.PageFactory;
@@ -59,7 +60,7 @@ public class Test {
         try {
             connection = dataSource.getConnection();
             connection.setAutoCommit(false);
-            JdbcUpdateStored<User> updateStored = new JdbcUpdateStored<>(new JdbcStoredConfig(dataSource), User.class);
+            JdbcUpdateStored<User> updateStored = new JdbcUpdateStored<>(new JdbcOperationsInSpring(dataSource), User.class);
             List<User> list = new ArrayList<>();
             for ( int i = 0; i < 5; i++ ) {
 
