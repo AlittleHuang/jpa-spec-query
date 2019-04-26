@@ -3,6 +3,7 @@ package com.github.alittlehuang.data.jdbc.operations;
 import com.github.alittlehuang.data.log.Logger;
 import com.github.alittlehuang.data.log.LoggerFactory;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 
@@ -14,22 +15,12 @@ import java.sql.SQLException;
 
 public class JdbcOperationsImpl implements JdbcOperations {
     private static final Logger logger = LoggerFactory.getLogger(JdbcOperationsImpl.class);
-    protected static final boolean RELY_ON_SPRING_JDBC;
+    protected static final boolean RELY_ON_SPRING_JDBC = isRelyOnSpringJdbc();
 
     @Getter
+    @Setter
     private DataSource dataSource;
     private JdbcTemplate jdbcTemplate;
-
-    static {
-        boolean result = false;
-        try {
-            Class.forName("org.springframework.jdbc.datasource.DataSourceUtils");
-            result = true;
-        } catch ( ClassNotFoundException e ) {
-            logger.info(e.getMessage());
-        }
-        RELY_ON_SPRING_JDBC = result;
-    }
 
     public JdbcOperationsImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -124,5 +115,16 @@ public class JdbcOperationsImpl implements JdbcOperations {
                 }
             }
         }, true);
+    }
+
+    private static boolean isRelyOnSpringJdbc() {
+        boolean relyOnSpringJdbc = false;
+        try {
+            Class.forName("org.springframework.jdbc.core.JdbcTemplate");
+            relyOnSpringJdbc = true;
+        } catch ( ClassNotFoundException e ) {
+            logger.info(e.getMessage());
+        }
+        return relyOnSpringJdbc;
     }
 }
