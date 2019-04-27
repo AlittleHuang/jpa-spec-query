@@ -23,7 +23,7 @@ public class JdbcOperationsInConnection extends AbstractJdbcOperations {
     protected <R> R execute(ConnectionCallback<R> action, boolean commit) {
         try {
             R result = action.doInConnection(getConnection());
-            if ( commit ) {
+            if ( commit && !connection.getAutoCommit() ) {
                 connection.commit();
             }
             return result;
