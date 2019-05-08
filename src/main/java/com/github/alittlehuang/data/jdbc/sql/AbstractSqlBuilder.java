@@ -1,6 +1,6 @@
 package com.github.alittlehuang.data.jdbc.sql;
 
-import com.github.alittlehuang.data.jdbc.JdbcStoredConfig;
+import com.github.alittlehuang.data.jdbc.JdbcQueryStoredConfig;
 import com.github.alittlehuang.data.metamodel.Attribute;
 import com.github.alittlehuang.data.metamodel.EntityInformation;
 import com.github.alittlehuang.data.query.page.Pageable;
@@ -21,9 +21,9 @@ import static javax.persistence.criteria.CriteriaBuilder.Trimspec;
 /**
  * @author ALittleHuang
  */
-public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuilder<T> {
+public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.SqlBuilder<T> {
     private static final JoinType DEFAULT_JOIN_TYPE = JoinType.LEFT;
-    private JdbcStoredConfig config;
+    private JdbcQueryStoredConfig config;
     private Criteria<T> criteria;
     private EntityInformation<T, ?> rootEntityInfo;
     private List<Object> args = new ArrayList<>();
@@ -33,13 +33,13 @@ public abstract class AbstractSqlBuilder<T> implements SqlBuilderFactory.SqlBuil
 
     StringBuilder sql;
 
-    public AbstractSqlBuilder(JdbcStoredConfig config, Criteria<T> criteria) {
+    public AbstractSqlBuilder(JdbcQueryStoredConfig config, Criteria<T> criteria) {
         this.config = config;
         this.criteria = criteria;
         rootEntityInfo = getEntityInformation(criteria.getJavaType());
     }
 
-    public AbstractSqlBuilder(JdbcStoredConfig config, Criteria<T> criteria, Pageable pageable) {
+    public AbstractSqlBuilder(JdbcQueryStoredConfig config, Criteria<T> criteria, Pageable pageable) {
         this.config = config;
         this.criteria = criteria;
         rootEntityInfo = getEntityInformation(criteria.getJavaType());

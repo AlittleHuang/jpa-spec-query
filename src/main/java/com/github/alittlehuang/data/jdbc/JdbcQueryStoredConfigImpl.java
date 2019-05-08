@@ -1,9 +1,10 @@
 package com.github.alittlehuang.data.jdbc;
 
+import com.github.alittlehuang.data.jdbc.operations.JdbcOperations;
 import com.github.alittlehuang.data.jdbc.operations.JdbcOperationsInSpring;
 import com.github.alittlehuang.data.jdbc.sql.EntityInformationFactory;
-import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
-import com.github.alittlehuang.data.jdbc.sql.mysql57.Mysql57SqlBuilderFactory;
+import com.github.alittlehuang.data.jdbc.sql.QuerySqlBuilderFactory;
+import com.github.alittlehuang.data.jdbc.sql.mysql57.Mysql57QuerySqlBuilderFactory;
 import com.github.alittlehuang.data.log.Logger;
 import com.github.alittlehuang.data.log.LoggerFactory;
 import com.github.alittlehuang.data.metamodel.support.EntityInformationImpl;
@@ -17,41 +18,46 @@ import java.util.function.Function;
 /**
  * @author ALittleHuang
  */
-public class JdbcStoredConfig extends JdbcOperationsInSpring {
+public class JdbcQueryStoredConfigImpl implements JdbcQueryStoredConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdbcStoredConfig.class);
-    private SqlBuilderFactory sqlBuilderFactory;
+    private static final Logger logger = LoggerFactory.getLogger(JdbcQueryStoredConfigImpl.class);
+    private QuerySqlBuilderFactory querySqlBuilderFactory;
     private Map<JointKey, Function> typeConverterSet = new ConcurrentHashMap<>();
     private EntityInformationFactory entityInformationFactory;
+    private JdbcOperations jdbcOperations;
 
-    public JdbcStoredConfig() {
+    public JdbcQueryStoredConfigImpl() {
     }
 
-    public JdbcStoredConfig(DataSource dataSource) {
-        super(dataSource);
+    public JdbcQueryStoredConfigImpl(DataSource dataSource) {
+        jdbcOperations = new JdbcOperationsInSpring(dataSource);
     }
 
+    @Override
     public <X, Y> Function<X, Y> getTypeConverter(Class<X> srcType, Class<Y> targetType) {
         //noinspection unchecked
         return typeConverterSet.get(new JointKey(srcType, targetType));
     }
 
+    @Override
     public <T, U> void registerTypeConverter(Class<T> srcType, Class<U> targetType, Function<T, U> converter) {
         typeConverterSet.put(new JointKey(srcType, targetType), converter);
     }
 
-
-    public SqlBuilderFactory getSqlBuilderFactory() {
-        if (sqlBuilderFactory == null) {
-            sqlBuilderFactory = new Mysql57SqlBuilderFactory(this);
+    @Override
+    public QuerySqlBuilderFactory getQuerySqlBuilderFactory() {
+        if ( querySqlBuilderFactory == null) {
+            querySqlBuilderFactory = new Mysql57QuerySqlBuilderFactory(this);
         }
-        return sqlBuilderFactory;
+        return querySqlBuilderFactory;
     }
 
-    public void setSqlBuilderFactory(SqlBuilderFactory sqlBuilderFactory) {
-        this.sqlBuilderFactory = sqlBuilderFactory;
+    @Override
+    public void setQuerySqlBuilderFactory(QuerySqlBuilderFactory querySqlBuilderFactory) {
+        this.querySqlBuilderFactory = querySqlBuilderFactory;
     }
 
+    @Override
     public EntityInformationFactory getEntityInformationFactory() {
         if (entityInformationFactory == null) {
             entityInformationFactory = EntityInformationImpl::getInstance;
@@ -59,9 +65,13 @@ public class JdbcStoredConfig extends JdbcOperationsInSpring {
         return entityInformationFactory;
     }
 
+    @Override
     public void setEntityInformationFactory(EntityInformationFactory entityInformationFactory) {
         this.entityInformationFactory = entityInformationFactory;
     }
 
-
+    @Override
+    public JdbcOperations getJdbcOperations() {
+        return jdbcOperations;
+    }
 }

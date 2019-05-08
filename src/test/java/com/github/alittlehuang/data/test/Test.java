@@ -3,7 +3,7 @@ package com.github.alittlehuang.data.test;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.github.alittlehuang.data.jdbc.JdbcQueryStored;
-import com.github.alittlehuang.data.jdbc.JdbcStoredConfig;
+import com.github.alittlehuang.data.jdbc.JdbcQueryStoredConfigImpl;
 import com.github.alittlehuang.data.jdbc.JdbcUpdateStored;
 import com.github.alittlehuang.data.jdbc.operations.JdbcOperationsInSpring;
 import com.github.alittlehuang.data.jpa.repostory.TypeRepository;
@@ -376,7 +376,7 @@ public class Test {
     }
 
     private static Query<User> getQuery() {
-        JdbcQueryStored<User, Page<User>> stored = new JdbcQueryStored<>(new JdbcStoredConfig(dataSource), User.class, PageFactory.getDefault());
+        JdbcQueryStored<User, Page<User>> stored = new JdbcQueryStored<>(new JdbcQueryStoredConfigImpl(dataSource), User.class, PageFactory.getDefault());
         return new QueryImpl<>(stored);
 //        return repository.query();
     }

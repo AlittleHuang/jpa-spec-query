@@ -4,7 +4,7 @@ import com.github.alittlehuang.data.jdbc.operations.ResultSetExtractor;
 import com.github.alittlehuang.data.jdbc.sql.PrecompiledSql;
 import com.github.alittlehuang.data.jdbc.sql.PrecompiledSqlForEntity;
 import com.github.alittlehuang.data.jdbc.sql.SelectedAttribute;
-import com.github.alittlehuang.data.jdbc.sql.SqlBuilderFactory;
+import com.github.alittlehuang.data.jdbc.sql.QuerySqlBuilderFactory;
 import com.github.alittlehuang.data.log.Logger;
 import com.github.alittlehuang.data.log.LoggerFactory;
 import com.github.alittlehuang.data.metamodel.Attribute;
@@ -27,10 +27,10 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
     private static Logger logger = LoggerFactory.getLogger(JdbcQueryStored.class);
 
     @Getter
-    private JdbcStoredConfig config;
+    private JdbcQueryStoredConfig config;
     private Class<T> entityType;
 
-    public JdbcQueryStored(JdbcStoredConfig config, Class<T> entityType, PageFactory<T, P> factory) {
+    public JdbcQueryStored(JdbcQueryStoredConfig config, Class<T> entityType, PageFactory<T, P> factory) {
         super(factory);
         this.config = config;
         this.entityType = entityType;
@@ -43,8 +43,8 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
     }
 
 
-    private SqlBuilderFactory.SqlBuilder<T> getSqlBuilder() {
-        return config.getSqlBuilderFactory().createSqlBuild(getCriteria());
+    private QuerySqlBuilderFactory.SqlBuilder<T> getSqlBuilder() {
+        return config.getQuerySqlBuilderFactory().createSqlBuild(getCriteria());
     }
 
     private Map<JointKey, Object> entityMap = new HashMap<>();
@@ -169,7 +169,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
         if ( count == 0 ) {
             content = Collections.emptyList();
         } else {
-            PrecompiledSqlForEntity<T> precompiledSql = config.getSqlBuilderFactory()
+            PrecompiledSqlForEntity<T> precompiledSql = config.getQuerySqlBuilderFactory()
                     .createSqlBuild(getCriteria(), pageable)
                     .listEntityResult();
             content = query(precompiledSql, resultSet -> toList(resultSet, precompiledSql));
@@ -203,7 +203,7 @@ public class JdbcQueryStored<T, P> extends AbstractQueryStored<T, P> {
     }
 
     private <X> X query(PrecompiledSql psc, ResultSetExtractor<X> rse) {
-        X result = getConfig().query(psc, rse);
+        X result = getConfig().getJdbcOperations().query(psc, rse);
         psc.logSql();
         return result;
     }

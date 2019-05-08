@@ -80,9 +80,11 @@ public class GetterMethodUtil {
         private static Proxy proxy = new Proxy();
 
         private static <T> Method getMethod(Class<T> type, Expressions<T, ?> getters, boolean cast) {
-            T target = proxy.getProxyInstance(type);
+            Object target = proxy.getProxyInstance(type);
             try {
-                getters.apply(target);
+                //noinspection unchecked
+                Expressions<Object, Object> g = (Expressions<Object, Object>) getters;
+                g.apply(target);
             } catch ( Exception e ) {
                 if ( e.getClass() == MethodInfoException.class ) {
                     //noinspection ConstantConditions
@@ -103,9 +105,8 @@ public class GetterMethodUtil {
             return null;
         }
 
-        private <T> T getProxyInstance(Class<T> type) {
-            //noinspection unchecked
-            return (T) instanceMap.computeIfAbsent(type, it -> {
+        private Object getProxyInstance(Class<?> type) {
+            return instanceMap.computeIfAbsent(type, it -> {
                 Enhancer enhancer = new Enhancer();
                 enhancer.setSuperclass(type);
                 enhancer.setCallback(this);

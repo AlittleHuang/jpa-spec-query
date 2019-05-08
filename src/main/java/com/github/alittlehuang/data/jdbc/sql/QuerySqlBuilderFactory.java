@@ -6,7 +6,7 @@ import com.github.alittlehuang.data.query.specification.Criteria;
 /**
  * @author ALittleHuang
  */
-public interface SqlBuilderFactory {
+public interface QuerySqlBuilderFactory {
 
     <T> SqlBuilder<T> createSqlBuild(Criteria<T> criteria);
 
