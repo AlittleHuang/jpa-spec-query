@@ -3,6 +3,7 @@ package com.github.alittlehuang.test.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Subselect;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Cacheable
 @Entity( name = "user" )
+
 public class User implements Serializable {
 
     /**

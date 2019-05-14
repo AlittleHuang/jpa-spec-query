@@ -54,13 +54,13 @@ public class EntityInformationImpl<T, ID> implements EntityInformation<T, ID> {
     /**
      * k->field name, v->attribute
      */
-    private final Map<String, Attribute> nameMap;
+    private final Map<String, Attribute<T, ?>> nameMap;
     /**
      * k->column name, v->attribute
      */
-    private final Map<String, Attribute> columnNameMap;
+    private final Map<String, Attribute<T, ?>> columnNameMap;
 
-    private final Map<Method, Attribute> getterMap;
+    private final Map<Method, Attribute<T, ?>> getterMap;
 
 
     private EntityInformationImpl(Class<T> javaType) {
@@ -148,6 +148,11 @@ public class EntityInformationImpl<T, ID> implements EntityInformation<T, ID> {
         }
 
         for ( Field field : writeMap.keySet() ) {
+
+            if ( Modifier.isStatic(field.getModifiers()) ) {
+                continue;
+            }
+
             Attribute<T, ?> attribute = new AttributeImpl<>(field, readerMap.get(field), writeMap.get(field), javaType);
             if ( attribute.getAnnotation(Transient.class) == null
                     && !Modifier.isStatic(field.getModifiers()) ) {
@@ -209,17 +214,17 @@ public class EntityInformationImpl<T, ID> implements EntityInformation<T, ID> {
     }
 
     @Override
-    public Attribute getAttribute(String name) {
+    public Attribute<T, ?> getAttribute(String name) {
         return nameMap.get(name);
     }
 
     @Override
-    public Attribute getAttributeByGetter(Method method) {
+    public Attribute<T, ?> getAttributeByGetter(Method method) {
         return getterMap.get(method);
     }
 
     @Override
-    public Attribute getAttributeByColumnName(String name) {
+    public Attribute<T, ?> getAttributeByColumnName(String name) {
         return columnNameMap.get(name);
     }
 
