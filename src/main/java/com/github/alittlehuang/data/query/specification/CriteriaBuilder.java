@@ -39,7 +39,9 @@ public interface CriteriaBuilder<T, THIS extends CriteriaBuilder<T, THIS>> exten
     THIS setMaxResult(long maxResult);
 
     /**
-     * set pageable
+     * set pageable, it will call
+     * {@link CriteriaBuilder#setOffset(long)} and
+     * {@link CriteriaBuilder#setMaxResult(long)}
      *
      * @param page Starting from zero
      * @param size max size per page
