@@ -26,8 +26,8 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addSelect(String... paths) {
-        for (String ignored : paths) {
-            Selection<T> selection = () -> paths;
+        for (String path : paths) {
+            Selection<T> selection = () -> path.split("\\.");
             criteria.selections.add(selection);
         }
         return self();
