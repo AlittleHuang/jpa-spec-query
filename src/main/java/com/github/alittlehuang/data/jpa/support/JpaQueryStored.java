@@ -80,7 +80,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
         }
 
         public List<R> getResultList() {
-            initWhere().initGroupBy().initFetch();
+            initWhere().initOrderBy().initGroupBy().initFetch();
             //noinspection unchecked
             TypedQuery<R> typedQuery = entityManager.createQuery(query.select(root));
             setLimit(typedQuery, criteria.getOffset(), criteria.getMaxResults());
@@ -100,8 +100,6 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
                         AggregateFunctions aggregate = it.getAggregateFunctions();
 
                         switch ( aggregate == null ? AggregateFunctions.NONE : aggregate ) {
-                            case NONE:
-                                return expression;
                             case AVG:
                                 return cb.avg(expression);
                             case SUM:
