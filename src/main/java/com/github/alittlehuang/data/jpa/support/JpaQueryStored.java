@@ -219,7 +219,9 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             List<? extends FetchAttribute<T>> list = criteria.getFetchAttributes();
             for ( FetchAttribute<T> attr : list ) {
                 Fetch fetch = null;
-                for ( String stringPath : attr.getNames() ) {
+                Class<T> javaType = getJavaType();
+                String[] names = attr.getNames(javaType);
+                for ( String stringPath : names) {
                     if ( fetch == null ) {
                         fetch = root.fetch(stringPath, attr.getJoinType());
                     } else {
@@ -480,8 +482,8 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return args == null || args.length == 0 || args[0] == null || !( args[0] instanceof com.github.alittlehuang.data.query.specification.Expression );
         }
 
-        private <X> Path<?> toPath(Root<X> root, AttributePath attribute) {
-            return JpaHelper.getPath(root, attribute.getNames());
+        private <X> Path<?> toPath(Root<X> root, AttributePath<X> attribute) {
+            return JpaHelper.getPath(root, attribute.getNames(root.getJavaType()));
         }
 
         public class SpecificationImpl {

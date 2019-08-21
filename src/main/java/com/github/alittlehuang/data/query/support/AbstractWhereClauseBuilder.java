@@ -58,7 +58,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        return add((Expression<T>) ( expression ), value, booleanOperator, negate, conditionalOperator);
+        return add((Expression<T>) expression, value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(String expression,

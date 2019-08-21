@@ -9,7 +9,7 @@ import lombok.Getter;
  */
 @Getter
 @EqualsAndHashCode
-public class SimpleAttribute<T> implements AttributePath {
+public class SimpleAttribute<T> implements AttributePath<T> {
 
     private String[] names;
 
@@ -17,8 +17,13 @@ public class SimpleAttribute<T> implements AttributePath {
         this.names = path.split("\\.");
     }
 
+//    @Override
+//    public String[] getNames() {
+//        return names;
+//    }
+
     @Override
-    public String[] getNames() {
+    public String[] getNames(Class<? extends T> type) {
         return names;
     }
 }

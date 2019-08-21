@@ -52,11 +52,19 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
         return Collections.singletonList(this);
     }
 
+//    @Override
+//    default String[] getNames() {
+//        return GetterMethodUtil.getAttrNames(null, this);
+//    }
+
     @Override
-    default String[] getNames() {
-        return GetterMethodUtil.getAttrNames(null, this);
+    default String[] getNames(Class<? extends T> type) {
+        return GetterMethodUtil.getAttrNames(type, this);
     }
 
+    /**
+     * absolute value
+     */
     static <T, R extends Number> Expressions<T, R> abs(Expressions<T, R> expression) {
         return new SimpleExpression<>(expression, Function.ABS);
     }
@@ -69,38 +77,65 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
         return new SimpleExpression<>(expression, Function.SUM, val);
     }
 
+    /**
+     * product
+     */
     static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.PROD, other);
     }
 
+    /**
+     * product
+     */
     static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Number val) {
         return new SimpleExpression<>(expression, Function.PROD, val);
     }
 
+    /**
+     * difference
+     */
     static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.DIFF, other);
     }
 
+    /**
+     * difference
+     */
     static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Number val) {
         return new SimpleExpression<>(expression, Function.DIFF, val);
     }
 
+    /**
+     * quotient
+     */
     static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Number val) {
         return new SimpleExpression<>(expression, Function.QUOT, val);
     }
 
+    /**
+     * quotient
+     */
     static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Expressions<T, R> other) {
         return new SimpleExpression<>(expression, Function.QUOT, other);
     }
 
+    /**
+     * mod
+     */
     static <T> Expressions<T, Integer> mod(Expressions<T, Integer> expression, Expressions<T, Integer> other) {
         return new SimpleExpression<>(expression, Function.MOD, other);
     }
 
+    /**
+     * mod
+     */
     static <T> Expressions<T, Integer> mod(Expressions<T, Integer> expression, Integer other) {
         return new SimpleExpression<>(expression, Function.MOD, other);
     }
 
+    /**
+     * sqrt
+     */
     static <T, R extends Number> Expressions<T, R> sqrt(Expressions<T, R> expression) {
         return new SimpleExpression<>(expression, Function.SQRT);
     }

@@ -55,7 +55,7 @@ public class GetterMethodUtil {
         }
         if ( method == null ) {
             method = CLASS_METHOD_MAP.get(key);
-            Objects.requireNonNull(method,"The function is not getter of " + type.getName());
+            Objects.requireNonNull(method, "The function " + getters + " is not getter of " + type.getName());
         }
         return method;
     }

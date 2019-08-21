@@ -3,7 +3,7 @@ package com.github.alittlehuang.data.query.specification;
 /**
  * @author ALittleHuang
  */
-public interface Expression<T> extends AttributePath {
+public interface Expression<T> extends AttributePath<T> {
 
     Object[] EMPTY_ARGS = {};
 

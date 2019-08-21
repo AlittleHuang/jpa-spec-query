@@ -33,8 +33,13 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
         this.expressions = new Expressions<T, R>() {
             private String[] names = path.split("\\.");
 
+//            @Override
+//            public String[] getNames() {
+//                return names;
+//            }
+
             @Override
-            public String[] getNames() {
+            public String[] getNames(Class<? extends T> type) {
                 return names;
             }
 
@@ -65,9 +70,14 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
         throw new UnsupportedOperationException();
     }
 
+//    @Override
+//    public String[] getNames() {
+//        return expressions.getNames();
+//    }
+
     @Override
-    public String[] getNames() {
-        return expressions.getNames();
+    public String[] getNames(Class<? extends T> type) {
+        return expressions.getNames(type);
     }
 
     @Override
@@ -78,5 +88,10 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
     @Override
     public String getFunctionName() {
         return functionName;
+    }
+
+    @Override
+    public String toString() {
+        return expressions.toString();
     }
 }

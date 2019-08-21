@@ -242,7 +242,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
         List<? extends FetchAttribute<T>> fetchList = criteria.getFetchAttributes();
         if ( fetchList != null && !fetchList.isEmpty() ) {
             for ( FetchAttribute<T> fetch : fetchList ) {
-                String[] names = fetch.getNames();
+                String[] names = fetch.getNames(criteria.getJavaType());
                 boolean hasCollections = false;
                 Class<?> upEntityType = rootEntityInfo.getJavaType();
                 for ( String name : names ) {
@@ -582,8 +582,8 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
         }
     }
 
-    protected void appendAttribute(AttributePath attribute) {
-        String[] names = attribute.getNames();
+    protected void appendAttribute(AttributePath<T> attribute) {
+        String[] names = attribute.getNames(criteria.getJavaType());
         appendAttribute(names, null);
     }
 

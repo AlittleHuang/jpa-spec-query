@@ -5,7 +5,7 @@ import javax.persistence.criteria.JoinType;
 /**
  * @author ALittleHuang
  */
-public interface FetchAttribute<T> extends AttributePath {
+public interface FetchAttribute<T> extends AttributePath<T> {
 
     JoinType getJoinType();
 

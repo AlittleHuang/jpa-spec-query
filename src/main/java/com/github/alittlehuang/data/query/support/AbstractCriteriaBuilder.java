@@ -27,7 +27,8 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     @Override
     public THIS addSelect(String... paths) {
         for (String path : paths) {
-            Selection<T> selection = () -> path.split("\\.");
+            String[] names = path.split("\\.");
+            Selection<T> selection = type -> names;
             criteria.selections.add(selection);
         }
         return self();
@@ -45,8 +46,8 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         Selection<T> selection = new Selection<T>() {
 
             @Override
-            public String[] getNames() {
-                return expression.getNames();
+            public String[] getNames(Class<? extends T> type) {
+                return expression.getNames(criteria.getJavaType());
             }
 
             @Override
