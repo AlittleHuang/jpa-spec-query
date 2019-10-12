@@ -61,13 +61,21 @@ public class GetterMethodUtil {
     }
 
     public static String toAttrName(String getterName) {
-        boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
-        Assert.state(check, "the function is not getters");
-        StringBuilder builder = new StringBuilder(getterName.substring(3));
-        if ( builder.length() == 1 ) {
+//        boolean check = getterName != null && getterName.length() > 3 && getterName.startsWith("get");
+//        Assert.state(check, "the function is not getters");
+        StringBuilder builder = null;
+        if (getterName != null) {
+            if (getterName.length() > 3 && getterName.startsWith("get")) {
+                builder = new StringBuilder(getterName.substring(3));
+            } else if (getterName.length() > 2 && getterName.startsWith("is")) {
+                builder = new StringBuilder(getterName.substring(2));
+            }
+        }
+        Assert.notNull(builder, "the function is not getters");
+        if (builder.length() == 1) {
             return builder.toString().toLowerCase();
         }
-        if ( builder.charAt(1) >= CHAR_A && builder.charAt(1) <= CHAR_Z ) {
+        if (builder.charAt(1) >= CHAR_A && builder.charAt(1) <= CHAR_Z) {
             return builder.toString();
         }
         builder.setCharAt(0, Character.toLowerCase(builder.charAt(0)));
