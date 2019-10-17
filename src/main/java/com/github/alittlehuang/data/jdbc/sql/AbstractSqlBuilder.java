@@ -76,7 +76,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     @Override
     public PrecompiledSql count() {
         sql = new StringBuilder();
-        sql.append("SELECT\n  COUNT(1) AS count_").append(rootEntityInfo.getTableName()).append("_");
+        sql.append("SELECT COUNT(1) AS count_").append(rootEntityInfo.getTableName()).append("_");
         appendFrom(rootEntityInfo);
         int index = sql.length();
         appendWhereClause();
@@ -87,7 +87,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     @Override
     public PrecompiledSql exists() {
         sql = new StringBuilder();
-        sql.append("SELECT\n  ");
+        sql.append("SELECT ");
         appendRootTableAlias();
         sql.append(".`").append(rootEntityInfo.getIdAttribute().getColumnName())
                 .append("` ");
@@ -95,19 +95,19 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
         int index = sql.length();
         appendWhereClause();
         insertJoin(index);
-        sql.append("\nLIMIT 1");
+        sql.append(" LIMIT 1");
         return new PrecompiledSql(sql.toString(), args);
     }
 
     protected void appendLimit() {
         Long offset = criteria.getOffset();
         Long maxResults = criteria.getMaxResults();
-        if ( pageable != null ) {
+        if (pageable != null) {
             offset = pageable.getOffset();
             maxResults = pageable.getPageSize();
         }
-        if ( offset != null || maxResults != null ) {
-            sql.append("\nLIMIT ")
+        if (offset != null || maxResults != null) {
+            sql.append(" LIMIT ")
                     .append(offset == null ? 0 : offset)
                     .append(',')
                     .append(maxResults == null ? Long.MAX_VALUE : maxResults);
@@ -116,8 +116,8 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void appendLockMode() {
         LockModeType lockModeType = criteria.getLockModeType();
-        if ( lockModeType != null ) {
-            switch ( lockModeType ) {
+        if (lockModeType != null) {
+            switch (lockModeType) {
                 case PESSIMISTIC_READ:
                     sql.append(" LOCK IN SHARE MODE");
                     break;
@@ -133,16 +133,16 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void appendGroupings() {
         List<? extends Expression<T>> groupings = criteria.getGroupings();
-        if ( groupings == null || groupings.isEmpty() ) {
+        if (groupings == null || groupings.isEmpty()) {
             return;
         }
-        sql.append("\nGROUP BY\n  ");
+        sql.append(" GROUP BY ");
         boolean first = true;
-        for ( Expression<T> grouping : groupings ) {
-            if ( first ) {
+        for (Expression<T> grouping : groupings) {
+            if (first) {
                 first = false;
             } else {
-                sql.append(",\n  ");
+                sql.append(",");
             }
             appendExpression(grouping);
         }
@@ -150,14 +150,14 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void appendOrders() {
         List<? extends Orders<T>> orders = criteria.getOrders();
-        if ( orders != null && !orders.isEmpty() ) {
-            sql.append("\nORDER BY\n  ");
+        if (orders != null && !orders.isEmpty()) {
+            sql.append(" ORDER BY ");
             boolean first = true;
-            for ( Orders<T> order : orders ) {
-                if ( first ) {
+            for (Orders<T> order : orders) {
+                if (first) {
                     first = false;
                 } else {
-                    sql.append(",\n  ");
+                    sql.append(",");
                 }
                 appendExpression(order);
                 sql.append(" ").append(order.getDirection());
@@ -168,19 +168,19 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void appendWhereClause() {
         WhereClause<T> whereClause = criteria.getWhereClause();
-        if ( whereClause != null ) {
+        if (whereClause != null) {
             boolean notEmpty = !whereClause.isCompound() || !whereClause.getCompoundItems().isEmpty();
-            if ( notEmpty ) {
-                sql.append("\nWHERE\n  ");
+            if (notEmpty) {
+                sql.append(" WHERE ");
                 appendWhereClause(whereClause);
             }
         }
     }
 
     protected void insertJoin(int index) {
-        if ( joinAttrs != null && !joinAttrs.isEmpty() ) {
+        if (joinAttrs != null && !joinAttrs.isEmpty()) {
             StringBuilder join = new StringBuilder();
-            for ( JoinAttr value : joinAttrs.values() ) {
+            for (JoinAttr value : joinAttrs.values()) {
                 buildJoin(join, value);
             }
             sql.insert(index, join);
@@ -189,18 +189,18 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void buildJoin(StringBuilder sql, JoinAttr joinAttr) {
         JoinAttr parent = joinAttr.parent;
-        if ( parent != null ) {
+        if (parent != null) {
             buildJoin(sql, parent);
         }
-        if ( !joinAttr.appended ) {
+        if (!joinAttr.appended) {
             joinAttr.appended = true;
-            sql.append(" \n  ").append(joinAttr.joinType).append(" JOIN `")
+            sql.append(" ").append(joinAttr.joinType).append(" JOIN `")
                     .append(joinAttr.attrInfo.getTableName())
                     .append("` ");
             joinAttr.appendAlias(sql);
             sql.append(" ON ");
 
-            if ( parent != null ) {
+            if (parent != null) {
                 parent.appendAlias(sql);
             } else {
                 appendRootTableAlias(sql);
@@ -209,7 +209,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
             sql.append(".`").append(joinAttr.attribute.getJoinColumn().name()).append("`=");
             joinAttr.appendAlias(sql);
             String referenced = joinAttr.attribute.getJoinColumn().referencedColumnName();
-            if ( referenced.length() == 0 ) {
+            if (referenced.length() == 0) {
                 referenced = joinAttr.attrInfo.getIdAttribute().getColumnName();
             }
             sql.append(".`").append(referenced).append('`');
@@ -218,7 +218,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     protected void appendFrom(EntityInformation entityInfo) {
-        sql.append("\nFROM\n  `")
+        sql.append(" FROM `")
                 .append(entityInfo.getTableName())
                 .append("` ");
         appendRootTableAlias();
@@ -226,13 +226,13 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void appendSelectFromEntity() {
         selectedAttributes = new ArrayList<>();
-        sql.append("SELECT\n  ");
+        sql.append("SELECT ");
         boolean first = true;
-        for ( Attribute attribute : rootEntityInfo.getBasicAttributes() ) {
-            if ( first ) {
+        for (Attribute attribute : rootEntityInfo.getBasicAttributes()) {
+            if (first) {
                 first = false;
             } else {
-                sql.append(",\n  ");
+                sql.append(",");
             }
             appendRootTableAlias();
             sql.append('.');
@@ -240,37 +240,37 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
             selectedAttributes.add(new SelectedAttribute(attribute));
         }
         List<? extends FetchAttribute<T>> fetchList = criteria.getFetchAttributes();
-        if ( fetchList != null && !fetchList.isEmpty() ) {
-            for ( FetchAttribute<T> fetch : fetchList ) {
+        if (fetchList != null && !fetchList.isEmpty()) {
+            for (FetchAttribute<T> fetch : fetchList) {
                 String[] names = fetch.getNames(criteria.getJavaType());
                 boolean hasCollections = false;
                 Class<?> upEntityType = rootEntityInfo.getJavaType();
-                for ( String name : names ) {
+                for (String name : names) {
                     EntityInformation information = getEntityInformation(upEntityType);
                     Attribute attribute = information.getAttribute(name);
-                    if ( attribute.isCollection() ) {
+                    if (attribute.isCollection()) {
                         hasCollections = true;
                         break;
                     }
                     upEntityType = attribute.getJavaType();
                 }
 
-                if ( !hasCollections ) {
+                if (!hasCollections) {
                     String[] tmp = new String[names.length + 1];
                     System.arraycopy(names, 0, tmp, 0, names.length);
 
                     Attribute<?, ?> attr = rootEntityInfo.getAttribute(names[0]);
                     EntityInformation<?, ?> attrInfo = getEntityInformation(attr.getJavaType());
                     SelectedAttribute select = new SelectedAttribute(attr, null);
-                    if ( names.length > 1 ) {
-                        for ( int i = 1; i < names.length; i++ ) {
+                    if (names.length > 1) {
+                        for (int i = 1; i < names.length; i++) {
                             attr = attrInfo.getAttribute(names[i]);
                             attrInfo = getEntityInformation(attr.getJavaType());
                             select = new SelectedAttribute(attr, select);
                         }
                     }
-                    for ( Attribute attribute : attrInfo.getBasicAttributes() ) {
-                        sql.append(",\n  ");
+                    for (Attribute attribute : attrInfo.getBasicAttributes()) {
+                        sql.append(",");
                         tmp[names.length] = attribute.getFieldName();
                         appendAttribute(tmp, fetch.getJoinType());
                         selectedAttributes.add(new SelectedAttribute(attribute, select));
@@ -287,16 +287,16 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
         List<? extends Selection<T>> selections = criteria.getSelections();
         Assert.state(selections != null && !selections.isEmpty(), "selections must not be empty");
 
-        sql.append("SELECT\n  ");
+        sql.append("SELECT ");
         boolean first = true;
-        for ( Selection<T> selection : selections ) {
-            if ( first ) {
+        for (Selection<T> selection : selections) {
+            if (first) {
                 first = false;
             } else {
-                sql.append(",\n  ");
+                sql.append(",");
             }
             AggregateFunctions aggregate = selection.getAggregateFunctions();
-            if ( aggregate == null || aggregate == AggregateFunctions.NONE ) {
+            if (aggregate == null || aggregate == AggregateFunctions.NONE) {
                 appendExpression(selection);
             } else {
                 sql.append(aggregate).append("(");
@@ -322,7 +322,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     protected void appendWhereClause(WhereClause<T> whereClause) {
-        if ( whereClause.isCompound() ) {
+        if (whereClause.isCompound()) {
             appendCompoundWhereClause(whereClause);
         } else {
             appendNonCompoundWhereClause(whereClause);
@@ -333,7 +333,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
         Expression<T> expression = item.getExpression();
         boolean negate = item.isNegate();
         appendExpression(expression);
-        switch ( item.getConditionalOperator() ) {
+        switch (item.getConditionalOperator()) {
             case EQUAL:
                 appendComparisonOperatorExpression(item, negate ? "<>" : "=");
                 break;
@@ -376,7 +376,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     private void appendBetweenExpression(WhereClause<T> item, boolean negate) {
-        Iterator<?> iterator = ( (Iterable<?>) item.getParameter() ).iterator();
+        Iterator<?> iterator = ((Iterable<?>) item.getParameter()).iterator();
         sql.append(negate ? " NOT BETWEEN " : " BETWEEN ");
         appendSimpleParam(iterator.next());
         sql.append(" AND ");
@@ -390,13 +390,13 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     protected void appendSqlParameter(Object parameter) {
-        if ( parameter instanceof Expression ) {
+        if (parameter instanceof Expression) {
             //noinspection unchecked
             appendExpression((Expression<T>) parameter);
-        } else if ( parameter instanceof Iterable ) {
+        } else if (parameter instanceof Iterable) {
             boolean first = true;
-            for ( Object arg : ( (Iterable<?>) parameter ) ) {
-                if ( first ) {
+            for (Object arg : ((Iterable<?>) parameter)) {
+                if (first) {
                     first = false;
                 } else {
                     sql.append(',');
@@ -418,7 +418,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
             Float.class,
             Double.class
     ));
-    
+
     protected void appendSimpleParam(Object arg) {
         if (arg != null && BASIC_NUMBER_CLASS.contains(arg.getClass())) {
             sql.append(arg);
@@ -430,8 +430,8 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void appendFunArg(Object[] parameter) {
         boolean first = true;
-        for ( Object o : parameter ) {
-            if ( first ) {
+        for (Object o : parameter) {
+            if (first) {
                 first = false;
             } else {
                 sql.append(",");
@@ -444,7 +444,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
         Expression.Function function = expression.getFunction();
         function = function == null ? Expression.Function.NONE : function;
         Object[] args = expression.getArgs();
-        switch ( function ) {
+        switch (function) {
             case NONE:
                 appendAttribute(expression);
                 break;
@@ -518,7 +518,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     private void customize(Expression<T> expression) {
         String functionName = expression.getFunctionName();
-        if ( expression.getArgs() == null || expression.getArgs().length == 0 ) {
+        if (expression.getArgs() == null || expression.getArgs().length == 0) {
             appendSingleParameterFunction(expression, functionName);
         } else {
             appendMultiParameterFunction(expression, functionName);
@@ -534,12 +534,12 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     private void trim(Expression<T> expression, Object[] args) {
-        if ( args == null || args.length == 0 ) {
+        if (args == null || args.length == 0) {
             appendSingleParameterFunction(expression, "TRIM");
         } else {
             Trimspec p0 = (Trimspec) args[0];
             char p1 = ' ';
-            if ( args.length > 1 ) {
+            if (args.length > 1) {
                 p1 = (char) args[1];
             }
             sql.append("TRIM(").append(p0).append(" '").append(p1).append("' FROM ");
@@ -557,6 +557,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     private static Pattern pattern = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*$");
+
     protected void appendSingleParameterFunction(Expression<T> expression, String funStr) {
         Assert.state(pattern.matcher(funStr).matches(), "function name error");
         sql.append(funStr).append("(");
@@ -565,16 +566,16 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     protected void appendFunArgs(Object arg) {
-        if ( arg instanceof Expression ) {
+        if (arg instanceof Expression) {
             //noinspection unchecked
             Expression<T> ex = (Expression<T>) arg;
             boolean lowPriority = ex.getFunction() == Expression.Function.SUM
                     || ex.getFunction() == Expression.Function.DIFF;
-            if ( lowPriority ) {
+            if (lowPriority) {
                 sql.append("(");
             }
             appendExpression(ex);
-            if ( lowPriority ) {
+            if (lowPriority) {
                 sql.append(")");
             }
         } else {
@@ -589,24 +590,24 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
 
     protected void appendAttribute(String[] names, JoinType joinType) {
         Attribute<?, ?> attr = rootEntityInfo.getAttribute(names[0]);
-        if ( names.length > 1 ) {
+        if (names.length > 1) {
             joinAttrs = joinAttrs == null ? new HashMap<>() : joinAttrs;
             JoinAttr joinAttr = null;
-            for (int i = 1; i < names.length; i++ ) {
+            for (int i = 1; i < names.length; i++) {
                 JointKey key = new JointKey(joinAttr, attr);
-                if ( !joinAttrs.containsKey(key) ) {
+                if (!joinAttrs.containsKey(key)) {
                     joinAttrs.put(key, new JoinAttr(joinAttr, attr));
                 }
                 joinAttr = joinAttrs.get(key);
-                if ( i == names.length - 1 ) {
+                if (i == names.length - 1) {
                     joinAttr.joinType = joinType == null ? DEFAULT_JOIN_TYPE : joinType;
-                } else if ( joinAttr.joinType == null ) {
+                } else if (joinAttr.joinType == null) {
                     joinAttr.joinType = DEFAULT_JOIN_TYPE;
                 }
 
                 EntityInformation attrInfo = getEntityInformation(attr.getJavaType());
                 attr = attrInfo.getAttribute(names[i]);
-                if ( !attr.isEntityType() ) {
+                if (!attr.isEntityType()) {
                     joinAttr.appendAlias(sql);
                     sql.append('.');
                 }
@@ -623,35 +624,35 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
         int appendIndex = sql.length();
 
         List<? extends WhereClause<T>> items = whereClause.getCompoundItems();
-        if ( items.size() == 1 ) {
+        if (items.size() == 1) {
             WhereClause<T> sub = items.get(0);
-            if ( sub.isCompound() ) {
+            if (sub.isCompound()) {
                 appendCompoundWhereClause(sub);
             } else {
                 appendNonCompoundWhereClause(sub);
             }
-        } else if ( !items.isEmpty() ) {
+        } else if (!items.isEmpty()) {
             Predicate.BooleanOperator preOperator = null;
             boolean firstWhereClause = true;
-            for ( WhereClause<T> item : items ) {
-                if ( isEmpty(item) ) {
+            for (WhereClause<T> item : items) {
+                if (isEmpty(item)) {
                     continue;
-                } else if ( !firstWhereClause ) {
+                } else if (!firstWhereClause) {
                     Predicate.BooleanOperator operator = item.getBooleanOperator();
-                    if ( preOperator == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND ) {
+                    if (preOperator == Predicate.BooleanOperator.OR && operator == Predicate.BooleanOperator.AND) {
                         sql.insert(appendIndex, "(").append(")");
                     }
-                    sql.append(operator == Predicate.BooleanOperator.OR ? "\n  OR  " : "\n  AND ");
+                    sql.append(operator == Predicate.BooleanOperator.OR ? " OR " : " AND ");
                     preOperator = operator;
                 } else {
                     firstWhereClause = false;
                 }
                 boolean compound = item.isCompound() && item.getCompoundItems().size() > 1;
-                if ( compound ) {
+                if (compound) {
                     sql.append("(");
                 }
                 appendWhereClause(item);
-                if ( compound ) {
+                if (compound) {
                     sql.append(")");
                 }
             }
