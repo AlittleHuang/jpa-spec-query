@@ -20,6 +20,6 @@ public interface UpdateStored<T> {
 
     int[] update(Iterable<T> entities);
 
-    <X extends Iterable<T>> X insert(X entities);
+    <X extends Iterable<? extends T>> X insert(X entities);
 
 }

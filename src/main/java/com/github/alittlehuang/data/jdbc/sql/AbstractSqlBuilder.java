@@ -491,7 +491,7 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
                 appendSingleParameterFunction(expression, "UPPER");
                 break;
             case LENGTH:
-                appendSingleParameterFunction(expression, "UPPER");
+                appendSingleParameterFunction(expression, "LENGTH");
                 break;
             case LOCATE:
                 locate(expression, args);

@@ -68,10 +68,10 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
     }
 
     @Override
-    public <X extends Iterable<T>> X insert(X entities) {
+    public <X extends Iterable<? extends T>> X insert(X entities) {
         Assert.notNull(entities, "entity must not be null");
 
-        Iterator<T> iterator = entities.iterator();
+        Iterator<? extends T> iterator = entities.iterator();
         if ( !iterator.hasNext() ) {
             return entities;
         }
@@ -94,10 +94,10 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
         StringBuilder sql;
         private List<List<?>> args;
 
-        final Iterable<T> entities;
+        final Iterable<? extends T> entities;
         final Class<T> type;
 
-        UpdateSlqBuilder(Iterable<T> entities, Class<T> type) {
+        UpdateSlqBuilder(Iterable<? extends T> entities, Class<T> type) {
             this.entities = entities;
             this.type = type;
         }
@@ -137,7 +137,7 @@ public class JdbcUpdateStored<T> implements UpdateStored<T> {
                 sql.append(" AND ").append(versionAttribute.getColumnName()).append("=?");
             }
 
-            Iterator<T> iterator = entities.iterator();
+            Iterator<? extends T> iterator = entities.iterator();
             for ( Data data : dataList ) {
                 data.arg.add(data.idValue);
                 if ( hasVersion ) {
