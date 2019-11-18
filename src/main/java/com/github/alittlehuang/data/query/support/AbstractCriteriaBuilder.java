@@ -1,6 +1,7 @@
 package com.github.alittlehuang.data.query.support;
 
 import com.github.alittlehuang.data.query.specification.*;
+import com.github.alittlehuang.data.query.support.model.*;
 
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.JoinType;
@@ -12,14 +13,14 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
         extends AbstractWhereClauseBuilder<T, THIS>
         implements CriteriaBuilder<T, THIS> {
 
-    private final SimpleCriteria<T> criteria;
+    private final CriteriaModel<T> criteria;
 
     protected AbstractCriteriaBuilder(Class<T> type) {
         super();
-        this.criteria = new SimpleCriteria<>(getWhereClause(), type);
+        this.criteria = new CriteriaModel<>(getWhereClause(), type);
     }
 
-    public AbstractCriteriaBuilder(Expression<T> path, SimpleWhereClause<T> root, SimpleCriteria<T> criteria) {
+    public AbstractCriteriaBuilder(Expression<T> path, WhereClauseModel<T> root, CriteriaModel<T> criteria) {
         super(path, root);
         this.criteria = criteria;
     }
@@ -28,120 +29,108 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     public THIS addSelect(String... paths) {
         for (String path : paths) {
             String[] names = path.split("\\.");
-            Selection<T> selection = type -> names;
-            criteria.selections.add(selection);
+            SelectionModel<T> selectionModel = new SelectionModel<>();
+            selectionModel.setNames(names);
+            criteria.getSelections().add(selectionModel);
         }
         return self();
     }
 
     @Override
     public THIS addSelect(Expressions<T, ?> expression) {
-        criteria.selections.add(expression);
+        criteria.getSelections().add(new SelectionModel<>(expression, getJavaType()));
         return self();
     }
 
     @Override
     public THIS addSelect(Expressions<T, Number> expression, AggregateFunctions aggregate) {
 
-        Selection<T> selection = new Selection<T>() {
+        SelectionModel<T> model = new SelectionModel<>(expression, getJavaType());
+        model.setAggregateFunctions(aggregate);
 
-            @Override
-            public String[] getNames(Class<? extends T> type) {
-                return expression.getNames(criteria.getJavaType());
-            }
-
-            @Override
-            public Object[] getArgs() {
-                return expression.getArgs();
-            }
-
-            @Override
-            public Expression<T> getSubexpression() {
-                return expression.getSubexpression();
-            }
-
-            @Override
-            public Function getFunction() {
-                return expression.getFunction();
-            }
-
-            @Override
-            public AggregateFunctions getAggregateFunctions() {
-                return aggregate;
-            }
-
-        };
-
-        criteria.selections.add(selection);
+        criteria.getSelections().add(model);
         return self();
     }
 
     @Override
     public THIS addGroupings(String... paths) {
         for (String path : paths) {
-            criteria.groupings.add(new SimpleExpression<>(path));
+            ExpressionModel<T> model = new ExpressionModel<>();
+            model.setNames(path.split("\\."));
+            criteria.getGroupings().add(model);
         }
         return self();
     }
 
     @Override
     public THIS addGroupings(Expressions<T, ?> expression) {
-        criteria.groupings.add(expression);
+        criteria.getGroupings().add(ExpressionModel.convert(expression, getJavaType()));
         return self();
     }
 
     @Override
     public THIS addOrdersAsc(String... paths) {
         for (String path : paths) {
-            criteria.orders.add(new SimpleOrders<>(Direction.ASC, path));
+            OrdersModel<T> order = new OrdersModel<>();
+            order.setNames(path.split("\\."));
+            criteria.getOrders().add(order);
         }
         return self();
     }
 
     @Override
     public THIS addOrdersAsc(Expressions<T, ?> expression) {
-        criteria.orders.add(new SimpleOrders<>(Direction.ASC, expression));
+        criteria.getOrders().add(new OrdersModel<>(expression, getJavaType()));
         return self();
     }
 
     @Override
     public THIS addOrdersDesc(String... paths) {
         for (String path : paths) {
-            criteria.orders.add(new SimpleOrders<>(Direction.DESC, path));
+            OrdersModel<T> order = new OrdersModel<>();
+            order.setNames(path.split("\\."));
+            order.setDirection(Direction.DESC);
+            criteria.getOrders().add(order);
         }
         return self();
     }
 
     @Override
     public THIS addOrdersDesc(Expressions<T, ?> expression) {
-        criteria.orders.add(new SimpleOrders<>(Direction.DESC, expression));
+        OrdersModel<T> order = new OrdersModel<>(expression, getJavaType());
+        order.setDirection(Direction.DESC);
+        criteria.getOrders().add(order);
         return self();
     }
 
     @Override
     public THIS fetch(String... paths) {
         for (String path : paths) {
-            criteria.fetchAttributes.add(new SimpleFetchAttribute<>(path, JoinType.LEFT));
+            fetch(path, JoinType.LEFT);
         }
         return self();
     }
 
     @Override
     public THIS fetch(String paths, JoinType joinType) {
-        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(paths, joinType));
+        FetchAttributeModel<T> fetchAttribute = new FetchAttributeModel<>();
+        fetchAttribute.setJoinType(joinType);
+        fetchAttribute.setNames(paths.split("\\."));
+        criteria.getFetchAttributes().add(fetchAttribute);
         return self();
     }
 
     @Override
     public THIS fetch(Expressions<T, ?> expression, JoinType joinType) {
-        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(expression, joinType));
+        FetchAttributeModel<T> attributeModel = new FetchAttributeModel<>(expression, getJavaType());
+        attributeModel.setJoinType(joinType);
+        criteria.getFetchAttributes().add(attributeModel);
         return self();
     }
 
     @Override
     public THIS fetch(Expressions<T, ?> expression) {
-        criteria.fetchAttributes.add(new SimpleFetchAttribute<>(expression, JoinType.LEFT));
-        return self();
+        return fetch(expression, JoinType.LEFT);
     }
 
     @Override
@@ -151,7 +140,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     }
 
     @Override
-    public SimpleCriteria<T> getCriteria() {
+    public CriteriaModel<T> getCriteria() {
         return criteria;
     }
 

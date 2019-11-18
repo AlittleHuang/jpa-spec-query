@@ -3,6 +3,8 @@ package com.github.alittlehuang.data.query.support;
 import com.github.alittlehuang.data.query.page.Page;
 import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.specification.Query;
+import com.github.alittlehuang.data.query.support.model.CriteriaModel;
+import com.github.alittlehuang.data.query.support.model.WhereClauseModel;
 
 /**
  * @author ALittleHuang
@@ -14,8 +16,8 @@ public class QueryImpl<T> extends AbstractQuery<T, Page<T>, Query<T>> implements
     }
 
     protected QueryImpl(Expression<T> expression,
-                        SimpleWhereClause<T> root,
-                        SimpleCriteria<T> criteria,
+                        WhereClauseModel<T> root,
+                        CriteriaModel<T> criteria,
                         AbstractQueryStored<T, Page<T>> stored) {
         super(expression, root, criteria, stored);
     }

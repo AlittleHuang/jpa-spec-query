@@ -2,52 +2,38 @@ package com.github.alittlehuang.data.query.support;
 
 import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.specification.Expressions;
+import com.github.alittlehuang.data.query.support.model.ExpressionModel;
 
 /**
  * @author ALittleHuang
  */
-public class SimpleExpression<T, R> implements Expressions<T, R> {
+public class ExpressionsImpl<T, R> implements Expressions<T, R> {
 
     private Expression<T> expressions;
 
-    private Expression.Function type;
+    private Expression.Function type = Function.NONE;
 
-    private Object[] args;
+    private Object[] args = Expression.EMPTY_ARGS;
 
     private String functionName;
 
-    public SimpleExpression(Expressions<T, ?> expressions, Expression.Function type, Object... args) {
+    public ExpressionsImpl(Expressions<T, ?> expressions, Expression.Function type, Object... args) {
         this.expressions = expressions;
         this.type = type;
         this.args = args;
     }
 
-    public SimpleExpression(String function, Expressions<T, ?> expressions, Expression.Function type, Object... args) {
+    public ExpressionsImpl(String function, Expressions<T, ?> expressions, Expression.Function type, Object... args) {
         this.expressions = expressions;
         this.type = type;
         this.args = args;
         functionName = function;
     }
 
-    public SimpleExpression(String path) {
-        this.expressions = new Expressions<T, R>() {
-            private String[] names = path.split("\\.");
-
-//            @Override
-//            public String[] getNames() {
-//                return names;
-//            }
-
-            @Override
-            public String[] getNames(Class<? extends T> type) {
-                return names;
-            }
-
-            @Override
-            public R apply(T t) {
-                throw new UnsupportedOperationException();
-            }
-        };
+    public ExpressionsImpl(String path) {
+        ExpressionModel<T> expressions = new ExpressionModel<>();
+        expressions.setNames(path.split("\\."));
+        this.expressions = expressions;
     }
 
     @Override
@@ -69,11 +55,6 @@ public class SimpleExpression<T, R> implements Expressions<T, R> {
     public <V> Expressions<T, V> to(Expressions<? extends R, ? extends V> expression) {
         throw new UnsupportedOperationException();
     }
-
-//    @Override
-//    public String[] getNames() {
-//        return expressions.getNames();
-//    }
 
     @Override
     public String[] getNames(Class<? extends T> type) {

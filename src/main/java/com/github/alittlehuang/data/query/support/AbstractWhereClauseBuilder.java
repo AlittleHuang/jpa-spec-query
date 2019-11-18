@@ -1,6 +1,7 @@
 package com.github.alittlehuang.data.query.support;
 
 import com.github.alittlehuang.data.query.specification.*;
+import com.github.alittlehuang.data.query.support.model.WhereClauseModel;
 import lombok.experimental.Delegate;
 
 import javax.persistence.criteria.Predicate;
@@ -11,15 +12,15 @@ import static javax.persistence.criteria.Predicate.BooleanOperator.AND;
 import static javax.persistence.criteria.Predicate.BooleanOperator.OR;
 
 public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
-        extends SimpleWhereClause<T>
         implements WhereClauseBuilder<T, THIS> {
 
     private static final boolean NOT = true;
-    private final SimpleWhereClause<T> root;
+    private final WhereClauseModel<T> root;
+    private final WhereClauseModel<T> current;
 
-    public AbstractWhereClauseBuilder(Expression<T> expression, SimpleWhereClause<T> root) {
-        super(expression);
-        this.root = root;
+    public AbstractWhereClauseBuilder(Expression<T> expression, WhereClause<T> root) {
+        current = new WhereClauseModel<>(expression, getJavaType());
+        this.root = WhereClauseModel.convert(root, getJavaType());
     }
 
     protected abstract THIS createSubItem(Expression<T> expression);
@@ -35,8 +36,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     public AbstractWhereClauseBuilder() {
-        super(null);
-        this.root = this;
+        this.root = current = new WhereClauseModel<>(getJavaType());
     }
 
     private THIS add(Expression<T> expression,
@@ -45,11 +45,11 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
         AbstractWhereClauseBuilder<T, THIS> item = sub(expression);
-        item.parameter = value;
-        item.booleanOperator = booleanOperator;
-        item.conditionalOperator = conditionalOperator;
-        item.negate = negate;
-        getCompoundItems().add(item);
+        item.current.setParameter(value);
+        item.current.setBooleanOperator(booleanOperator);
+        item.current.setConditionalOperator(conditionalOperator);
+        item.current.setNegate(negate);
+        current.getCompoundItems().add(item.current);
         return self();
     }
 
@@ -66,7 +66,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        return add(new SimpleExpression<>(expression), value, booleanOperator, negate, conditionalOperator);
+        return add(new ExpressionsImpl<>(expression), value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(Expressions<T, ?> expression,
@@ -86,7 +86,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     @Override
     public THIS and() {
         AbstractWhereClauseBuilder<T, THIS> sub = sub(null);
-        getCompoundItems().add(sub);
+        current.getCompoundItems().add(sub.current);
         return sub.self();
     }
 
@@ -94,32 +94,24 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     public THIS and(WhereClause<T> whereClause) {
         WhereClause<T> sub;
         sub = sub(whereClause, AND);
-        getCompoundItems().add(sub);
+        current.getCompoundItems().add(WhereClauseModel.convert(sub, getJavaType()));
         return self();
     }
 
     private WhereClause<T> sub(WhereClause<T> whereClause,
                                Predicate.BooleanOperator booleanOperator) {
-        WhereClause<T> sub;
-        if ( whereClause instanceof SimpleWhereClause ) {
-            sub = whereClause;
-            ( (SimpleWhereClause) sub ).booleanOperator = booleanOperator;
-        } else {
-            sub = new AbstractWhereClause(whereClause) {
-                @Override
-                public Predicate.BooleanOperator getBooleanOperator() {
-                    return booleanOperator;
-                }
-            };
-        }
-        return sub;
+
+        WhereClauseModel<T> result = WhereClauseModel.convert(whereClause, getJavaType());
+        result.setBooleanOperator(booleanOperator);
+
+        return result;
     }
 
     @Override
     public THIS or() {
         AbstractWhereClauseBuilder<T, THIS> sub = sub(null);
-        sub.booleanOperator = OR;
-        getCompoundItems().add(sub);
+        sub.current.setBooleanOperator(OR);
+        current.getCompoundItems().add(WhereClauseModel.convert(sub.current, getJavaType()));
         return sub.self();
     }
 
@@ -127,7 +119,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     public THIS or(WhereClause<T> whereClause) {
         WhereClause<T> sub;
         sub = sub(whereClause, OR);
-        getCompoundItems().add(sub);
+        current.getCompoundItems().add(WhereClauseModel.convert(sub, getJavaType()));
         return self();
     }
 
@@ -560,7 +552,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     }
 
     @Override
-    public SimpleWhereClause<T> getWhereClause() {
+    public WhereClauseModel<T> getWhereClause() {
         return root;
     }
 

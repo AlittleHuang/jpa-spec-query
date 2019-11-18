@@ -3,6 +3,8 @@ package com.github.alittlehuang.data.query.support;
 import com.github.alittlehuang.data.query.specification.BaseQuery;
 import com.github.alittlehuang.data.query.specification.BaseQueryStored;
 import com.github.alittlehuang.data.query.specification.Expression;
+import com.github.alittlehuang.data.query.support.model.CriteriaModel;
+import com.github.alittlehuang.data.query.support.model.WhereClauseModel;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public abstract class AbstractQuery<T, P, THIS extends BaseQuery<T, P, THIS>>
         this.stored = stored;
     }
 
-    protected AbstractQuery(Expression<T> expression, SimpleWhereClause<T> root, SimpleCriteria<T> criteria,
+    protected AbstractQuery(Expression<T> expression, WhereClauseModel<T> root, CriteriaModel<T> criteria,
                             AbstractQueryStored<T, P> stored) {
         super(expression, root, criteria);
         stored.criteria = criteria;

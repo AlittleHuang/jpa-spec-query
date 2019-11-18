@@ -395,4 +395,6 @@ public interface WhereClauseBuilder<T, THIS extends WhereClauseBuilder<T, THIS>>
     <X, E extends Expressions<T, ? super X>> THIS orNotIn(E expression, X... value);
 
     WhereClause<T> getWhereClause();
+
+    Class<T> getJavaType();
 }
