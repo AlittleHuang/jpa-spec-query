@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -26,7 +29,7 @@ public class ExpressionModel<T> extends AttributePathModel<T> implements Express
         this.functionName = expression.getFunctionName();
     }
 
-    public static <T> ExpressionModel<T> convert(Expression<T> expression, Class<? extends T> javaType) {
+    public static <T> ExpressionModel<T> convertExpression(Expression<T> expression, Class<? extends T> javaType) {
         if (expression.getClass() == ExpressionModel.class) {
             return (ExpressionModel<T>) expression;
         } else {
@@ -34,4 +37,15 @@ public class ExpressionModel<T> extends AttributePathModel<T> implements Express
         }
     }
 
+
+    public static <T> List<ExpressionModel<T>> convertExpression(List<? extends Expression<T>> expression,
+                                                                 Class<? extends T> javaType) {
+
+        if (expression == null || expression.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return expression.stream().map(i -> convertExpression(i, javaType)).collect(Collectors.toList());
+
+    }
 }

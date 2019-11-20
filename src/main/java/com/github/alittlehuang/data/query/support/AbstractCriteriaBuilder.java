@@ -16,13 +16,13 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
     private final CriteriaModel<T> criteria;
 
     protected AbstractCriteriaBuilder(Class<T> type) {
-        super();
+        super(type);
         this.criteria = new CriteriaModel<>(getWhereClause(), type);
     }
 
-    public AbstractCriteriaBuilder(Expression<T> path, WhereClauseModel<T> root, CriteriaModel<T> criteria) {
-        super(path, root);
-        this.criteria = criteria;
+    public AbstractCriteriaBuilder(Expression<T> path, WhereClause<T> root, Criteria<T> criteria) {
+        super(path, root, criteria.getJavaType());
+        this.criteria = CriteriaModel.convert(criteria);
     }
 
     @Override
@@ -64,7 +64,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addGroupings(Expressions<T, ?> expression) {
-        criteria.getGroupings().add(ExpressionModel.convert(expression, getJavaType()));
+        criteria.getGroupings().add(ExpressionModel.convertExpression(expression, getJavaType()));
         return self();
     }
 

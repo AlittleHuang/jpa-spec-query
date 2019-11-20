@@ -15,10 +15,18 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
         implements WhereClauseBuilder<T, THIS> {
 
     private static final boolean NOT = true;
+    private final Class<T> javaType;
     private final WhereClauseModel<T> root;
     private final WhereClauseModel<T> current;
 
-    public AbstractWhereClauseBuilder(Expression<T> expression, WhereClause<T> root) {
+    public AbstractWhereClauseBuilder(Class<T> javaType) {
+        this.javaType = javaType;
+        this.root = current = new WhereClauseModel<>(getJavaType());
+    }
+
+    public AbstractWhereClauseBuilder(Expression<T> expression, WhereClause<T> root, Class<T> javaType) {
+        this.javaType = javaType;
+
         current = new WhereClauseModel<>(expression, getJavaType());
         this.root = WhereClauseModel.convert(root, getJavaType());
     }
@@ -33,10 +41,6 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
     private AbstractWhereClauseBuilder<T, THIS> sub(Expression<T> expression) {
         //noinspection unchecked
         return (AbstractWhereClauseBuilder) createSubItem(expression);
-    }
-
-    public AbstractWhereClauseBuilder() {
-        this.root = current = new WhereClauseModel<>(getJavaType());
     }
 
     private THIS add(Expression<T> expression,
@@ -564,5 +568,10 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
             this.whereClause = whereClause;
         }
 
+    }
+
+    @Override
+    public Class<T> getJavaType() {
+        return javaType;
     }
 }
