@@ -18,18 +18,21 @@ public class FetchAttributeModel<T> extends AttributePathModel<T> implements Fet
     public FetchAttributeModel() {
     }
 
-    public FetchAttributeModel(AttributePath<T> expression, Class<? extends T> javaType) {
-        super(expression, javaType);
+    public FetchAttributeModel(AttributePath<T> expression) {
+        super(expression);
     }
 
-    public static <T> FetchAttributeModel<T> convertFetch(FetchAttribute<T> fetch, Class<? extends T> javaType) {
-        FetchAttributeModel<T> result = new FetchAttributeModel<>(fetch, javaType);
+    public FetchAttributeModel(String[] names) {
+        super(names);
+    }
+
+    public static <T> FetchAttributeModel<T> convertFetch(FetchAttribute<T> fetch) {
+        FetchAttributeModel<T> result = new FetchAttributeModel<>(fetch);
         result.setJoinType(fetch.getJoinType());
         return result;
     }
 
-    public static <T> List<FetchAttributeModel<T>> convertFetch(List<? extends FetchAttribute<T>> fetch, Class<? extends T> javaType) {
-        return fetch.stream().map(i -> convertFetch(i, javaType))
-                .collect(Collectors.toList());
+    public static <T> List<FetchAttributeModel<T>> convertFetch(List<? extends FetchAttribute<T>> fetch) {
+        return fetch.stream().map(FetchAttributeModel::convertFetch).collect(Collectors.toList());
     }
 }

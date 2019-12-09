@@ -38,16 +38,15 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addSelect(Expressions<T, ?> expression) {
-        criteria.getSelections().add(new SelectionModel<>(expression, getJavaType()));
+        criteria.getSelections().add(expression.toSelectionModel(getJavaType()));
         return self();
     }
 
     @Override
     public THIS addSelect(Expressions<T, Number> expression, AggregateFunctions aggregate) {
 
-        SelectionModel<T> model = new SelectionModel<>(expression, getJavaType());
+        SelectionModel<T> model = expression.toSelectionModel(getJavaType());
         model.setAggregateFunctions(aggregate);
-
         criteria.getSelections().add(model);
         return self();
     }
@@ -64,7 +63,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addGroupings(Expressions<T, ?> expression) {
-        criteria.getGroupings().add(ExpressionModel.convertExpression(expression, getJavaType()));
+        criteria.getGroupings().add(expression.toExpressionModel(getJavaType()));
         return self();
     }
 
@@ -80,7 +79,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addOrdersAsc(Expressions<T, ?> expression) {
-        criteria.getOrders().add(new OrdersModel<>(expression, getJavaType()));
+        criteria.getOrders().add(expression.toOrdersModel(getJavaType()));
         return self();
     }
 
@@ -97,7 +96,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS addOrdersDesc(Expressions<T, ?> expression) {
-        OrdersModel<T> order = new OrdersModel<>(expression, getJavaType());
+        OrdersModel<T> order = expression.toOrdersModel(getJavaType());
         order.setDirection(Direction.DESC);
         criteria.getOrders().add(order);
         return self();
@@ -122,7 +121,7 @@ public abstract class AbstractCriteriaBuilder<T, THIS extends CriteriaBuilder<T,
 
     @Override
     public THIS fetch(Expressions<T, ?> expression, JoinType joinType) {
-        FetchAttributeModel<T> attributeModel = new FetchAttributeModel<>(expression, getJavaType());
+        FetchAttributeModel<T> attributeModel = expression.toFetchAttributeModel(getJavaType());
         attributeModel.setJoinType(joinType);
         criteria.getFetchAttributes().add(attributeModel);
         return self();

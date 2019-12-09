@@ -21,31 +21,34 @@ public class ExpressionModel<T> extends AttributePathModel<T> implements Express
     public ExpressionModel() {
     }
 
-    public ExpressionModel(Expression<T> expression, Class<? extends T> javaType) {
-        super(expression, javaType);
+    public ExpressionModel(String[] names) {
+        super(names);
+    }
+
+    public ExpressionModel(Expression<T> expression) {
+        super(expression);
         this.args = expression.getArgs();
         this.subexpression = expression.getSubexpression();
         this.function = expression.getFunction();
         this.functionName = expression.getFunctionName();
     }
 
-    public static <T> ExpressionModel<T> convertExpression(Expression<T> expression, Class<? extends T> javaType) {
+    public static <T> ExpressionModel<T> convertExpression(Expression<T> expression) {
         if (expression.getClass() == ExpressionModel.class) {
             return (ExpressionModel<T>) expression;
         } else {
-            return new ExpressionModel<>(expression, javaType);
+            return new ExpressionModel<>(expression);
         }
     }
 
 
-    public static <T> List<ExpressionModel<T>> convertExpression(List<? extends Expression<T>> expression,
-                                                                 Class<? extends T> javaType) {
+    public static <T> List<ExpressionModel<T>> convertExpression(List<? extends Expression<T>> expression) {
 
         if (expression == null || expression.isEmpty()) {
             return Collections.emptyList();
         }
 
-        return expression.stream().map(i -> convertExpression(i, javaType)).collect(Collectors.toList());
+        return expression.stream().map(ExpressionModel::convertExpression).collect(Collectors.toList());
 
     }
 }

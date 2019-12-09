@@ -8,6 +8,7 @@ import com.github.alittlehuang.data.query.page.Pageable;
 import com.github.alittlehuang.data.query.specification.Selection;
 import com.github.alittlehuang.data.query.specification.*;
 import com.github.alittlehuang.data.query.support.AbstractQueryStored;
+import com.github.alittlehuang.data.query.support.model.ExpressionModel;
 
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
@@ -220,7 +221,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             for ( FetchAttribute<T> attr : list ) {
                 Fetch fetch = null;
                 Class<T> javaType = getJavaType();
-                String[] names = attr.getNames(javaType);
+                String[] names = attr.getNames();
                 for ( String stringPath : names) {
                     if ( fetch == null ) {
                         fetch = root.fetch(stringPath, attr.getJoinType());
@@ -245,14 +246,20 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return new SpecificationImpl(where).toPredicate(root, query, cb);
         }
 
-        public <X> Expression toExpression(com.github.alittlehuang.data.query.specification.Expression<X> expression, CriteriaBuilder cb, Root<X> root) {
-            com.github.alittlehuang.data.query.specification.Expression<X> subexpression = expression.getSubexpression();
-            Expression exp = ( subexpression != null )
+        public Expression toExpression(com.github.alittlehuang.data.query.specification.Expressions<T, ?> expression, CriteriaBuilder cb, Root<T> root) {
+            Class<T> javaType = getJavaType();
+            ExpressionModel<T> model = expression.toExpressionModel(javaType);
+            return toExpression(model, cb, root);
+        }
+
+        public Expression toExpression(com.github.alittlehuang.data.query.specification.Expression<T> expression, CriteriaBuilder cb, Root<T> root) {
+            com.github.alittlehuang.data.query.specification.Expression<T> subexpression = expression.getSubexpression();
+            Expression exp = (subexpression != null)
                     ? toExpression(subexpression, cb, root)
                     : toPath(root, expression);
 
             com.github.alittlehuang.data.query.specification.Expression.Function type = expression.getFunction();
-            if ( type == null ) {
+            if (type == null) {
                 type = com.github.alittlehuang.data.query.specification.Expression.Function.NONE;
             }
 
@@ -326,7 +333,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression sum(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression sum(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
             if ( isFirstArgNotAttrExpression(args) ) {
                 //noinspection unchecked
@@ -338,7 +345,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression prod(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression prod(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
             if ( isFirstArgNotAttrExpression(args) ) {
                 //noinspection unchecked
@@ -350,7 +357,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression diff(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression diff(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
             if ( isFirstArgNotAttrExpression(args) ) {
                 //noinspection unchecked
@@ -362,7 +369,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression quot(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression quot(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
             if ( isFirstArgNotAttrExpression(args) ) {
                 //noinspection unchecked
@@ -375,7 +382,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression mod(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression mod(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
             if ( isFirstArgNotAttrExpression(args) ) {
                 //noinspection unchecked
@@ -387,7 +394,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression concat(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression concat(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
             if ( isFirstArgNotAttrExpression(args) ) {
                 //noinspection unchecked
@@ -426,9 +433,9 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression locate(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression locate(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
-            if ( args[0] instanceof AttributePath ) {
+            if (args[0] instanceof Expressions) {
                 //noinspection unchecked
                 result = cb.locate(exp, getExpression(cb, root, args));
             } else {
@@ -438,9 +445,9 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression coalesce(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression coalesce(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
-            if ( args[0] instanceof AttributePath ) {
+            if (args[0] instanceof Expressions) {
                 result = cb.coalesce(exp, getExpression(cb, root, args));
             } else {
                 result = cb.coalesce(exp, args[0]);
@@ -448,7 +455,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression nullif(CriteriaBuilder cb, Root<X> root, Expression exp, Object[] args) {
+        private Expression nullif(CriteriaBuilder cb, Root<T> root, Expression exp, Object[] args) {
             Expression result;
             if ( isFirstArgNotAttrExpression(args) ) {
                 //noinspection unchecked
@@ -459,7 +466,7 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private <X> Expression customize(com.github.alittlehuang.data.query.specification.Expression<X> expression, CriteriaBuilder cb, Expression exp, Object[] args) {
+        private Expression customize(com.github.alittlehuang.data.query.specification.Expression<T> expression, CriteriaBuilder cb, Expression exp, Object[] args) {
             Expression result;
             Expression[] expressions = new Expression[args.length + 1];
             int index = 0;
@@ -473,17 +480,17 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
             return result;
         }
 
-        private Expression getExpression(CriteriaBuilder cb, Root<?> root, Object[] args) {
-            //noinspection unchecked
-            return toExpression((com.github.alittlehuang.data.query.specification.Expression) args[0], cb, root);
+        private Expression getExpression(CriteriaBuilder cb, Root<T> root, Object[] args) {
+            //noinspection unchecked,rawtypes
+            return toExpression((Expressions) args[0], cb, root);
         }
 
         private boolean isFirstArgNotAttrExpression(Object[] args) {
-            return args == null || args.length == 0 || args[0] == null || !( args[0] instanceof com.github.alittlehuang.data.query.specification.Expression );
+            return args == null || args.length == 0 || args[0] == null || !(args[0] instanceof Expressions);
         }
 
         private <X> Path<?> toPath(Root<X> root, AttributePath<X> attribute) {
-            return JpaHelper.getPath(root, attribute.getNames(root.getJavaType()));
+            return JpaHelper.getPath(root, attribute.getNames());
         }
 
         public class SpecificationImpl {
@@ -555,9 +562,9 @@ public class JpaQueryStored<T, P> extends AbstractQueryStored<T, P> {
 
                     Object value = item.getParameter();
 
-                    if ( value instanceof com.github.alittlehuang.data.query.specification.Expression ) {
+                    if (value instanceof Expressions) {
                         //noinspection unchecked
-                        com.github.alittlehuang.data.query.specification.Expression<T> attr = (com.github.alittlehuang.data.query.specification.Expression<T>) value;
+                        Expressions<T, ?> attr = (Expressions<T, ?>) value;
                         toPredicateItem(expression, toExpression(attr, cb, root));
                     } else {
                         toPredicateItem(expression, value);

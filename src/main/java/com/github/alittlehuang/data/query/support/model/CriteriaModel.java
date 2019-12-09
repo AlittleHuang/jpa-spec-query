@@ -38,9 +38,9 @@ public class CriteriaModel<T> implements Criteria<T>, Serializable {
         CriteriaModel<T> result = new CriteriaModel<>(criteria.getWhereClause(), javaType);
 
         result.getSelections().addAll(SelectionModel.convertSelection(criteria.getSelections(), javaType));
-        result.getGroupings().addAll(ExpressionModel.convertExpression(criteria.getGroupings(), javaType));
-        result.getOrders().addAll(OrdersModel.convertOrders(criteria.getOrders(), javaType));
-        result.getFetchAttributes().addAll(FetchAttributeModel.convertFetch(criteria.getFetchAttributes(), javaType));
+        result.getGroupings().addAll(ExpressionModel.convertExpression(criteria.getGroupings()));
+        result.getOrders().addAll(OrdersModel.convertOrders(criteria.getOrders()));
+        result.getFetchAttributes().addAll(FetchAttributeModel.convertFetch(criteria.getFetchAttributes()));
         result.setOffset(criteria.getOffset());
         result.setMaxResults(criteria.getMaxResults());
         result.setLockModeType(criteria.getLockModeType());

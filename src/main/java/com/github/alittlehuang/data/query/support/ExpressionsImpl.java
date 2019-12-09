@@ -2,46 +2,54 @@ package com.github.alittlehuang.data.query.support;
 
 import com.github.alittlehuang.data.query.specification.Expression;
 import com.github.alittlehuang.data.query.specification.Expressions;
-import com.github.alittlehuang.data.query.support.model.ExpressionModel;
+import com.github.alittlehuang.data.query.support.model.*;
 
 /**
  * @author ALittleHuang
  */
 public class ExpressionsImpl<T, R> implements Expressions<T, R> {
 
-    private Expression<T> expressions;
+    private Expressions<T, ?> expressions;
 
-    private Expression.Function type = Function.NONE;
+    private Expression.Function function = Expression.Function.NONE;
 
     private Object[] args = Expression.EMPTY_ARGS;
 
     private String functionName;
 
-    public ExpressionsImpl(Expressions<T, ?> expressions, Expression.Function type, Object... args) {
+    public ExpressionsImpl(Expressions<T, ?> expressions, Expression.Function function, Object... args) {
         this.expressions = expressions;
-        this.type = type;
+        this.function = function;
         this.args = args;
     }
 
     public ExpressionsImpl(String function, Expressions<T, ?> expressions, Expression.Function type, Object... args) {
         this.expressions = expressions;
-        this.type = type;
+        this.function = type;
         this.args = args;
         functionName = function;
     }
 
     public ExpressionsImpl(String path) {
-        ExpressionModel<T> expressions = new ExpressionModel<>();
-        expressions.setNames(path.split("\\."));
-        this.expressions = expressions;
+        String[] names = path.split("\\.");
+        this.expressions = new Expressions<T, Object>() {
+
+            @Override
+            public Object apply(T t) {
+                return null;
+            }
+
+            @Override
+            public String[] getNames(Class<? extends T> type) {
+                return names;
+            }
+        };
     }
 
-    @Override
     public Expression.Function getFunction() {
-        return type;
+        return function;
     }
 
-    @Override
     public Object[] getArgs() {
         return args;
     }
@@ -62,17 +70,40 @@ public class ExpressionsImpl<T, R> implements Expressions<T, R> {
     }
 
     @Override
-    public Expression<T> getSubexpression() {
-        return expressions;
+    public AttributePathModel<T> toAttributePathModel(Class<T> javaType) {
+        return new AttributePathModel<>(getNames(javaType));
     }
 
     @Override
-    public String getFunctionName() {
-        return functionName;
+    public ExpressionModel<T> toExpressionModel(Class<T> javaType) {
+        ExpressionModel<T> result = new ExpressionModel<>(getNames(javaType));
+        result.setFunction(function);
+        result.setFunctionName(functionName);
+        result.setArgs(args);
+        return result;
     }
 
     @Override
-    public String toString() {
-        return expressions.toString();
+    public FetchAttributeModel<T> toFetchAttributeModel(Class<T> javaType) {
+        return new FetchAttributeModel<>(getNames(javaType));
     }
+
+    @Override
+    public OrdersModel<T> toOrdersModel(Class<T> javaType) {
+        OrdersModel<T> result = new OrdersModel<>(getNames(javaType));
+        result.setFunction(function);
+        result.setFunctionName(functionName);
+        result.setArgs(args);
+        return result;
+    }
+
+    @Override
+    public SelectionModel<T> toSelectionModel(Class<T> javaType) {
+        SelectionModel<T> result = new SelectionModel<>(getNames(javaType));
+        result.setFunction(function);
+        result.setFunctionName(functionName);
+        result.setArgs(args);
+        return result;
+    }
+
 }

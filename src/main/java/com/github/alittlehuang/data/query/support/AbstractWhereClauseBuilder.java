@@ -1,6 +1,7 @@
 package com.github.alittlehuang.data.query.support;
 
 import com.github.alittlehuang.data.query.specification.*;
+import com.github.alittlehuang.data.query.support.model.ExpressionModel;
 import com.github.alittlehuang.data.query.support.model.WhereClauseModel;
 import lombok.experimental.Delegate;
 
@@ -40,7 +41,7 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
 
     private AbstractWhereClauseBuilder<T, THIS> sub(Expression<T> expression) {
         //noinspection unchecked
-        return (AbstractWhereClauseBuilder) createSubItem(expression);
+        return (AbstractWhereClauseBuilder<T, THIS>) createSubItem(expression);
     }
 
     private THIS add(Expression<T> expression,
@@ -62,7 +63,8 @@ public abstract class AbstractWhereClauseBuilder<T, THIS extends WhereClauseBuil
                      Predicate.BooleanOperator booleanOperator,
                      boolean negate,
                      ConditionalOperator conditionalOperator) {
-        return add((Expression<T>) expression, value, booleanOperator, negate, conditionalOperator);
+        ExpressionModel<T> model = expression.toExpressionModel(getJavaType());
+        return add(model, value, booleanOperator, negate, conditionalOperator);
     }
 
     private THIS add(String expression,

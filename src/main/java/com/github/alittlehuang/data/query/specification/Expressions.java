@@ -1,6 +1,7 @@
 package com.github.alittlehuang.data.query.specification;
 
 import com.github.alittlehuang.data.query.support.ExpressionsImpl;
+import com.github.alittlehuang.data.query.support.model.*;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import java.util.ArrayList;
@@ -8,9 +9,9 @@ import java.util.Collections;
 import java.util.List;
 
 @FunctionalInterface
-public interface Expressions<T, R> extends Selection<T>, Expression<T> {
+public interface Expressions<T, R> {
 
-    @SuppressWarnings( "UnusedReturnValue" )
+    @SuppressWarnings("UnusedReturnValue")
     R apply(T t);
 
     static <T, R> Expressions<T, R> of(Expressions<? extends T, ? extends R> expression) {
@@ -52,12 +53,26 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
         return Collections.singletonList(this);
     }
 
-//    @Override
-//    default String[] getNames() {
-//        return GetterMethodUtil.getAttrNames(null, this);
-//    }
+    default AttributePathModel<T> toAttributePathModel(Class<T> javaType) {
+        return new AttributePathModel<>(getNames(javaType));
+    }
 
-    @Override
+    default ExpressionModel<T> toExpressionModel(Class<T> javaType) {
+        return new ExpressionModel<>(getNames(javaType));
+    }
+
+    default OrdersModel<T> toOrdersModel(Class<T> javaType) {
+        return new OrdersModel<>(getNames(javaType));
+    }
+
+    default FetchAttributeModel<T> toFetchAttributeModel(Class<T> javaType) {
+        return new FetchAttributeModel<>(getNames(javaType));
+    }
+
+    default SelectionModel<T> toSelectionModel(Class<T> javaType) {
+        return new SelectionModel<>(getNames(javaType));
+    }
+
     default String[] getNames(Class<? extends T> type) {
         return GetterMethodUtil.getAttrNames(type, this);
     }
@@ -66,86 +81,86 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * absolute value
      */
     static <T, R extends Number> Expressions<T, R> abs(Expressions<T, R> expression) {
-        return new ExpressionsImpl<>(expression, Function.ABS);
+        return new ExpressionsImpl<>(expression, Expression.Function.ABS);
     }
 
     static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new ExpressionsImpl<>(expression, Function.SUM, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.SUM, other);
     }
 
     static <T, R extends Number> Expressions<T, R> sum(Expressions<T, R> expression, Number val) {
-        return new ExpressionsImpl<>(expression, Function.SUM, val);
+        return new ExpressionsImpl<>(expression, Expression.Function.SUM, val);
     }
 
     /**
      * product
      */
     static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new ExpressionsImpl<>(expression, Function.PROD, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.PROD, other);
     }
 
     /**
      * product
      */
     static <T, R extends Number> Expressions<T, R> prod(Expressions<T, R> expression, Number val) {
-        return new ExpressionsImpl<>(expression, Function.PROD, val);
+        return new ExpressionsImpl<>(expression, Expression.Function.PROD, val);
     }
 
     /**
      * difference
      */
     static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new ExpressionsImpl<>(expression, Function.DIFF, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.DIFF, other);
     }
 
     /**
      * difference
      */
     static <T, R extends Number> Expressions<T, R> diff(Expressions<T, R> expression, Number val) {
-        return new ExpressionsImpl<>(expression, Function.DIFF, val);
+        return new ExpressionsImpl<>(expression, Expression.Function.DIFF, val);
     }
 
     /**
      * quotient
      */
     static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Number val) {
-        return new ExpressionsImpl<>(expression, Function.QUOT, val);
+        return new ExpressionsImpl<>(expression, Expression.Function.QUOT, val);
     }
 
     /**
      * quotient
      */
     static <T, R extends Number> Expressions<T, R> quot(Expressions<T, R> expression, Expressions<T, R> other) {
-        return new ExpressionsImpl<>(expression, Function.QUOT, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.QUOT, other);
     }
 
     /**
      * mod
      */
     static <T> Expressions<T, Integer> mod(Expressions<T, Integer> expression, Expressions<T, Integer> other) {
-        return new ExpressionsImpl<>(expression, Function.MOD, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.MOD, other);
     }
 
     /**
      * mod
      */
     static <T> Expressions<T, Integer> mod(Expressions<T, Integer> expression, Integer other) {
-        return new ExpressionsImpl<>(expression, Function.MOD, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.MOD, other);
     }
 
     /**
      * sqrt
      */
     static <T, R extends Number> Expressions<T, R> sqrt(Expressions<T, R> expression) {
-        return new ExpressionsImpl<>(expression, Function.SQRT);
+        return new ExpressionsImpl<>(expression, Expression.Function.SQRT);
     }
 
     static <T> Expressions<T, String> concat(Expressions<T, String> expression, Expressions<T, String> other) {
-        return new ExpressionsImpl<>(expression, Function.CONCAT, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.CONCAT, other);
     }
 
     static <T> Expressions<T, String> concat(Expressions<T, String> expression, String other) {
-        return new ExpressionsImpl<>(expression, Function.CONCAT, other);
+        return new ExpressionsImpl<>(expression, Expression.Function.CONCAT, other);
     }
 
     /**
@@ -155,7 +170,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * First position is 1.
      */
     static <T> Expressions<T, String> substring(Expressions<T, String> expression, int from, int length) {
-        return new ExpressionsImpl<>(expression, Function.SUBSTRING, from, length);
+        return new ExpressionsImpl<>(expression, Expression.Function.SUBSTRING, from, length);
     }
 
 
@@ -166,7 +181,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * First position is 1.
      */
     static <T> Expressions<T, String> substring(Expressions<T, String> expression, int from) {
-        return new ExpressionsImpl<>(expression, Function.SUBSTRING, from);
+        return new ExpressionsImpl<>(expression, Expression.Function.SUBSTRING, from);
     }
 
     /**
@@ -174,21 +189,21 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * a string.
      */
     static <T> Expressions<T, String> trim(Expressions<T, String> expression) {
-        return new ExpressionsImpl<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.BOTH);
+        return new ExpressionsImpl<>(expression, Expression.Function.TRIM, CriteriaBuilder.Trimspec.BOTH);
     }
 
     /**
      * Trim from leading end
      */
     static <T> Expressions<T, String> trimLeading(Expressions<T, String> expression) {
-        return new ExpressionsImpl<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.LEADING);
+        return new ExpressionsImpl<>(expression, Expression.Function.TRIM, CriteriaBuilder.Trimspec.LEADING);
     }
 
     /**
      * Trim from trailing end.
      */
     static <T> Expressions<T, String> trimTrailing(Expressions<T, String> expression) {
-        return new ExpressionsImpl<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.TRAILING);
+        return new ExpressionsImpl<>(expression, Expression.Function.TRIM, CriteriaBuilder.Trimspec.TRAILING);
     }
 
 
@@ -197,33 +212,33 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * a string.
      */
     static <T> Expressions<T, String> trim(Expressions<T, String> expression, char beTrimmed) {
-        return new ExpressionsImpl<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.BOTH, beTrimmed);
+        return new ExpressionsImpl<>(expression, Expression.Function.TRIM, CriteriaBuilder.Trimspec.BOTH, beTrimmed);
     }
 
     /**
      * Trim from leading end
      */
     static <T> Expressions<T, String> trimLeading(Expressions<T, String> expression, char beTrimmed) {
-        return new ExpressionsImpl<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.LEADING, beTrimmed);
+        return new ExpressionsImpl<>(expression, Expression.Function.TRIM, CriteriaBuilder.Trimspec.LEADING, beTrimmed);
     }
 
     /**
      * Trim from trailing end.
      */
     static <T> Expressions<T, String> trimTrailing(Expressions<T, String> expression, char beTrimmed) {
-        return new ExpressionsImpl<>(expression, Function.TRIM, CriteriaBuilder.Trimspec.TRAILING, beTrimmed);
+        return new ExpressionsImpl<>(expression, Expression.Function.TRIM, CriteriaBuilder.Trimspec.TRAILING, beTrimmed);
     }
 
     static <T> Expressions<T, String> lower(Expressions<T, String> expression) {
-        return new ExpressionsImpl<>(expression, Function.LOWER);
+        return new ExpressionsImpl<>(expression, Expression.Function.LOWER);
     }
 
     static <T> Expressions<T, String> upper(Expressions<T, String> expression) {
-        return new ExpressionsImpl<>(expression, Function.UPPER);
+        return new ExpressionsImpl<>(expression, Expression.Function.UPPER);
     }
 
     static <T> Expressions<T, Integer> length(Expressions<T, String> expression) {
-        return new ExpressionsImpl<>(expression, Function.LENGTH);
+        return new ExpressionsImpl<>(expression, Expression.Function.LENGTH);
     }
 
     /**
@@ -234,7 +249,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * string to be located is not found, 0 is returned.
      */
     static <T> Expressions<T, Integer> locate(Expressions<T, String> expression, String pattern) {
-        return new ExpressionsImpl<>(expression, Function.LOCATE, pattern);
+        return new ExpressionsImpl<>(expression, Expression.Function.LOCATE, pattern);
     }
 
     /**
@@ -245,7 +260,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * string to be located is not found, 0 is returned.
      */
     static <T> Expressions<T, Integer> locate(Expressions<T, String> expression, Expressions<T, String> pattern) {
-        return new ExpressionsImpl<>(expression, Function.LOCATE, pattern);
+        return new ExpressionsImpl<>(expression, Expression.Function.LOCATE, pattern);
     }
 
     /**
@@ -253,7 +268,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * and the value of the first non-null argument otherwise.
      */
     static <X, Y,E extends Expressions<X, ? super Y>> Expressions<X, Y> coalesceVal(E expression, Y y) {
-        return new ExpressionsImpl<>(expression, Function.COALESCE, y);
+        return new ExpressionsImpl<>(expression, Expression.Function.COALESCE, y);
     }
 
     /**
@@ -261,7 +276,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * and the value of the first non-null argument otherwise.
      */
     static <X, Y, E extends Expressions<X, ? extends Y>> Expressions<X, Y> coalesce(E expression, E y) {
-        return new ExpressionsImpl<>(expression, Function.COALESCE, y);
+        return new ExpressionsImpl<>(expression, Expression.Function.COALESCE, y);
     }
 
     /**
@@ -270,7 +285,7 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * first expression if they are not.
      */
     static <T, Y, E extends Expressions<T, ? super Y>> Expressions<T, Y> nullifVal(E expression, Y val) {
-        return new ExpressionsImpl<>(expression, Function.NULLIF, val);
+        return new ExpressionsImpl<>(expression, Expression.Function.NULLIF, val);
     }
 
     /**
@@ -279,11 +294,11 @@ public interface Expressions<T, R> extends Selection<T>, Expression<T> {
      * first expression if they are not.
      */
     static <T, Y, E extends Expressions<T, ? extends Y>> Expressions<T, Y> nullif(E expression, E val) {
-        return new ExpressionsImpl<>(expression, Function.NULLIF, val);
+        return new ExpressionsImpl<>(expression, Expression.Function.NULLIF, val);
     }
 
     static <T, Y> Expressions<T, Y> function(String function, Expressions<T, ?> expression, Object... val) {
-        return new ExpressionsImpl<>(function, expression, Function.CUSTOMIZE, val);
+        return new ExpressionsImpl<>(function, expression, Expression.Function.CUSTOMIZE, val);
     }
 
 }

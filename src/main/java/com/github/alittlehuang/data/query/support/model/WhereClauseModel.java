@@ -40,7 +40,7 @@ public class WhereClauseModel<T> implements WhereClause<T>, Serializable {
         if (expression == null || expression.getClass() == ExpressionModel.class) {
             this.expression = (ExpressionModel<T>) expression;
         } else {
-            this.expression = new ExpressionModel<>(expression, javaType);
+            this.expression = new ExpressionModel<>(expression);
         }
         if (expression == null) {
             compound = true;
@@ -61,7 +61,7 @@ public class WhereClauseModel<T> implements WhereClause<T>, Serializable {
     public WhereClauseModel(WhereClause<T> whereClause, Class<T> javaType) {
 
         this.javaType = javaType;
-        this.expression = new ExpressionModel<>(whereClause.getExpression(), javaType);
+        this.expression = new ExpressionModel<>(whereClause.getExpression());
         this.compound = whereClause.isCompound();
         this.parameter = whereClause.getParameter();
         this.booleanOperator = whereClause.getBooleanOperator();

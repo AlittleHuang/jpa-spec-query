@@ -13,12 +13,16 @@ public class AttributePathModel<T> implements AttributePath<T>, Serializable {
     public AttributePathModel() {
     }
 
-    public AttributePathModel(AttributePath<T> expression, Class<? extends T> javaType) {
-        names = expression.getNames(javaType);
+    public AttributePathModel(String[] names) {
+        this.names = names;
+    }
+
+    public AttributePathModel(AttributePath<T> expression) {
+        names = expression.getNames();
     }
 
     @Override
-    public String[] getNames(Class<? extends T> type) {
+    public String[] getNames() {
         return names;
     }
 

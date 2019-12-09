@@ -5,8 +5,8 @@ package com.github.alittlehuang.data.query.specification;
  */
 public interface AttributePath<T> {
 
-//    String[] getNames();
+    String[] getNames();
 
-    String[] getNames(Class<? extends T> type);
+//    String[] getNames(Class<? extends T> type);
 
 }

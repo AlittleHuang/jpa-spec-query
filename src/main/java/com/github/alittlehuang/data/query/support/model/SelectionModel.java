@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SelectionModel<T> extends ExpressionModel<T> implements Selection<T>, Serializable {
-    protected AggregateFunctions aggregateFunctions;
+    protected AggregateFunctions aggregateFunctions = AggregateFunctions.NONE;
 
     public SelectionModel() {
     }
@@ -22,8 +22,12 @@ public class SelectionModel<T> extends ExpressionModel<T> implements Selection<T
         this.aggregateFunctions = aggregateFunctions;
     }
 
+    public SelectionModel(String[] names) {
+        super(names);
+    }
+
     public SelectionModel(Selection<T> selectionModel, Class<? extends T> javaType) {
-        super(selectionModel, javaType);
+        super(selectionModel);
         this.aggregateFunctions = selectionModel.getAggregateFunctions();
     }
 
