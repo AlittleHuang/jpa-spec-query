@@ -390,9 +390,9 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     protected void appendSqlParameter(Object parameter) {
-        if (parameter instanceof Expression) {
+        if (parameter instanceof Expressions) {
             //noinspection unchecked
-            appendExpression((Expression<T>) parameter);
+            appendExpression(((Expressions<T, ?>) parameter).toExpressionModel(criteria.getJavaType()));
         } else if (parameter instanceof Iterable) {
             boolean first = true;
             for (Object arg : ((Iterable<?>) parameter)) {
@@ -566,9 +566,9 @@ public abstract class AbstractSqlBuilder<T> implements QuerySqlBuilderFactory.Sq
     }
 
     protected void appendFunArgs(Object arg) {
-        if (arg instanceof Expression) {
+        if (arg instanceof Expressions) {
             //noinspection unchecked
-            Expression<T> ex = (Expression<T>) arg;
+            Expression<T> ex = ((Expressions<T, ?>) arg).toExpressionModel(criteria.getJavaType());
             boolean lowPriority = ex.getFunction() == Expression.Function.SUM
                     || ex.getFunction() == Expression.Function.DIFF;
             if (lowPriority) {
